@@ -26,6 +26,8 @@ function setupCalibrationsContent(){
       //dropArea.addEventListener('dragover', handlerFunction, false)
       dropArea.addEventListener('drop', handleDrop, false)
 
+      // Populate the Config table on initial load
+      refreshConfigCalibrationsContent();
 }
 
 function refreshConfigCalibrationsContent(){
