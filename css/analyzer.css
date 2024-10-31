@@ -270,3 +270,20 @@ div.headerContent{
             user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome, Edge, Opera and Firefox */
 }
+
+
+#drop-area {
+  border: 4px dashed #ccc;
+  border-color: #FA8072; /* Salmon pink */
+  border-radius: 20px;
+  width: 480px;
+  font-family: sans-serif;
+  margin: 100px auto;
+  padding: 10px;
+}
+#drop-area.highlight {
+  border-color: #DAA520; /* goldenrod*/
+}
+#fileElem {
+  display: none;
+}

@@ -55,6 +55,7 @@ function setupDataStore(){
     dataStore.midasRunList = {};                               // place to store the list of midas runs available to sort which is provided by the server
     dataStore.midasTableLastRowClicked = 1;                    // place to remember the last row number clicked with a single mouse click
     dataStore.CalibrationSource = 'midas';                     // selection the source of calibrations to be applied in the submitted sort job (either midas or config)
+    dataStore.CalibrationURLs = [];                     // Array of URLs containing the latest calibration coefficients to communicate to the analyzer
 
 
     dataStore.SortStatusRequestLock = false;                   // A request lock to prevent new requests if a request is still pending. true = block new requests, false = allow new request
@@ -190,7 +191,7 @@ function onloadInitialSetup(){
 
                // Do the work of getConfigFileFromServer() but with a resolved promise
                // get the Global conditions, Gates conditions and Histogram definitions from the server/ODB
-               url = dataStore.spectrumServer + '/?cmd=viewConfig';
+               let url = dataStore.spectrumServer + '/?cmd=viewConfig';
                resolve(promiseXHR(url, "Problem getting Config file from analyzer server", processConfigFile, function(error){ErrorConnectingToAnalyzerServer(error)}));
 
        		   }
@@ -238,12 +239,13 @@ function setupEventListeners(){
 	///////////////////////////
 	//handle templates
 	///////////////////////////
-	    dataStore.templates = prepareTemplates(['header', 'analyzer-menu', 'analyzer-sorting', 'analyzer-histograms', 'analyzer-viewer', 'globalBlock', 'gateBlock', 'histogramBlock', 'histogramConditionRow', 'gateConditionRow', 'plotList', 'plotGrid', 'plotControl', 'auxPlotControl', 'auxPlotControlTable', 'fitRow', 'footer']);
+	    dataStore.templates = prepareTemplates(['header', 'analyzer-menu', 'analyzer-sorting', 'analyzer-histograms', 'analyzer-calibrations', 'analyzer-viewer', 'globalBlock', 'gateBlock', 'histogramBlock', 'histogramConditionRow', 'gateConditionRow', 'plotList', 'plotGrid', 'plotControl', 'auxPlotControl', 'auxPlotControlTable', 'fitRow', 'footer']);
 
       setupHeader('head', 'Analyzer Interface');
 	    setupAnalyzerMenu('menu');
 	    setupAnalyzerSorting('AnalyzerDisplaySorting');
 	    setupAnalyzerHistograms('AnalyzerDisplayHistograms');
+	    setupAnalyzerCalibrations('AnalyzerDisplayCalibrations');
 	    setupAnalyzerViewer('AnalyzerDisplayViewer');
 	    setupFooter('foot');
 

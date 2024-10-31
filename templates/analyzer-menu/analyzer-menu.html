@@ -7,8 +7,8 @@
 <script>
 
         // Variables for menu buttons
-        var buttonNames = ["Sorting Control", "Histogram & Gate Definitions", "Spectrum Viewer & Analysis"];
-        var buttonIDs = ["SortingButton", "HistogramsButton", "ViewerButton"];
+        var buttonNames = ["Sorting Control", "Histogram & Gate Definitions", "Calibrations", "Spectrum Viewer & Analysis"];
+        var buttonIDs = ["SortingButton", "HistogramsButton", "CalibrationsButton", "ViewerButton"];
 
 
 function menuButtonClick(thisID){
@@ -24,10 +24,12 @@ function menuButtonClick(thisID){
     // Hide all pages
     document.getElementById('AnalyzerDisplaySorting').classList.add('hidden');
     document.getElementById('AnalyzerDisplayHistograms').classList.add('hidden');
+    document.getElementById('AnalyzerDisplayCalibrations').classList.add('hidden');
     document.getElementById('AnalyzerDisplayViewer').classList.add('hidden');
 
     if(thisID == "SortingButton"){ document.getElementById('AnalyzerDisplaySorting').classList.remove('hidden');       }
     if(thisID == "HistogramsButton"){ document.getElementById('AnalyzerDisplayHistograms').classList.remove('hidden'); }
+    if(thisID == "CalibrationsButton"){ document.getElementById('AnalyzerDisplayCalibrations').classList.remove('hidden'); }
     if(thisID == "ViewerButton"){     document.getElementById('AnalyzerDisplayViewer').classList.remove('hidden'); }
 }
 
@@ -39,9 +41,9 @@ function injectMenuButtons(){
 
         // Create menu buttons
     for(i=0; i<buttonNames.length; i++){
-                newButton = document.createElement('button'); 
-                newButton.setAttribute('id', buttonIDs[i]); 
-                newButton.setAttribute('class', 'btn btn-default btn-lg'); 
+                newButton = document.createElement('button');
+                newButton.setAttribute('id', buttonIDs[i]);
+                newButton.setAttribute('class', 'btn btn-default btn-lg');
                 newButton.innerHTML = buttonNames[i];
                 newButton.style.padding = '4px';
                 newButton.onclick = function(){
