@@ -4,26 +4,59 @@
 
 	<div class='section-wrapper'>
 		<div class='col-md-12 pan' id='Calibrations-Calibrations'>
-			<h2>Calibrations</h2>
 			<div id='Calibrations'>
 
 				<div id="CalibrationsContainerDiv">
 
-					      <div class='col-md-12'>
-					        <div id='drop-area'>
-					            <form class="my-form">
-					              <p>Upload a Cal file by dragging and dropping the file onto the dashed region or click the button</p>
-					              <input type="file" id="fileElem" accept="Cal/*" onchange="handleDropFiles(this.files)">
-					              <label class="btn btn-info" for="fileElem">Upload Cal file</label>
-					            </form>
-					        </div>
-									<div id='submitDivCal' class='col-md-6'></div><div id='submitDivCalReport' class='col-md-6'></div>
-					      </div>
+					<div class='col-md-12'>
 
-					          <div class='col-md-12'>
-					            <div id='calFileContentsTitleDiv' class='col-md-12'></div>
-						            <div id='calFileContentsDiv' class='col-md-6'></div>
-					          </div>
+							<div class='col-md-6'>
+								<h3>Calibration schemes in grif-replay</h3>
+<h4>Option 1: Values from MIDAS file ODB (Default)</h4>
+The gain coefficients are taken from the version of the MIDAS Online DataBase (ODB) which is saved into the specific MIDAS file (.mid) at the start of data collection.
+<h4>Option 2: Values from Current Config file</h4>
+Gain coefficients can be loaded to grif-replay via the GainMatcher or this page and are stored in a current config file. These coefficients will be applied during data sorting to all files.
+<h4>Option 3: Values from run-specific Config files (Not yet implemented!!!)</h4>
+The gain coefficients are taken from a Config file that is saved in the MIDAS Data File Directory (json format). The Config file used for each run is the one with the filename containing the highest run number that is lower than or equal to the run being sorted. For example, if there are Config files named run500.json, run502.json and run505.json, then the following will be used when sorting runs run500 to run510.<br>
+run500.mid will have coefficients from run500.config applied.<br>
+run501.mid will have coefficients from run500.config applied.<br>
+run502.mid will have coefficients from run502.config applied.<br>
+run503.mid will have coefficients from run502.config applied.<br>
+run504.mid will have coefficients from run502.config applied.<br>
+run505.mid will have coefficients from run505.config applied.<br>
+run506.mid will have coefficients from run505.config applied.<br>
+run507.mid will have coefficients from run505.config applied.<br>
+run508.mid will have coefficients from run505.config applied.<br>
+run509.mid will have coefficients from run505.config applied.<br>
+run510.mid will have coefficients from run505.config applied.<br>
+								</div>
+
+												<div class='col-md-6'>
+													<div id='drop-area' class='col-md-6'>
+														<form class="my-form">
+															<p>Upload a Cal file by dragging and dropping the file onto the dashed region or click the button</p>
+															<input type="file" id="fileElem" accept="Cal/*" onchange="handleDropFiles(this.files)">
+															<label class="btn btn-info" for="fileElem">Upload Cal file</label>
+														</form>
+													</div>
+
+													<div id='submitDivCal' class='col-md-6'></div><div id='submitDivCalReport' class='col-md-6'></div>
+												</div>
+					</div>
+
+					<div class='col-md-12'>
+						<div class='col-md-6'>
+						<div id='currentConfigCalibrationsTitleDiv' class='col-md-12'></div>
+							<div id='currentConfigCalibrationsTableDiv' class='col-md-12'></div>
+						</div>
+
+						<div class='col-md-6'>
+							<div id='calFileContentsTitleDiv' class='col-md-12'></div>
+							<div id='calFileContentsDiv' class='col-md-12'></div>
+						</div>
+
+					</div>
+
 				</div>
 			</div>
 		</div>
@@ -41,7 +74,7 @@
 				newButton = document.createElement('button');
 				newButton.setAttribute('id', 'submitCalibrationsButton');
 				newButton.setAttribute('class', 'btn btn-default btn-lg hidden');
-				newButton.innerHTML = "Write calibration to Analyzer";
+				newButton.innerHTML = "Save as Current Config";
 				newButton.style.padding = '4px';
 				newButton.onclick = function(){
 				sendCalibrationsToAnalyzer();
@@ -50,6 +83,7 @@
 
     // set up event listeners
     listener(wrapperID, 'requestCalibrationsRefresh', setupCalibrationsContent);
+    listener(wrapperID, 'requestConfigCalibrationsRefresh', refreshConfigCalibrationsContent);
 
     // Set up the content of this sub page
     setupCalibrationsContent();

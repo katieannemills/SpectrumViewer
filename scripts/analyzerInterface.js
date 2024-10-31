@@ -83,7 +83,7 @@ function setupDataStore(){
   //  dataStore.configFileDataDirectoryPath = "/home/grifstor/daq/analyzer/grif-replay";                                 // [added in processConfigFile()] initial config file directory path
     dataStore.configFileDataDirectoryPath = '';                                 // [added in processConfigFile()] initial config file directory path
     dataStore.configFileTimestamp = 0;               // Timestamp recorded at the most recent request for the config file (viewConfig)
-    dataStore.Configs = {};                          // plase to park Config file information
+    dataStore.Configs = {};                          // place to park Config file information
     dataStore.globalCondition = {                   // place to park Global condition info on the dataStore
         "globalIndex" : 0,               // monotonically increasing counter to create unique IDs for new Glabal condition blocks
 	"contents" : []             // array of structures holding the variables and values for each Global condition
@@ -99,6 +99,7 @@ function setupDataStore(){
         "nRows" : [],            // array of monotonic counters for number of rows inserted into Histogram condition block; Histogram block # == array index.
         "contents" : []            // place to save Histogram definition parameters
     };
+    dataStore.currentCalibrations = [];     // place to save the current Calibrations from the Config file
     dataStore.uniqueGlobalName = '';        // place to save the unique global name entered in the modal
     dataStore.uniqueGateName = '';          // place to save the unique gate namne entered in the modal
     dataStore.uniqueHistogramName = '';     // place to save the unique histogram namne entered in the modal
@@ -253,7 +254,7 @@ function setupEventListeners(){
 	    updateTime();
 
 	    // Launch the heartbeat for regularly grabbing the sort status
-	    console.log('initiateSortStatusHeartbeat');
+	    //console.log('initiateSortStatusHeartbeat');
 	    initiateSortStatusHeartbeat();
 
 	});
@@ -313,8 +314,11 @@ function processSortStatus(payload){
     // Set the progress bar to orange and write a status message
     if(strncmp(payload,'ONLINE',6)){
 
+    // Save the timestamp of the most recent config file saved on the server
+    dataStore.configServerTimestamp = payload.split(' ')[2];
+
 	// Check the timestamp of the most recent config file saved on the server
-	checkConfigTimestamps(payload.split(' ')[2]);
+	checkConfigTimestamps(dataStore.configServerTimestamp);
 
 	// Set the heartbeat frequency
 	dataStore.heartbeatInterval = dataStore.heartbeatIntervalIDLEvalue;
@@ -492,9 +496,9 @@ function checkConfigTimestamps(serverTimestamp){
 
     // Compare this lastest Config timestamp received from the sever with the timestamp saved the last time we received a Config file
     // If our local version is out-of-date then request the lastest version from the server
-    console.log(serverTimestamp);
+  //  console.log(serverTimestamp);
     if(serverTimestamp > dataStore.configFileTimestamp){
-    console.log('Fetch config because server '+serverTimestamp+' > '+dataStore.configFileTimestamp);
+  //  console.log('Fetch config because server '+serverTimestamp+' > '+dataStore.configFileTimestamp);
 	  getConfigFileFromServer();
     }
 }

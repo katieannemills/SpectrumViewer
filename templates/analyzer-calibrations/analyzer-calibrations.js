@@ -5,7 +5,7 @@
 function setupCalibrationsContent(){
     // function to refresh the content of the Calibrations subpage
     // Called when there is new content available
-    console.log('setupCalibrationsContent');
+    //console.log('setupCalibrationsContent');
 
     // Set up event listeners for the drop area
     let dropArea = document.getElementById('drop-area');
@@ -26,7 +26,24 @@ function setupCalibrationsContent(){
       //dropArea.addEventListener('dragover', handlerFunction, false)
       dropArea.addEventListener('drop', handleDrop, false)
 
+}
 
+function refreshConfigCalibrationsContent(){
+//console.log(dataStore.currentCalibrations);
+
+// Set the title for the current config
+thisTimestamp = new Date(dataStore.configFileTimestamp * 1000);
+document.getElementById('currentConfigCalibrationsTitleDiv').innerHTML = "<h3>Current Config file</h3>"+
+    "<br>Fetched "+thisTimestamp.toString();
+  // Clear the report Div
+document.getElementById('currentConfigCalibrationsTableDiv').innerHTML = "";
+
+let outputString = "";
+for(let i=0; i<dataStore.currentCalibrations.length; i++)
+outputString += dataStore.currentCalibrations[i].name+': '+ dataStore.currentCalibrations[i].quad+','
+                + dataStore.currentCalibrations[i].gain+','+ dataStore.currentCalibrations[i].offset + "<br>";
+
+document.getElementById('currentConfigCalibrationsTableDiv').innerHTML = outputString;
 }
 
 
@@ -64,7 +81,7 @@ function handleDropFiles(files) {
 function sendCalibrationsToAnalyzer(){
 
     //send requests
-    for(i=0; i<dataStore.CalibrationURLs.length; i++){
+    for(let i=0; i<dataStore.CalibrationURLs.length; i++){
       XHR(dataStore.CalibrationURLs[i], 'An error occured.',
       function(){ document.getElementById('submitDivCalReport').innerHTML = "This calibration has been uploaded to the Analyzer. It is now the Current Config file."; return 0},
       function(error){console.log(error); document.getElementById('submitDivCalReport').innerHTML = "An error occured.";} );
@@ -78,7 +95,8 @@ function processDropFile(file){
 document.getElementById('submitDivCalReport').innerHTML = "";
 
 // Set the title
-document.getElementById('calFileContentsTitleDiv').innerHTML = "Contents of Cal file, \""+file.name+"\", "+(file.size/1000).toFixed(1)+" kB, last modified "+file.lastModifiedDate;
+document.getElementById('calFileContentsTitleDiv').innerHTML = "<h3>Contents of Cal file</h3><br>\""+file.name+"\"";
+          //    +"", "+(file.size/1000).toFixed(1)+" kB,<br>last modified "+file.lastModifiedDate+"<br>";
 
   let fr = new FileReader();
 
@@ -127,9 +145,13 @@ document.getElementById('calFileContentsTitleDiv').innerHTML = "Contents of Cal 
     //  console.log(thisName+': '+ thisQuad+','+ thisGain+','+ thisOffset);
       outputString += thisName+': '+ thisQuad+','+ thisGain+','+ thisOffset + "<br>";
       // Build URL here
+      // Dont allow NaN to be sent to the server
+      if(isNaN(thisQuad)){ thisQuad = 0.0; }
+      if(isNaN(thisGain)){ thisGain = 1.0; }
+      if(isNaN(thisOffset)){ thisOffset = 0.0; }
       dataStore.CalibrationURLs[num] += '&channelName'+ctr+'='+thisName+'&quad'+ctr+'='+thisQuad+'&gain'+ctr+'='+thisGain+'&offset'+ctr+'='+thisOffset;
       ctr++;
-      if(ctr%16==0){ // new URL every 16 entries
+      if(ctr%12==0){ // new URL every 12 entries
         num++; ctr=0;
         dataStore.CalibrationURLs[num] = spectrumServer + '?cmd=setCalibration';
       }

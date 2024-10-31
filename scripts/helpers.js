@@ -624,7 +624,7 @@ function processConfigFile(payload){
 
   // Record the timestamp of when this config file is received
   dataStore.configFileTimestamp = Math.floor(Date.now() / 1000);
-  console.log('Save timestamp as '+dataStore.configFileTimestamp);
+  //console.log('Save timestamp as '+dataStore.configFileTimestamp);
 
   // Reset the dataStore of any old definitions
   dataStore.sortCodeVariables = [];
@@ -667,10 +667,14 @@ function processConfigFile(payload){
 
   // Unpack the Calibrations content here
   //dataStore.Configs.Analyzer[4].Calibrations
+  dataStore.currentCalibrations = [];
+  for(var i=0; i<dataStore.Configs.Analyzer[4].Calibrations.length; i++){
+    dataStore.currentCalibrations.push(dataStore.Configs.Analyzer[4].Calibrations[i]);
+  }
 
   // Update content that involves the config file
   dispatcher({}, 'requestHistogramsRefresh');
-
+  dispatcher({}, 'requestConfigCalibrationsRefresh');
 }
 
 function processMidasFileList(payload){
