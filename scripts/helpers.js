@@ -1880,6 +1880,20 @@ function formatNumberAndUncertaintyString(number,uncertainty){
   return;
 }
 
+// Returns the typical peak width for a given Energy
+// The result is used to set the expectation of peak fitting or gating
+function typicalPeakWidth(energy,detector){
+  if(energy<5){ return(1); }
+  if(detector == undefined){ detector = "HPGe"; }
+  let width = 1.0;
+
+if(detector == "HPGe"){
+  width = parseFloat(energy)*0.0014 + 2.2;
+}
+ if(width<1.0){ return(1); }
+ return(width);
+}
+
 // Taken from https://github.com/GRIFFINCollaboration/efficiencyCalculator/blob/gh-pages/scripts/efficiencyCalculator.js
 // Modified to remove the upper and lower uncertainty values
 // logEn expected for MeV units

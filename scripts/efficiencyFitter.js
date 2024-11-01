@@ -895,7 +895,7 @@ for(i=0; i<keys.length; i++){
     for(i=0; i<keys.length; i++){
 	dataStore.ROI[keys[i]] = [];
 	for(j=0; j<dataStore.sourceInfo[keys[i]]['literaturePeaks'].length; j++){
-      var ROIwidth= dataStore.sourceInfo[keys[i]].literaturePeaks[j]*0.0028 + 4.434; // HPGe singles ROI width
+      var ROIwidth= typicalPeakWidth(dataStore.sourceInfo[keys[i]].literaturePeaks[j],"HPGe")*2; // HPGe singles ROI width
 	    dataStore.ROI[keys[i]][j] = [Math.floor(dataStore.sourceInfo[keys[i]].literaturePeaks[j] - ROIwidth), Math.ceil(dataStore.sourceInfo[keys[i]].literaturePeaks[j] + ROIwidth)];
 
 	    // Count the total number of peaks to fit for use in the progress bar
@@ -1269,7 +1269,7 @@ function projectAllMatrices(){
 
       // Set limits for the projections
 			console.log('Make projection for '+dataStore.sourceInfo[dataStore.currentSource].literaturePeaks[j]);
-      var thisPeakWidth = dataStore.sourceInfo[dataStore.currentSource].literaturePeaks[j]*0.0014 + 2.2; // HPGe singles peak width
+      var thisPeakWidth = typicalPeakWidth(dataStore.sourceInfo[dataStore.currentSource].literaturePeaks[j],"HPGe"); // HPGe singles peak width
 			min = Math.floor(dataStore.sourceInfo[dataStore.currentSource].literaturePeaks[j]-thisPeakWidth);
 			max = Math.ceil(dataStore.sourceInfo[dataStore.currentSource].literaturePeaks[j]+thisPeakWidth);
 
@@ -1314,7 +1314,7 @@ function projectAllMatrices(){
 				// Make it now, unless it has already been created
 
 			console.log('Projections: This peak is not a literature peak, '+dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1]);
-      var thisPeakWidth = dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1]*0.0014 + 2.2; // HPGe singles peak width
+      var thisPeakWidth = typicalPeakWidth(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1]); // HPGe singles peak width
 			min = Math.floor(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1]-thisPeakWidth);
 			max = Math.ceil(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1]+thisPeakWidth);
 
@@ -1352,7 +1352,7 @@ function projectAllMatrices(){
 
 			    // Save the ROI for projections so it can be used for drawing the fitlines
 			    if(!dataStore.ROIprojections[plotName]) dataStore.ROIprojections[plotName] = [];
-          var ROIwidth= dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0]*0.0028 + 4.434; // HPGe singles ROI width
+          var ROIwidth= typicalPeakWidth(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0])*2; // HPGe singles ROI width
 			    dataStore.ROIprojections[plotName].push([Math.floor(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0]-ROIwidth),Math.ceil(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0]+ROIwidth)]);
 			}
 			console.log(dataStore.spectrumListProjectionsPeaks[plotName].peaks);
