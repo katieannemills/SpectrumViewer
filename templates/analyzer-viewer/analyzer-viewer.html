@@ -1,7 +1,7 @@
 <link rel="stylesheet" href="analyzer-viewer.css">
 
 <template id='analyzer-viewer'>
-	
+
     <div class='section-wrapper'>
         <div class='col-md-12 pan' id='Viewer-Viewer'>
             <h2>Analyzer Spectrum Viewer</h2>
@@ -20,7 +20,10 @@
 		  </div>
 	      </div>
 	      <div id='AnalyzerViewerDiv'>Here it is</div>
-	      <div id='submitDivSum'></div>
+		    <div class='container-fluid'>
+	      <div id='submitDivSum' class='col-md-6'></div>
+	      <div id='launchEffFitDiv' class='col-md-6'></div>
+		</div>
 	      <table id="HistoFilesTable" class='analyzer-table-selectable'></table>
 	    </div>
 	  </div>
@@ -46,7 +49,7 @@
 
   </div>
 </div>
-  
+
 <div id="viewConfigModal" class="modal fade" role="dialog">
   <div class="modal-dialog modal-lg modal-dialog-centered">
 
@@ -66,7 +69,7 @@
 
   </div>
 </div>
-  
+
 <button type='button' class='btn invisible' id='alertSumModalButton' data-toggle='modal' data-target='#alertSumModal'>Info</button>
 <button type='button' class='btn invisible' id='viewConfigModalButton' data-toggle='modal' data-target='#viewConfigModal'>View Config</button>
 
@@ -78,34 +81,34 @@
         document.getElementById(wrapperID).innerHTML = Mustache.to_html(dataStore.templates['analyzer-viewer'], {});
 
     // Create the text input for the Histogram file directory
-    newInput = document.createElement('input'); 
-    newInput.id = 'HistoDirectoryInputViewer'; 
-    newInput.type = 'text'; 
-    newInput.className = 'analyzer-input-text'; 
-    newInput.value = dataStore.histoFileDirectoryPath; 
+    newInput = document.createElement('input');
+    newInput.id = 'HistoDirectoryInputViewer';
+    newInput.type = 'text';
+    newInput.className = 'analyzer-input-text';
+    newInput.value = dataStore.histoFileDirectoryPath;
     newInput.onchange = function(){
-       dataStore.histoFileDirectoryPath = this.value; 
+       dataStore.histoFileDirectoryPath = this.value;
        document.getElementById('HistoDirectoryInputSorting').value = this.value;
        getHistoFileListFromServer();
 
 }.bind(newInput);
     document.getElementById('HistoDirectoryInputDivViewer').appendChild(newInput);
-    
+
     // Create the text input for the Histogram Sum filename
-    newInput = document.createElement('input'); 
-    newInput.id = 'HistoSumFilenameInput'; 
-    newInput.type = 'text'; 
-    newInput.className = 'analyzer-input-text'; 
-    newInput.value = dataStore.histoSumFilename; 
+    newInput = document.createElement('input');
+    newInput.id = 'HistoSumFilenameInput';
+    newInput.type = 'text';
+    newInput.className = 'analyzer-input-text';
+    newInput.value = dataStore.histoSumFilename;
     newInput.onchange = function(){
     dataStore.histoSumFilename = this.value;
     }.bind(newInput);
     document.getElementById('HistoSumFilenameInputDiv').appendChild(newInput);
-    
+
     // Create Submit button for summing histograms
-    newButton = document.createElement('button'); 
-    newButton.setAttribute('id', 'submitSumHistosButton'); 
-    newButton.setAttribute('class', 'btn btn-default btn-lg'); 
+    newButton = document.createElement('button');
+    newButton.setAttribute('id', 'submitSumHistosButton');
+    newButton.setAttribute('class', 'btn btn-default btn-lg');
     newButton.innerHTML = "Sum selected Histogram files together";
     newButton.style.padding = '4px';
     newButton.onclick = function(){
@@ -113,10 +116,23 @@
     }.bind(newButton);
     document.getElementById('submitDivSum').appendChild(newButton);
 
+    // Create button for launching Efficiency Fitter app
+    newButton = document.createElement('button');
+    newButton.setAttribute('id', 'launchEffFitButton');
+    newButton.setAttribute('class', 'btn btn-default btn-lg');
+    newButton.innerHTML = "Launch Efficiency Fitter";
+    document.getElementById('launchEffFitDiv').style.textAlign = 'right';
+    newButton.style.padding = '4px';
+    newButton.onclick = function(){
+			var url = "https://griffincollaboration.github.io/SpectrumViewer/efficiencyFitter.html?analyzerBackend="+dataStore.spectrumServerBackend+"&analyzerPort="+dataStore.spectrumServerPort+"&histoDir="+dataStore.midasFileDataDirectoryPath;
+		window.open(url);
+    }.bind(newButton);
+    document.getElementById('launchEffFitDiv').appendChild(newButton);
+
     // Create Refresh button for fetching histograms list
-    newButton = document.createElement('button'); 
-    newButton.setAttribute('id', 'refreshHistosListButton'); 
-    newButton.setAttribute('class', 'btn btn-default btn-lg'); 
+    newButton = document.createElement('button');
+    newButton.setAttribute('id', 'refreshHistosListButton');
+    newButton.setAttribute('class', 'btn btn-default btn-lg');
     newButton.innerHTML = "Refresh Histogram list";
     newButton.style.padding = '4px';
     newButton.onclick = function(){
