@@ -133,15 +133,15 @@ document.getElementById('calFileContentsTitleDiv').innerHTML = "<h3>Contents of 
       thisArrStr = arrStr[i].split('\n');
       for(var j=0; j<thisArrStr.length; j++){
         if(thisArrStr[j].includes("Name")){
-          thisName = thisArrStr[j].split('\t')[1];
+          thisName = thisArrStr[j].split(/\t| /)[1];
         }
         if(thisArrStr[j].includes("EngCoeff")){
-          thisCoefficientsString = thisArrStr[j].split('\t')[1].trim()  ;
-          thisCoefficientsString = thisCoefficientsString.split(/[ ,]+/).join(',');
-          thisCoefficients = thisCoefficientsString.split(',');
-          thisOffset = parseFloat(thisCoefficients[0]);
-          thisGain = parseFloat(thisCoefficients[1]);
-          thisQuad = parseFloat(thisCoefficients[2]);
+          thisArray = thisArrStr[j].split(/\t| /);
+            thisArray = thisArray.filter(String);
+            thisOffset = parseFloat(thisArray[1]);
+            thisGain = parseFloat(thisArray[2]);
+            thisQuad = parseFloat(thisArray[3]);
+          //  console.log("Using thisArray: "+thisName+': '+ thisQuad+','+ thisGain+','+ thisOffset);
         }
       }
     //  console.log(thisName+': '+ thisQuad+','+ thisGain+','+ thisOffset);

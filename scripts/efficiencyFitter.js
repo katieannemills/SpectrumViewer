@@ -802,9 +802,9 @@ document.getElementById('submitHistoFilenameChoicesButton').disabled = true;
 // Remove any sources that are set to exclude
 for(i=0; i<keys.length; i++){
   if(dataStore.sourceInfo[keys[i]].histoFileName == "exclude"){
-    console.log("Deleting 11Be from dataStore.sourceInfo");
+    console.log("Deleting "+keys[i]+"from dataStore.sourceInfo");
     delete dataStore.sourceInfo[keys[i]];
-    document.getElementById('efficiencyPlot11Be').style.display = 'none';
+    document.getElementById('efficiencyPlot'+keys[i]).style.display = 'none';
   }
 }
 
