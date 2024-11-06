@@ -22,6 +22,7 @@
         <link id='header' rel="import" href="templates/header/header.html">
         <link id='energyCalibratorReport' rel="import" href="templates/energyCalibratorReport/energyCalibratorReport.html">
         <link id='energyCalibratorReportTable' rel="import" href="templates/energyCalibratorReport/energyCalibratorReportTable.html">
+        <link id='energyCalibratorMenu' rel="import" href="templates/energyCalibratorReport/energyCalibratorMenu.html">
         <link id='plotGrid' rel="import" href="templates/plotGrid/plotGrid.html">
         <link id='plotControl' rel="import" href="templates/plotControl/plotControl.html">
         <link id='plotListLite' rel="import" href="templates/plotList/plotListLite.html">
@@ -30,7 +31,7 @@
     </head>
 
     <body>
-        <div id='head'></div>
+      <div id='head'></div>
         <div id='messageDiv' class='col-md-12'></div>
 
         <div id='progressDiv' class="progress hidden" width=100%>
@@ -74,9 +75,9 @@
              <div id='histoChoice60Co' class='col-md-4'></div>
            </div>
 	   <div id='histoChoiceSubmit' class='col-md-12'></div>
-
 	   </div>
 
+     <div id='menu' class='col-md-12 hidden'></div>
 
         <!--Spectrum Plotting-->
         <div id='plotRegion' class='sectionWrapper'>
@@ -97,29 +98,26 @@
             </div>
         </div>
 
-        <!--Table of calculations and results-->
-        <div id='energyCalibrator'></div>
+                <!--Table of calculations and results-->
+                <div id='energyCalibrator' class='hidden'></div>
 
-        <!--Efficiency curve Plotting-->
-        <div id='graphSection' class='sectionWrapper'>
-            <div id='efficiencyPlotWrap' class='col-md-12'>
-	    <div class='col-md-12'>
-	      <h3>Efficiency curves:</h3>
-	        <div id='efficiencyPlotAbs' class='col-md-6'></div>
-		<div id='efficiencyPlotRel' class='col-md-6'></div>
-		</div>
-	    <div class='col-md-12'>
-	      <h3>Efficiency curves of the individual sources:</h3>
-                <div id='efficiencyPlot133Ba' class='col-md-6'></div>
-		<div id='efficiencyPlot152Eu' class='col-md-6'></div>
-		</div>
-		<div class='col-md-12'>
-                <div id='efficiencyPlot56Co' class='col-md-6'></div>
-		<div id='efficiencyPlot60Co' class='col-md-6'></div>
-		</div>
-            </div>
-            </div>
-        </div>
+                <!--Efficiency curve Plotting-->
+                  <div id='efficiencyPlotWrap' class='col-md-12'>
+                    <div class='col-md-12'>
+                      <h3>Efficiency curves:</h3>
+                      <div id='efficiencyPlotAbs' class='col-md-6'></div>
+                      <div id='efficiencyPlotRel' class='col-md-6'></div>
+                    </div>
+                    <div class='col-md-12'>
+                      <h3>Efficiency curves of the individual sources:</h3>
+                      <div id='efficiencyPlot133Ba' class='col-md-6'></div>
+                      <div id='efficiencyPlot152Eu' class='col-md-6'></div>
+                    </div>
+                    <div class='col-md-12'>
+                      <div id='efficiencyPlot56Co' class='col-md-6'></div>
+                      <div id='efficiencyPlot60Co' class='col-md-6'></div>
+                    </div>
+                  </div>
 
         <div id='foot'></div>
 
@@ -135,9 +133,10 @@
                 dataStore._dataplot[4] = new dataplot('efficiencyPlot56Co',4);
                 dataStore._dataplot[5] = new dataplot('efficiencyPlot60Co',5);
 
-                dataStore.templates = prepareTemplates(['header', 'energyCalibratorReport', 'energyCalibratorReportTable', 'plotGrid', 'plotControl', 'plotListLite', 'dataplot', 'footer']);
+                dataStore.templates = prepareTemplates(['header', 'energyCalibratorMenu', 'energyCalibratorReport', 'energyCalibratorReportTable', 'plotGrid', 'plotControl', 'plotListLite', 'dataplot', 'footer']);
 
                 setupHeader('head', 'Energy Calibrator');
+          	    setupEnergyCalibratorMenu('menu');
                 dataStore._plotGrid.setup();
                 dataStore._plotControl.setup();
                 //set up spectrum cell

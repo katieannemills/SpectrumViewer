@@ -3,6 +3,7 @@
 <template id='energyCalibratorReport'>
     <div class='sectionWrapper item'>
         <div class='col-md-12'>
+            <div id='tableMenuDiv'></div>
             <table id='{{id}}energyCalibratorResults' class='table energyCalibratorTable'></table>
 
             <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myAnalyzerModal">
@@ -79,24 +80,6 @@
         this.wrap = document.getElementById(wrapID);
 
         this.setup = function(){
-            // build list of source titles
-            var listOfSourceTitles = [];
-
-            if(dataStore.THESEdetectors[0].includes('PAC')){
-               var thisObject = {
-                   "name" : dataStore.sourceInfoPACES[0].name,
-                   "title" : dataStore.sourceInfoPACES[0].title
-               }
-               listOfSourceTitles.push(thisObject);
-           }else{
-               for(var i=0; i<dataStore.sourceInfo.length; i++){
-                   var thisObject = {
-                      "name" : dataStore.sourceInfo[i].name,
-                      "title" : dataStore.sourceInfo[i].title
-                  }
-                  listOfSourceTitles.push(thisObject);
-              }
-          }
 
             //inject templates
           this.wrap.innerHTML = Mustache.to_html(
@@ -108,22 +91,40 @@
             // table has to be done as a separate template, since templates and tables don't play too nice together
           console.log('Inject the Table');
     // Build the list of rows for the table. Loop through each peak of each source
-          var detectors =[];
-          var keys = Object.keys(dataStore.sourceInfo);
-          for(i=0; i<keys.length; i++){
-              for(j=0; j<dataStore.sourceInfo[keys[i]].literaturePeaks.length; j++){
-                detectors.push(keys[i] + '-P' + j);
-            }
+          var peaks =[];
+          for(var i=0; i<dataStore.THESEcalibrations[0].y.length; i++){
+                peaks.push(dataStore.THESEcalibrations[0].y[i]);
         }
-        console.log(keys);
-        console.log(detectors);
         document.getElementById(this.wrapID + 'energyCalibratorResults').innerHTML= Mustache.to_html(
             dataStore.templates.energyCalibratorReportTable,
             content = {
                 'id': this.wrapID,
-                'detectors': detectors
+                'peaks': peaks
             }
             );
+
+                      // Build Table select for selecting which detector data is displayed
+                      	// Add the title text
+                      	var newLabel = document.createElement("label");
+                      	newLabel.for = 'tableMenuSelect';
+                      	newLabel.id = 'tableMenuSelectLabel';
+                      	newLabel.innerHTML = 'Detector: ';
+                      	document.getElementById('tableMenuDiv').appendChild(newLabel);
+
+                      	// Create a select input for the histo file list
+                      	var newSelect = document.createElement("select");
+                      	newSelect.id = 'tableMenuSelect';
+                      	newSelect.name = 'tableMenuSelect';
+                      	newSelect.onchange = function(){
+                      	   dataStore._energyCalibratorReport.refreshTableData(this.value);
+                      	}.bind(newSelect);
+                      	document.getElementById('tableMenuDiv').appendChild(newSelect);
+
+                      	// Add the list of detectors as the options
+                      	thisSelect = document.getElementById('tableMenuSelect');
+                      	for(var j=0; j<dataStore.THESEdetectors.length; j++){
+                      	    thisSelect.add( new Option(dataStore.THESEdetectors[j], j) );
+                      	}
 
             //make sure the file name for Cal file download gets passed around:
         document.getElementById('saveCalname').onchange = function(){
@@ -162,6 +163,17 @@
         }
         promiseScript(dataStore.ODBrequests[0]);
     }
+},
+
+this.refreshTableData = function(thisDetectorIndex){
+ console.log("Table select for "+thisDetectorIndex+", "+dataStore.THESEdetectors[thisDetectorIndex]);
+
+ for(var i=0; i<dataStore.THESEcalibrations[thisDetectorIndex].y.length; i++){
+   var thisID = 'energyCalibrator'+dataStore.THESEcalibrations[thisDetectorIndex].y[i];
+   document.getElementById(thisID+'pulseHeightCentroid').innerHTML = dataStore.THESEcalibrations[thisDetectorIndex].xPH[i].toFixed(2);
+   document.getElementById(thisID+'energyCentroid').innerHTML = dataStore.THESEcalibrations[thisDetectorIndex].xEn[i].toFixed(2);
+   document.getElementById(thisID+'residual').innerHTML = dataStore.THESEcalibrations[thisDetectorIndex].residual[i].toFixed(4);
+ }
 },
 
 this.fitAllSinglesPeaks = function(){
@@ -612,6 +624,18 @@ this.fitEnergyCalibrationData = function(thisDetector){
   dataStore.THESEcalibrations[thisDetector].fit.offset = result.equation[2];  // The coefficient of the offset term of the equation
   dataStore.THESEcalibrations[thisDetector].fit.string = result.string;       //  A string representation of the equation
   dataStore.THESEcalibrations[thisDetector].fit.r2 = result.r2;               // the coefficient of determination (R^2)
+
+  // Also save the address which is needed in the Cal file
+  // Need to find a source that was not excluded.
+  if(dataStore.sourceInfo["152Eu"].Config){
+    var thisSource = "152Eu";
+  }else if(dataStore.sourceInfo["133Ba"].Config){
+    var thisSource = "133Ba";
+  }else{
+    var thisSource = "56Co";
+  }
+  var thisCalibrationIndex = dataStore.sourceInfo[thisSource].Config.map(function(e) { return e.name; }).indexOf(dataStore.THESEdetectors[thisDetector]);
+  dataStore.THESEcalibrations[thisDetector].address = dataStore.sourceInfo[thisSource].Config[thisCalibrationIndex].address;
 
   for(var j=0; j<dataStore.THESEcalibrations[thisDetector].xPH.length; j++){
     var x = dataStore.THESEcalibrations[thisDetector].xPH[j];

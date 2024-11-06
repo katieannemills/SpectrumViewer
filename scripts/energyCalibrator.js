@@ -45,6 +45,18 @@ function setupDataStore(){
     dataStore.numberOfClovers = 1;                                     // Default number of clovers is all of the array
     // shouldn't need to change anything below this line -----------------------------------------------------------------------
 
+    // Pagination for the results and plotting display
+    // plotRegion = spectra
+    // energyCalibrator = Table of per detector (lit En., centroids PH and En and residuals)
+    // energyCalibrator = Table of all (detector num, fit params, r2)
+    // graphSection = plot of per detector the PH vs Lit en with Fit and a residuals pane
+    // graphSection = plot of all the residuals for specific peak
+    // Variables for Pagination menu buttons
+    dataStore.buttonNames = ["Spectra", "Detector Results", "Fit Coefficients"];                      // Names to appear on the buttons
+    dataStore.buttonIDs = ["plotRegionMenuButton", "tableRegionMenuButton", "graphRegionMenuButton"]; // IDs for the buttons
+    dataStore.buttonPages = ["plotRegion", "energyCalibrator", "efficiencyPlotWrap"];                 // Pages (div IDs) to be associated with the buttons
+
+
     dataStore.pageTitle = 'Efficiency Fitter';                                   //header title
     dataStore.DAQquery = '';
     dataStore.ViewConfigQuery = '';
@@ -551,6 +563,10 @@ function submitHistoFilenameChoices(){
   document.getElementById('HistoDirectoryInput').disabled = true;
   document.getElementById('submitHistoFilenameChoicesButton').disabled = true;
 
+  // Display the results menu and spectra
+  document.getElementById("menu").classList.remove('hidden');
+  document.getElementById(dataStore.buttonPages[0]).classList.remove('hidden');
+
   // setup the dataStore for this choice of detectorType
   var i, num=0, groups = [];
 
@@ -628,10 +644,6 @@ function submitHistoFilenameChoices(){
   dataStore._plotListLite = new plotListLite('plotList');
   dataStore._plotListLite.setup();
 
-  // Generate the Energy Calibrator report table
-  dataStore._energyCalibratorReport = new energyCalibratorReport('energyCalibrator');
-  dataStore._energyCalibratorReport.setup();
-
   //user guidance
   deleteNode('histogramMessage');
   document.getElementById('downloadMessage').classList.remove('hidden');
@@ -685,13 +697,19 @@ function submitHistoFilenameChoices(){
   // Initialize the THESEcalibrations array of objects
   for(i=0; i<dataStore.THESEdetectors.length; i++){
     dataStore.THESEcalibrations[i] = {
-      'xPH':[],                             //pulseHeight centroids
-      'xEn':[],                             //Calibrated energy centroids (using newly determined coefficients)
-      'y': listOfLiteratureEnergies,        //literature energies
-      'residual':[],                        // difference of Energy centroid to literature energy
+      'name':dataStore.THESEdetectors[i],    //name of this detector
+      'address':0,                           //address of this detector
+      'xPH':[],                              //pulseHeight centroids
+      'xEn':[],                              //Calibrated energy centroids (using newly determined coefficients)
+      'y': listOfLiteratureEnergies,         //literature energies
+      'residual':[],                         // difference of Energy centroid to literature energy
       'fit':{'string':"",'quad':0, 'gain':0, 'offset':0,'r2':0}       // string is the equation, quad, gain, offset the coefficient, r2 the efficient of determination
     }
   }
+
+  // Generate the Energy Calibrator report table
+  dataStore._energyCalibratorReport = new energyCalibratorReport('energyCalibrator');
+  dataStore._energyCalibratorReport.setup();
 
   // Issue the request for the spectra of the first source.
   // The request for additional sources will be issued in the fetchCallback
@@ -818,21 +836,17 @@ function updateODB(obj){
 function buildCalfile(){
     console.log('Download initiated');
 
-    // Write the Cal file content based on the list in the ODB and the fitted results
+    // Write the Cal file
     CAL = '';
 
-    for(i=0; i<dataStore.PSCchannels.length; i++){
-        if(dataStore.PSCchannels[i].slice(0,3) == 'XXX'){ continue; }
-       CAL += dataStore.PSCchannels[i]+' { \n';
-       CAL += 'Name:	'+dataStore.PSCchannels[i]+'\n';
+    for(var i=0; i<dataStore.THESEdetectors.length; i++){
+       CAL += dataStore.THESEdetectors[i]+' { \n';
+       CAL += 'Name:	'+dataStore.THESEdetectors[i]+'\n';
        CAL += 'Number:	'+i+'\n';
-	CAL += 'Address:	0x'+dataStore.PSCaddresses[i].toString(16).toLocaleString(undefined, {minimumIntegerDigits: 2})+'\n';
+	     CAL += 'Address:  0x'+dataStore.THESEcalibrations[i].address.toString(16).toLocaleString(undefined, {minimumIntegerDigits: 2})+'\n';
        CAL += 'Digitizer:	GRF16\n';
-        if(dataStore.PSCchannels[i].slice(0,3) == dataStore.THESEdetectors[0].slice(0,3)){
-	CAL += 'EngCoeff:	'+dataStore.fitResults[dataStore.PSCchannels[i]+'_Pulse_Height'][4][0]+' '+dataStore.fitResults[dataStore.PSCchannels[i]+'_Pulse_Height'][4][1]+' '+dataStore.fitResults[dataStore.PSCchannels[i]+'_Pulse_Height'][4][2]+'\n';
-	}else{
-       CAL += 'EngCoeff:	0 1 0\n';
-	}
+	CAL += 'EngCoeff:	'+dataStore.THESEcalibrations[i].fit.offset+' '+dataStore.THESEcalibrations[i].fit.gain+' '+dataStore.THESEcalibrations[i].fit.quad+'\n';
+
 	CAL += 'Integration:	0\n';
        CAL += 'ENGChi2:	0\n';
        CAL += 'FileInt:	0\n';
