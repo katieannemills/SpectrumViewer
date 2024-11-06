@@ -195,9 +195,9 @@ efficiencyRegression(thisX,thisY,thisYerror);
       "absoluteEfficiencyUnc": [],         // Uncertainty for Absolute efficiency calculated for this peak energy after summing corrections
     },
     '56Co' : {"name":  "Co-56", "title":  "56Co", 'histoFileName' : '', "maxXValue":4000,       // General source details
-    "literaturePeaks": [ 846.76, 1037.84, 1175.1, 1238.29, 1360.21, 1771.35, 2015.18, 2034.76, 2598.46, 3201.95, 3253.42, 3272.99, 3451.15, 3548.27 ],     // Peak energies from this source. Literature values taken from ENSDF.
-    "literatureIntensity":    [ 0.99940, 0.14052, 0.02252, 0.66460, 0.04283, 0.15411, 0.03016, 0.07769, 0.16970, 0.03209, 0.07923, 0.01876, 0.00949, 0.00196 ], // Peak intensities from this source. Literature values taken from ENSDF (gamma rays per 100 decays of the parent).
-    "literatureIntensityUnc": [ 0.00002, 0.00040, 0.00006, 0.00120, 0.00012, 0.00060, 0.00012, 0.00028, 0.00040, 0.00012, 0.00021, 0.00002, 0.00005, 0.00002 ], // Peak intensities from this source. Literature values taken from ENSDF (gamma rays per 100 decays of the parent).
+    "literaturePeaks": [ 846.76, 1037.84, 1175.1, 1238.29, 1360.21, 1771.35, 2015.18, 2034.76, 2598.46, 3201.95, 3253.42, 3451.15, 3548.27 ],     // Peak energies from this source. Literature values taken from ENSDF.
+    "literatureIntensity":    [ 0.99940, 0.14052, 0.02252, 0.66460, 0.04283, 0.15411, 0.03016, 0.07769, 0.16970, 0.03209, 0.07923, 0.00949, 0.00196 ], // Peak intensities from this source. Literature values taken from ENSDF (gamma rays per 100 decays of the parent).
+    "literatureIntensityUnc": [ 0.00002, 0.00040, 0.00006, 0.00120, 0.00012, 0.00060, 0.00012, 0.00028, 0.00040, 0.00012, 0.00021, 0.00005, 0.00002 ], // Peak intensities from this source. Literature values taken from ENSDF (gamma rays per 100 decays of the parent).
     "peakWidth": 3,                     // integer number of channels used for gating. [centroid-peakWidth ... centroid+peakWidth]
     "ROIWidth": 10,                      // integer number of channels used for setting ROI limits. [centroid-peakWidth ... centroid+peakWidth]
     "uncalibratedCentroids": [],
@@ -215,7 +215,6 @@ efficiencyRegression(thisX,thisY,thisYerror);
     [[1360,1238],[787,1810]], // for 2598.46 keV
     [[1963,1238],[1088,2113]], // for 3201.95 keV
     [[2015.18,1238],[1442,1810],[1140,2113],[977,2276],[655,2598.46]], // for 3253.42 keV
-    [[2034,1238],[1462,1810],[1159,2113],[996,2276],[674,2598.46],[263,3009]], // for 3272 keV
     [[2212,1238],[1640,1810],[1175.1,2276],[852,2598.46]], // for 3451.15 keV
     [[1271,2276]] // for 3548.27 keV
   ],

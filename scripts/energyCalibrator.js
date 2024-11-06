@@ -42,7 +42,7 @@ function setupDataStore(){
     GetURLArguments();
 
     //dataStore.numberOfClovers = 16;                                     // Default number of clovers is all of the array
-    dataStore.numberOfClovers = 1;                                     // Default number of clovers is all of the array
+    dataStore.numberOfClovers = 16;                                     // Default number of clovers is all of the array
     // shouldn't need to change anything below this line -----------------------------------------------------------------------
 
     // Pagination for the results and plotting display
@@ -184,7 +184,7 @@ function setupDataStore(){
 	           },
 	'56Co' : {"name":  "Co-56", "title":  "56Co", 'histoFileName' : '', "maxXValue":4000,       // General source details
               "Config": {},         // Place to store the Calibrations from the Config file of this run
-	          "literaturePeaks": [ 846.76, 1037.84, 1175.1, 1238.29, 1360.21, 1771.35, 2015.18, 2034.76, 2598.46, 3201.95,
+	          "literaturePeaks": [ 846.76, 1037.84, 1175.1, 1238.29, 1360.21, 1771.35, 2015.18, 2034.76, 2598.46, 3009.56, 3201.95,
               3253.42,
               // 3272.99,
                3451.15,
@@ -246,6 +246,14 @@ function setupDataStore(){
 		  "sourceActivity": 0,                // source Activity in becquerels at the start of the run
 		  "sourceTotalDecaysDuringThisRun": 0 // Total number of decays of this source during this run
     },
+	'66Ga' : {"name": "66Ga", "title": "66Ga", 'histoFileName' : '', "maxXValue": 7000,       // General source details
+              "Config": {},         // Place to store the Calibrations from the Config file of this run
+	            "literaturePeaks": [ 833.53, 1039.22, 1333.11, 1918.32, 2189.62, 2422.52, 2751.83, 3228.80, 3380.85, 4085.85, 4295.7, 4461.20, 4806.01 ],     // Peak energies from this source. Literature values taken from ENSDF.
+		   "peakWidth": 4,                     // integer number of channels used for gating. [centroid-peakWidth ... centroid+peakWidth]
+	           "uncalibratedCentroids": [],
+	          "calibratedCentroids": [],
+		  "FWHM": []
+	           },
 	'244Cm+13C' : {"name": "244Cm+13C", "title": "244Cm+13C", 'histoFileName' : '', "maxXValue": 7000,       // General source details
               "Config": {},         // Place to store the Calibrations from the Config file of this run
 	            "literaturePeaks": [ 6129.89 ],     // Peak energies from this source. Literature values taken from ENSDF.
@@ -533,7 +541,7 @@ function setupHistoListSelect(){
     newButton = document.createElement('button');
     newButton.setAttribute('id', 'submitHistoFilenameChoicesButton');
     newButton.setAttribute('class', 'btn btn-default btn-lg');
-    newButton.innerHTML = "Auto-fill for development";
+    newButton.innerHTML = "Auto-fill for development, S2319";
     newButton.style.padding = '4px';
     newButton.onclick = function(){
 
@@ -541,14 +549,39 @@ function setupHistoListSelect(){
       document.getElementById('HistoListSelect152Eu').value = "run28171.tar";
       document.getElementById('HistoListSelect56Co').value = "run28174.tar";
       document.getElementById('HistoListSelect60Co').value = "run28175.tar";
+      document.getElementById('HistoListSelect66Ga').value = "exclude";
       document.getElementById('HistoListSelect244Cm+13C').value = "run28176.tar";
       document.getElementById('HistoListSelect133Ba').onchange();
       document.getElementById('HistoListSelect152Eu').onchange();
       document.getElementById('HistoListSelect56Co').onchange();
       document.getElementById('HistoListSelect60Co').onchange();
+      document.getElementById('HistoListSelect66Ga').onchange();
       document.getElementById('HistoListSelect244Cm+13C').onchange();
     }.bind(newButton);
       document.getElementById('histoChoiceSubmit').appendChild(newButton);
+
+          // Create the Auto-fill for development button
+          newButton = document.createElement('button');
+          newButton.setAttribute('id', 'submitHistoFilenameChoicesButton');
+          newButton.setAttribute('class', 'btn btn-default btn-lg');
+          newButton.innerHTML = "Auto-fill for development, S1723";
+          newButton.style.padding = '4px';
+          newButton.onclick = function(){
+
+            document.getElementById('HistoListSelect133Ba').value = "run20567.tar";
+            document.getElementById('HistoListSelect152Eu').value = "run20570.tar";
+            document.getElementById('HistoListSelect56Co').value = "run20573.tar";
+            document.getElementById('HistoListSelect60Co').value = "run20571.tar";
+            document.getElementById('HistoListSelect66Ga').value = "run20546.tar";
+            document.getElementById('HistoListSelect244Cm+13C').value = "exclude";
+            document.getElementById('HistoListSelect133Ba').onchange();
+            document.getElementById('HistoListSelect152Eu').onchange();
+            document.getElementById('HistoListSelect56Co').onchange();
+            document.getElementById('HistoListSelect60Co').onchange();
+            document.getElementById('HistoListSelect66Ga').onchange();
+            document.getElementById('HistoListSelect244Cm+13C').onchange();
+          }.bind(newButton);
+            document.getElementById('histoChoiceSubmit').appendChild(newButton);
 
 }
 

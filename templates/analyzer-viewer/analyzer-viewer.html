@@ -2,76 +2,76 @@
 
 <template id='analyzer-viewer'>
 
-    <div class='section-wrapper'>
-        <div class='col-md-12 pan' id='Viewer-Viewer'>
-            <h2>Analyzer Spectrum Viewer</h2>
-	  <div id='Viewer'>
+  <div class='section-wrapper'>
+    <div class='col-md-12 pan' id='Viewer-Viewer'>
+      <h2>Analyzer Spectrum Viewer</h2>
+      <div id='Viewer'>
 
-	    <div id="HistoFilesTableContainerDiv">
-	    <div class='container-fluid'>
-	      <div class='row'>
-	        <div class='col-md-2'><h5>Histogram File Directory:</h5></div>
-	        <div class='col-md-4' id='HistoDirectoryInputDivViewer'></div>
-	        <div class='col-md-2' id='HistoDirectoryRefreshDivViewer'></div>
-		  </div>
-	      <div class='row'>
-	        <div class='col-md-2'><h5>Filename for Summed Histogram file:</h5></div>
-	        <div class='col-md-4' id='HistoSumFilenameInputDiv'></div>
-		  </div>
-	      </div>
-	      <div id='AnalyzerViewerDiv'>Here it is</div>
-		    <div class='container-fluid'>
-	      <div id='submitDivSum' class='col-md-6'></div>
-	      <div id='launchEffFitDiv' class='col-md-6'></div>
-		</div>
-	      <table id="HistoFilesTable" class='analyzer-table-selectable'></table>
-	    </div>
-	  </div>
+        <div id="HistoFilesTableContainerDiv">
+          <div class='container-fluid'>
+            <div class='row'>
+              <div class='col-md-2'><h5>Histogram File Directory:</h5></div>
+              <div class='col-md-4' id='HistoDirectoryInputDivViewer'></div>
+              <div class='col-md-2' id='HistoDirectoryRefreshDivViewer'></div>
+            </div>
+            <div class='row'>
+              <div class='col-md-2'><h5>Filename for Summed Histogram file:</h5></div>
+              <div class='col-md-4' id='HistoSumFilenameInputDiv'></div>
+            </div>
+          </div>
+          <div id='AnalyzerViewerDiv'>Here it is</div>
+          <div class='container-fluid'>
+            <div id='submitDivSum' class='col-md-6'></div>
+            <div id='launchAppsDiv' class='col-md-6'></div>
+          </div>
+          <table id="HistoFilesTable" class='analyzer-table-selectable'></table>
         </div>
-    </div>
-
-<div id="alertSumModal" class="modal fade" role="dialog">
-  <div class="modal-dialog">
-
-    <!-- Modal content-->
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Error</h4>
-      </div>
-      <div class="modal-body">
-        <p>Please select at least two histogram files to sum together.</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-warning" data-dismiss="modal">Close</button>
       </div>
     </div>
-
   </div>
-</div>
 
-<div id="viewConfigModal" class="modal fade" role="dialog">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
+  <div id="alertSumModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
 
-    <!-- Modal content-->
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title" id="viewConfigModalTitle">Configuration</h4>
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Error</h4>
+        </div>
+        <div class="modal-body">
+          <p>Please select at least two histogram files to sum together.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-warning" data-dismiss="modal">Close</button>
+        </div>
       </div>
-      <div class="modal-body">
-        <div id="viewConfigModalContent"></div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-warning" data-dismiss="modal">Close</button>
-      </div>
+
     </div>
-
   </div>
-</div>
 
-<button type='button' class='btn invisible' id='alertSumModalButton' data-toggle='modal' data-target='#alertSumModal'>Info</button>
-<button type='button' class='btn invisible' id='viewConfigModalButton' data-toggle='modal' data-target='#viewConfigModal'>View Config</button>
+  <div id="viewConfigModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title" id="viewConfigModalTitle">Configuration</h4>
+        </div>
+        <div class="modal-body">
+          <div id="viewConfigModalContent"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-warning" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <button type='button' class='btn invisible' id='alertSumModalButton' data-toggle='modal' data-target='#alertSumModal'>Info</button>
+  <button type='button' class='btn invisible' id='viewConfigModalButton' data-toggle='modal' data-target='#viewConfigModal'>View Config</button>
 
 </template>
 
@@ -116,18 +116,31 @@
     }.bind(newButton);
     document.getElementById('submitDivSum').appendChild(newButton);
 
+    // Create button for launching Energy Calibrator app
+    newButton = document.createElement('button');
+    newButton.setAttribute('id', 'launchEnCalButton');
+    newButton.setAttribute('class', 'btn btn-default btn-lg');
+    newButton.innerHTML = "Launch Energy Calibrator";
+    document.getElementById('launchAppsDiv').style.textAlign = 'right';
+    newButton.style.padding = '4px';
+    newButton.onclick = function(){
+      var url = "https://griffincollaboration.github.io/SpectrumViewer/energyCalibrator.html?analyzerBackend="+dataStore.spectrumServerBackend+"&analyzerPort="+dataStore.spectrumServerPort+"&histoDir="+dataStore.midasFileDataDirectoryPath;
+      window.open(url);
+    }.bind(newButton);
+    document.getElementById('launchAppsDiv').appendChild(newButton);
+
     // Create button for launching Efficiency Fitter app
     newButton = document.createElement('button');
     newButton.setAttribute('id', 'launchEffFitButton');
     newButton.setAttribute('class', 'btn btn-default btn-lg');
     newButton.innerHTML = "Launch Efficiency Fitter";
-    document.getElementById('launchEffFitDiv').style.textAlign = 'right';
+    document.getElementById('launchAppsDiv').style.textAlign = 'right';
     newButton.style.padding = '4px';
     newButton.onclick = function(){
-			var url = "https://griffincollaboration.github.io/SpectrumViewer/efficiencyFitter.html?analyzerBackend="+dataStore.spectrumServerBackend+"&analyzerPort="+dataStore.spectrumServerPort+"&histoDir="+dataStore.midasFileDataDirectoryPath;
-		window.open(url);
+      var url = "https://griffincollaboration.github.io/SpectrumViewer/efficiencyFitter.html?analyzerBackend="+dataStore.spectrumServerBackend+"&analyzerPort="+dataStore.spectrumServerPort+"&histoDir="+dataStore.midasFileDataDirectoryPath;
+      window.open(url);
     }.bind(newButton);
-    document.getElementById('launchEffFitDiv').appendChild(newButton);
+    document.getElementById('launchAppsDiv').appendChild(newButton);
 
     // Create Refresh button for fetching histograms list
     newButton = document.createElement('button');
