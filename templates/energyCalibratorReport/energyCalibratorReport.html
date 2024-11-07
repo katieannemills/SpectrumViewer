@@ -334,7 +334,6 @@ this.fitAllSinglesPeaks = function(){
 
             // update the progress bar
             dataStore.progressBarTasksCompleted++;
-            console.log('Tasks completed '+dataStore.progressBarTasksCompleted+' of '+dataStore.progressBarNumberTasks+' tasks, '+(100*(dataStore.progressBarTasksCompleted / dataStore.progressBarNumberTasks))+'%');
             document.getElementById('progress').setAttribute('style', 'width:' + (100*(dataStore.progressBarTasksCompleted / dataStore.progressBarNumberTasks)) + '%' );
 
 // fitting singles
@@ -605,7 +604,6 @@ this.postFittingTasks = function(){
 
   // We are finished
   dataStore.currentTask = 'Finished';
-  console.log('Everything completed. Tasks completed '+dataStore.progressBarTasksCompleted+' of '+dataStore.progressBarNumberTasks+' tasks, '+(dataStore.progressBarTasksCompleted / dataStore.progressBarNumberTasks)+'.');
   document.getElementById('progress').setAttribute('style', 'width:' + (100) + '%' );
   console.log(dataStore);
 },

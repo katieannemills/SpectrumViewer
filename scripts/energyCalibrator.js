@@ -42,7 +42,7 @@ function setupDataStore(){
     GetURLArguments();
 
     //dataStore.numberOfClovers = 16;                                     // Default number of clovers is all of the array
-    dataStore.numberOfClovers = 1;                                     // Default number of clovers is all of the array
+    dataStore.numberOfClovers = 16;                                     // Default number of clovers is all of the array
     // shouldn't need to change anything below this line -----------------------------------------------------------------------
 
     // Pagination for the results and plotting display
