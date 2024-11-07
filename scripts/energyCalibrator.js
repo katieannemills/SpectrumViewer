@@ -458,8 +458,11 @@ function fetchCallback(){
 	var j=0;
 	while(keys[j] != dataStore.currentSource){ j++; }
 	j++;
-	console.log('Next source in fetchCallback(): '+dataStore.sourceInfo[keys[j]].title);
-  document.getElementById('progress').setAttribute('style', 'width:' + (5*(j+1)) + '%' );
+  console.log('Next source in fetchCallback(): '+dataStore.sourceInfo[keys[j]].title);
+  // update the progress bar
+  dataStore.progressBarTasksCompleted++;
+  console.log('Tasks completed '+dataStore.progressBarTasksCompleted+' of '+dataStore.progressBarNumberTasks+' tasks, '+(100*(dataStore.progressBarTasksCompleted / dataStore.progressBarNumberTasks))+'%');
+  document.getElementById('progress').setAttribute('style', 'width:' + (100*(dataStore.progressBarTasksCompleted / dataStore.progressBarNumberTasks)) + '%' );
 
 	// Set the dataStore.histoFileName to this source so that constructQueries requests the correct spectrum
 	dataStore.currentSource = keys[j];
@@ -469,7 +472,6 @@ function fetchCallback(){
 	dataStore._plotControl.refreshAll();
 	return;
     }
-    document.getElementById('progress').setAttribute('style', 'width:' + (25) + '%' );
     console.log('I think I have all the spectra from all histogram files!');
     console.log(dataStore.rawData);
     console.log(dataStore.THESEdetectors);
@@ -620,6 +622,9 @@ function submitHistoFilenameChoices(){
 
   // Get the keys of the different sources again as they may have changed
   var keys = Object.keys(dataStore.sourceInfo);
+
+  // Add the file and config fetching as tasks to complete for the progress bar
+  dataStore.progressBarNumberTasks += keys.length;
 
   // Save the lists of spectrum names to the dataStore for this detectorType
   if(dataStore.detectorType == 'HPGe'){
@@ -942,7 +947,10 @@ function processConfigFileForCalibrations(payload){
   while(keys[j] != dataStore.currentSource){ j++; }
   j++;
   console.log('Next source in processConfigFileForCalibrations(): '+dataStore.sourceInfo[keys[j]].title);
-  document.getElementById('progress').setAttribute('style', 'width:' + (5*(j+1)) + '%' );
+  // update the progress bar
+  dataStore.progressBarTasksCompleted++;
+  console.log('Tasks completed '+dataStore.progressBarTasksCompleted+' of '+dataStore.progressBarNumberTasks+' tasks, '+(100*(dataStore.progressBarTasksCompleted / dataStore.progressBarNumberTasks))+'%');
+  document.getElementById('progress').setAttribute('style', 'width:' + (100*(dataStore.progressBarTasksCompleted / dataStore.progressBarNumberTasks)) + '%' );
 
   // Set the dataStore.histoFileName to this source
   dataStore.currentSource = keys[j];
