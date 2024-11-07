@@ -1027,50 +1027,12 @@ function updateODB(obj){
 }
 
 
-function buildCalfile(){
-    console.log('Download initiated');
-
-    // Write the Cal file content based on the list in the ODB and the fitted results
-    CAL = '';
-
-    for(i=0; i<dataStore.PSCchannels.length; i++){
-        if(dataStore.PSCchannels[i].slice(0,3) == 'XXX'){ continue; }
-       CAL += dataStore.PSCchannels[i]+' { \n';
-       CAL += 'Name:	'+dataStore.PSCchannels[i]+'\n';
-       CAL += 'Number:	'+i+'\n';
-	CAL += 'Address:	0x'+dataStore.PSCaddresses[i].toString(16).toLocaleString(undefined, {minimumIntegerDigits: 2})+'\n';
-       CAL += 'Digitizer:	GRF16\n';
-        if(dataStore.PSCchannels[i].slice(0,3) == dataStore.THESEdetectors[0].slice(0,3)){
-	CAL += 'EngCoeff:	'+dataStore.fitResults[dataStore.PSCchannels[i]+'_Pulse_Height'][4][0]+' '+dataStore.fitResults[dataStore.PSCchannels[i]+'_Pulse_Height'][4][1]+' '+dataStore.fitResults[dataStore.PSCchannels[i]+'_Pulse_Height'][4][2]+'\n';
-	}else{
-       CAL += 'EngCoeff:	0 1 0\n';
-	}
-	CAL += 'Integration:	0\n';
-       CAL += 'ENGChi2:	0\n';
-       CAL += 'FileInt:	0\n';
-       CAL += '}\n';
-       CAL += '\n';
-       CAL += '//====================================//\n';
-    }
-
-    // Create a download link
-    const textBlob = new Blob([CAL], {type: 'text/plain'});
-    URL.revokeObjectURL(window.textBlobURL);
-    const downloadLink = document.createElement('a');
-    downloadLink.href = URL.createObjectURL(textBlob);
-    downloadLink.download = document.getElementById('saveCalname').value;
-
-    // Trigger the download
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-}
-
 function buildCSVfile(){
     console.log('Download initiated');
     var keys = Object.keys(dataStore.sourceInfo);
 
     // Write the table of results to a CSV file for download.
-    CSV = '';
+    var CSV = '';
 
     CSV += 'GRIFFIN Efficiency Data\n\n';
 
@@ -1141,12 +1103,107 @@ function buildCSVfile(){
     downloadLink.click();
 }
 
-function buildGNUfile(){
-    console.log('Download initiated');
+function buildDatafile(){
+    console.log('Download of data file initiated');
     var keys = Object.keys(dataStore.sourceInfo);
 
-    // Write the table of results to a GNUplot file for download.
-    GNU = '';
+    // Write the table of results to a data file for download.
+    var DATA = '';
+
+    // Loop through all peaks for all sources to provide the data
+    for(i=0; i<keys.length; i++){
+      currentSource = keys[i];
+      for(currentPeak=0; currentPeak<dataStore.sourceInfo[currentSource]['literaturePeaks'].length; currentPeak++){
+        DATA += dataStore.sourceInfo[currentSource].literaturePeaks[currentPeak] + ' ';
+        DATA += dataStore.sourceInfo[currentSource].absoluteEfficiency[currentPeak]+' ';
+        DATA += dataStore.sourceInfo[currentSource].absoluteEfficiencyUnc[currentPeak]+'\n';
+      }
+    }
+
+    // Create a download link
+    const textBlob = new Blob([DATA], {type: 'text/plain'});
+    URL.revokeObjectURL(window.textBlobURL);
+    const downloadLink = document.createElement('a');
+    downloadLink.href = URL.createObjectURL(textBlob);
+    downloadLink.download = "GRIFFIN_efficiency_data.dat";
+
+    // Trigger the download
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+}
+
+function buildRootfile(){
+    console.log('Download of Root script initiated');
+    var keys = Object.keys(dataStore.sourceInfo);
+
+    // Generate the Root script file for download.
+    var ROOT = '';
+
+    ROOT += 'void efficiency_curve_GRIFFIN(){\n';
+    ROOT += '\n';
+    ROOT += '  //reading output file from grif_replay:\n';
+    ROOT += '  ifstream * f = new ifstream(\"GRIFFIN_efficiency_data.dat\");\n';
+    ROOT += '\n';
+    ROOT += '  float energy, efficiency, error;\n';
+    ROOT += '  std::vector<float> v_energies;\n';
+    ROOT += '  std::vector<float> v_efficiencies;\n';
+    ROOT += '\n';
+    ROOT += '  while(*f>>energy>>efficiency>>error){\n';
+    ROOT += '    cout<<\"Energy: \"<<energy<<\" Efficiency: \"<<efficiency<<\" Error: \"<<error<<endl;\n';
+    ROOT += '    v_energies.push_back(energy);\n';
+    ROOT += '    v_efficiencies.push_back(efficiency);\n';
+    ROOT += '  }\n';
+    ROOT += '\n';
+    ROOT += '  //define your fit function\n';
+    ROOT += '  //TF1 *function_name= new TF1("function_name", "function", low_limit, high_limit)\n';
+    ROOT += '  TF1 *f_fit = new TF1(\"f_fit\", \"exp(([0]*log(x*0.001)**0) + ([1]*log(x*0.001)**1) + ([2]*log(x*0.001)**2) + ([3]*log(x*0.001)**3) +';
+    ROOT += ' ([4]*log(x*0.001)**4) + ([5]*log(x*0.001)**5) + ([6]*log(x*0.001)**6) + ([7]*log(x*0.001)**7) + ([8]*log(x*0.001)**8))\",0,3600);\n';
+    ROOT += '\n';
+    ROOT += '  // set initial values for the parameters';
+    ROOT += '  f_fit->SetParameter(0,11.2);\n';
+    ROOT += '  f_fit->SetParameter(1,-0.5);\n';
+    ROOT += '  f_fit->SetParameter(2,-0.05);\n';
+    ROOT += '  f_fit->SetParameter(3,-0.09);\n';
+    ROOT += '  f_fit->SetParameter(4,0.01);\n';
+    ROOT += '  f_fit->SetParameter(5,0.0001);\n';
+    ROOT += '  f_fit->SetParameter(6,-0.04);\n';
+    ROOT += '  f_fit->SetParameter(7,-0.02);\n';
+    ROOT += '  f_fit->SetParameter(8,-0.003);\n';
+    ROOT += '\n';
+    ROOT += '  // Create the graph and plot the data\n';
+    ROOT += '  TGraph *gCurve = new TGraph(v_energies.size(), &(v_energies.at(0)),&(v_efficiencies.at(0)));\n';
+    ROOT += '  gCurve->GetXaxis()->SetTitle(\"E_{#gamma} [keV]\");\n';
+    ROOT += '  gCurve->GetYaxis()->SetTitle(\"Efficiency\");\n';
+    ROOT += '  gCurve->SetTitle(\"Efficiency Fit\");\n';
+    ROOT += '  gCurve->SetLineColor(kBlue); //https://root.cern.ch/doc/v632/classTColor.html\n';
+    ROOT += '  gCurve->SetMarkerStyle(8);\n';
+    ROOT += '  gCurve->SetMarkerSize(1);\n';
+    ROOT += '\n';
+    ROOT += '  // Fit the data\n';
+    ROOT += '  gCurve->Fit(f_fit,\"R\");\n';
+    ROOT += '\n';
+    ROOT += '  // Plot the fit result\n';
+    ROOT += '  gCurve->Draw(\"AP\"); //https://root.cern/root/html524/TGraphPainter.html\n';
+    ROOT += '}\n';
+
+    // Create a download link
+    const textBlob = new Blob([ROOT], {type: 'text/plain'});
+    URL.revokeObjectURL(window.textBlobURL);
+    const downloadLink = document.createElement('a');
+    downloadLink.href = URL.createObjectURL(textBlob);
+    downloadLink.download = document.getElementById('saveRootname').value;
+
+    // Trigger the download
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+}
+
+function buildGNUfile(){
+    console.log('Download of GNUPlot file initiated');
+    var keys = Object.keys(dataStore.sourceInfo);
+
+    // Generate the table of results to a GNUplot file for download.
+    var GNU = '';
 
     GNU += '# GRIFFIN Efficiency curve GNU plot file\n\n';
     GNU += '# set terminal pngcairo  transparent enhanced font \"arial,10\" fontscale 1.0 size 600, 400 \n';
@@ -1177,50 +1234,16 @@ function buildGNUfile(){
     GNU += 'gf1H=-0.02\n';
     GNU += 'gf1I=-0.003\n';
     GNU += 'gf1(x) = exp((gf1A*log(x*0.001)**0) + (gf1B*log(x*0.001)**1) + (gf1C*log(x*0.001)**2) + (gf1D*log(x*0.001)**3) + (gf1E*log(x*0.001)**4) + (gf1F*log(x*0.001)**5) + (gf1G*log(x*0.001)**6) + (gf1H*log(x*0.001)**7) + (gf1I*log(x*0.001)**8))\n';
-    GNU += 'fit gf1(x) \"-\" u 1:2:3 yerrors via gf1A, gf1B, gf1C, gf1D, gf1E, gf1F, gf1G, gf1H, gf1I\n\n';
+    GNU += 'fit gf1(x) \"GRIFFIN_efficiency_data.dat\" u 1:2:3 yerrors via gf1A, gf1B, gf1C, gf1D, gf1E, gf1F, gf1G, gf1H, gf1I\n\n';
 
     GNU += '## Plot the data points\n';
-    GNU += 'plot [40:10000] \"-\" t \"Data from ';
+    GNU += 'plot [40:10000] \"GRIFFIN_efficiency_data.dat\" t \"Data from ';
     for(i=0; i<keys.length; i++){
       if(i>0){ GNU += '+'; }
     GNU += keys[i];
     }
     GNU += '\" w yerr, \\\n';
     GNU += 'gf1(x) t \"Efficiency fit\"\n';
-
-    // Loop through all peaks for all sources to provide the data
-
-    for(i=0; i<keys.length; i++){
-      currentSource = keys[i];
-      for(currentPeak=0; currentPeak<dataStore.sourceInfo[currentSource]['literaturePeaks'].length; currentPeak++){
-        GNU += dataStore.sourceInfo[currentSource].literaturePeaks[currentPeak] + ' ';
-        GNU += dataStore.sourceInfo[currentSource].absoluteEfficiency[currentPeak]+' ';
-        GNU += dataStore.sourceInfo[currentSource].absoluteEfficiencyUnc[currentPeak]+'\n';
-      }
-    }
-    /*
-    for(i=0; i<keys.length; i++){
-      currentSource = keys[i];
-      for(currentPeak=0; currentPeak<dataStore.sourceInfo[currentSource]['literaturePeaks'].length; currentPeak++){
-        GNU += dataStore.sourceInfo[currentSource].literaturePeaks[currentPeak] + '\n';
-      }
-    }
-    GNU += 'e\n';
-    for(i=0; i<keys.length; i++){
-      currentSource = keys[i];
-      for(currentPeak=0; currentPeak<dataStore.sourceInfo[currentSource]['literaturePeaks'].length; currentPeak++){
-        GNU += dataStore.sourceInfo[currentSource].absoluteEfficiency[currentPeak] + '\n';
-      }
-    }
-    GNU += 'e\n';
-    for(i=0; i<keys.length; i++){
-      currentSource = keys[i];
-      for(currentPeak=0; currentPeak<dataStore.sourceInfo[currentSource]['literaturePeaks'].length; currentPeak++){
-        GNU += dataStore.sourceInfo[currentSource].absoluteEfficiencyUnc[currentPeak] + '\n';
-      }
-    }
-    GNU += 'e\n';
-*/
 
     // Create a download link
     const textBlob = new Blob([GNU], {type: 'text/plain'});

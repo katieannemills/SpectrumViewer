@@ -3,7 +3,7 @@
 <template id='energyCalibratorReport'>
     <div class='sectionWrapper item'>
         <div class='col-md-12'>
-            <div id='tableMenuDiv'></div>
+            <div id='tableMenuDiv'></div><div id='reportCardDiv'></div>
             <table id='{{id}}energyCalibratorResults' class='table energyCalibratorTable'></table>
 
             <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myAnalyzerModal">
@@ -174,6 +174,8 @@ this.refreshTableData = function(thisDetectorIndex){
    document.getElementById(thisID+'energyCentroid').innerHTML = dataStore.THESEcalibrations[thisDetectorIndex].xEn[i].toFixed(2);
    document.getElementById(thisID+'residual').innerHTML = dataStore.THESEcalibrations[thisDetectorIndex].residual[i].toFixed(4);
  }
+ document.getElementById('reportCardDiv').innerHTML = "Mean of residuals = "+ dataStore.THESEcalibrations[thisDetectorIndex].residualMean.toFixed(2) +
+ "keV, Variance of residuals = "+ dataStore.THESEcalibrations[thisDetectorIndex].residualVar.toFixed(2)+"keV";
 },
 
 this.fitAllSinglesPeaks = function(){
@@ -599,6 +601,7 @@ this.postFittingTasks = function(){
   }
 
   // Report all results in a table
+  this.refreshTableData(0);
 
   // We are finished
   dataStore.currentTask = 'Finished';
@@ -637,13 +640,25 @@ this.fitEnergyCalibrationData = function(thisDetector){
   var thisCalibrationIndex = dataStore.sourceInfo[thisSource].Config.map(function(e) { return e.name; }).indexOf(dataStore.THESEdetectors[thisDetector]);
   dataStore.THESEcalibrations[thisDetector].address = dataStore.sourceInfo[thisSource].Config[thisCalibrationIndex].address;
 
+  dataStore.THESEcalibrations[thisDetector].residualMean = 0;
   for(var j=0; j<dataStore.THESEcalibrations[thisDetector].xPH.length; j++){
     var x = dataStore.THESEcalibrations[thisDetector].xPH[j];
     // Calculate the Energy centroids from the new coefficients
     dataStore.THESEcalibrations[thisDetector].xEn[j] = (x*x*dataStore.THESEcalibrations[thisDetector].fit.quad) + (x*dataStore.THESEcalibrations[thisDetector].fit.gain) + dataStore.THESEcalibrations[thisDetector].fit.offset;
     // Calculate the residuals of the re-calibrated peak centroids
     dataStore.THESEcalibrations[thisDetector].residual[j] = dataStore.THESEcalibrations[thisDetector].y[j] - dataStore.THESEcalibrations[thisDetector].xEn[j];
+    dataStore.THESEcalibrations[thisDetector].residualMean += Math.abs(dataStore.THESEcalibrations[thisDetector].residual[j]);
   }
+  dataStore.THESEcalibrations[thisDetector].residualMean /= dataStore.THESEcalibrations[thisDetector].residual.length;
+
+  dataStore.THESEcalibrations[thisDetector].residualVar = 0;
+  var mean = dataStore.THESEcalibrations[thisDetector].residualMean;
+  for(var j=0; j<dataStore.THESEcalibrations[thisDetector].xPH.length; j++){
+dataStore.THESEcalibrations[thisDetector].residualVar +=
+(Math.abs(dataStore.THESEcalibrations[thisDetector].residual[j]) - mean) * (Math.abs(dataStore.THESEcalibrations[thisDetector].residual[j]) - mean);
+  }
+  dataStore.THESEcalibrations[thisDetector].residualVar /= dataStore.THESEcalibrations[thisDetector].residual.length;
+
 },
 
 this.updateEnergies = function(){

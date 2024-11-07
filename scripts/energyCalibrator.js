@@ -42,7 +42,7 @@ function setupDataStore(){
     GetURLArguments();
 
     //dataStore.numberOfClovers = 16;                                     // Default number of clovers is all of the array
-    dataStore.numberOfClovers = 16;                                     // Default number of clovers is all of the array
+    dataStore.numberOfClovers = 1;                                     // Default number of clovers is all of the array
     // shouldn't need to change anything below this line -----------------------------------------------------------------------
 
     // Pagination for the results and plotting display
@@ -736,6 +736,8 @@ function submitHistoFilenameChoices(){
       'xEn':[],                              //Calibrated energy centroids (using newly determined coefficients)
       'y': listOfLiteratureEnergies,         //literature energies
       'residual':[],                         // difference of Energy centroid to literature energy
+      'residualMean':0,                      // mean of the residuals
+      'residualVar':0,                       // standard deviation of the residuals
       'fit':{'string':"",'quad':0, 'gain':0, 'offset':0,'r2':0}       // string is the equation, quad, gain, offset the coefficient, r2 the efficient of determination
     }
   }
