@@ -89,7 +89,6 @@
             }
             );
             // table has to be done as a separate template, since templates and tables don't play too nice together
-          console.log('Inject the Table');
     // Build the list of rows for the table. Loop through each peak of each source
           var peaks =[];
           for(var i=0; i<dataStore.THESEcalibrations[0].y.length; i++){
@@ -166,7 +165,6 @@
 },
 
 this.refreshTableData = function(thisDetectorIndex){
- console.log("Table select for "+thisDetectorIndex+", "+dataStore.THESEdetectors[thisDetectorIndex]);
 
  for(var i=0; i<dataStore.THESEcalibrations[thisDetectorIndex].y.length; i++){
    var thisID = 'energyCalibrator'+dataStore.THESEcalibrations[thisDetectorIndex].y[i];
@@ -181,8 +179,6 @@ this.refreshTableData = function(thisDetectorIndex){
 this.fitAllSinglesPeaks = function(){
             //fit all spectra to the peaks defined.
             //this: efficiencyFitterReport object
-            console.log("fitAllSinglesPeaks");
-    console.log(dataStore);
 
     var i, keys = Object.keys(dataStore.spectrumListSingles);
     var buffer = dataStore.currentPlot; //keep track of whatever was originally plotted so we can return to it
@@ -208,13 +204,8 @@ this.fitAllSinglesPeaks = function(){
                     //leave the viewer pointing at the first spectrum for fitting
                         dispatcher({target: buffer}, 'fitAllComplete')
 
-                    // Message to console
-                        console.log('fitAllSinglesPeaks releaser has finished its work. Now have all peaks fitted for singles spectra.');
-
                     // Set the current task to keep track of our progress
                         dataStore.currentTask = 'Review';
-
-                        console.log(dataStore);
 
                         // Go to the post-fitting tasks
                         this.postFittingTasks();
@@ -269,7 +260,6 @@ this.fitAllSinglesPeaks = function(){
 
             this.addFitLines = function(){
               //add current fits to the plot
-              console.log('addFitLines in efficiencyFitterReport');
 
               var fitLines = [];
               var lower, upper, middle
@@ -278,26 +268,12 @@ this.fitAllSinglesPeaks = function(){
               dataStore.viewers[viewerName].containerFit.removeAllChildren();
 
               // Set the current Source for this spectrum
-              dataStore.currentSource = Object.keys(dataStore.sourceInfo).find(key => dataStore.sourceInfo[key].histoFileName.split('.')[0] === dataStore.currentPlot.split(':')[0])
-              console.log('addFitLines for '+dataStore.currentPlot+', identify key '+dataStore.currentSource+' during '+dataStore.currentTask);
+              dataStore.currentSource = Object.keys(dataStore.sourceInfo).find(key => dataStore.sourceInfo[key].histoFileName.split('.')[0] === dataStore.currentPlot.split(':')[0]);
 
               // Set the current detector name (crystalIndex) for this spectrum
               dataStore.currentDetector = dataStore.THESEdetectors.indexOf(dataStore.currentPlot.split(':')[1].split('_')[0]);
 
-              console.log(dataStore.currentSource+": "+dataStore.THESEdetectors[dataStore.currentDetector]+" from "+dataStore.currentPlot);
-              console.log(dataStore.fitResults);
-
-/*
-              // Bail out of no fitResults yet
-              if(!dataStore.fitResults[dataStore.currentPlot]){
-                console.log('No fitResults yet for '+dataStore.currentPlot+' in addFitLines so bailing out');
-                return;
-              }
-              */
-
-              // Only try to save the fit if the fitResults exist
-        //      if(dataStore.fitResults[dataStore.currentPlot]){
-                // fitting singles
+                // Loop through all peaks for this source
                 for(var i=0; i<dataStore.sourceInfo[dataStore.currentSource].literaturePeaks.length; i++){
                   //add fit lines
                   fitLines[i] = dataStore.viewers[viewerName].addFitLine(
@@ -309,10 +285,9 @@ this.fitAllSinglesPeaks = function(){
                   dataStore.fitResults[dataStore.currentPlot][i][3],
                   dataStore.fitResults[dataStore.currentPlot][i][4]
                   );
-                }
 
-                dataStore.viewers[viewerName].containerFit.addChild(fitLines[i]);
-          //    }
+                  dataStore.viewers[viewerName].containerFit.addChild(fitLines[i]);
+                }
 
               dataStore.viewers[viewerName].stage.update();
         },
@@ -390,7 +365,6 @@ return;
 
             // define the ID for the HTML elements
             thisID = this.wrapID + dataStore.currentSource + '-P' + dataStore.currentPeak;
-            console.log('updateTable for '+thisID);
 
 // Update the literature parts of the table
             if(dataStore.currentPeak == 0)

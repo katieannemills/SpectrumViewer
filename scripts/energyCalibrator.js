@@ -41,7 +41,6 @@ function setupDataStore(){
     // Get the analyzer Server and ODB host names from the URL
     GetURLArguments();
 
-    //dataStore.numberOfClovers = 16;                                     // Default number of clovers is all of the array
     dataStore.numberOfClovers = 16;                                     // Default number of clovers is all of the array
     // shouldn't need to change anything below this line -----------------------------------------------------------------------
 
@@ -449,7 +448,6 @@ function setupDataStore(){
 setupDataStore();
 
 function fetchCallback(){
-    console.log('fetchCallback');
 
     // If we have not recieved the histograms from all sources yet, request the histograms from the next source
     // Get the keys of all the different sources
@@ -458,10 +456,9 @@ function fetchCallback(){
 	var j=0;
 	while(keys[j] != dataStore.currentSource){ j++; }
 	j++;
-  console.log('Next source in fetchCallback(): '+dataStore.sourceInfo[keys[j]].title);
+
   // update the progress bar
   dataStore.progressBarTasksCompleted++;
-  console.log('Tasks completed '+dataStore.progressBarTasksCompleted+' of '+dataStore.progressBarNumberTasks+' tasks, '+(100*(dataStore.progressBarTasksCompleted / dataStore.progressBarNumberTasks))+'%');
   document.getElementById('progress').setAttribute('style', 'width:' + (100*(dataStore.progressBarTasksCompleted / dataStore.progressBarNumberTasks)) + '%' );
 
 	// Set the dataStore.histoFileName to this source so that constructQueries requests the correct spectrum
@@ -472,9 +469,6 @@ function fetchCallback(){
 	dataStore._plotControl.refreshAll();
 	return;
     }
-    console.log('I think I have all the spectra from all histogram files!');
-    console.log(dataStore.rawData);
-    console.log(dataStore.THESEdetectors);
 
     // We have all the histograms, we need to get the config file of each file to obtain the Calibrations
     // Request viewConfig from the server for the histrogram file of the first source
@@ -612,7 +606,6 @@ function submitHistoFilenameChoices(){
   for(i=0; i<keys.length; i++){
     if(dataStore.sourceInfo[keys[i]].histoFileName == "exclude" ||
     dataStore.sourceInfo[keys[i]].histoFileName.length<2){
-      console.log("Deleting "+keys[i]+"from dataStore.sourceInfo");
       delete dataStore.sourceInfo[keys[i]];
       if(document.getElementById('efficiencyPlot'+keys[i])){
         document.getElementById('efficiencyPlot'+keys[i]).style.display = 'none';
@@ -719,8 +712,6 @@ function submitHistoFilenameChoices(){
     }
   }
   }
-  console.log(dataStore.ROI);
-  console.log(dataStore);
 
   // Collect the list of Literature energies from all sources
   var listOfLiteratureEnergies = [];
@@ -753,7 +744,6 @@ function submitHistoFilenameChoices(){
 
   // Issue the request for the spectra of the first source.
   // The request for additional sources will be issued in the fetchCallback
-  console.log('First source in submitHistoFilenameChoices(): '+dataStore.sourceInfo[keys[0]].title);
 
   // Set the dataStore.histoFileName to this source so that constructQueries requests the correct spectrum
   dataStore.currentSource = keys[0];
@@ -908,7 +898,6 @@ function buildCalfile(){
 }
 
 function viewConfigOfHisto(histo){
-    console.log('View config of Histogram '+histo);
 
     // Format check for the data file
     HistoFileDirectory = dataStore.histoFileDirectoryPath;
@@ -925,59 +914,53 @@ function viewConfigOfHisto(histo){
 
 function processConfigFileForCalibrations(payload){
 
-	// Unpack the response from the server into a local variable
-	console.log(payload);
-    var thisConfig = JSON.parse(payload);
-	console.log(thisConfig);
+  // Unpack the response from the server into a local variable
+  var thisConfig = JSON.parse(payload);
 
-    var content = '';
+  var content = '';
 
-    // We only care about the Calbrations in this app
-    // Save the contents of the Config file for this Histogram file for this source
-    dataStore.sourceInfo[dataStore.currentSource].Config = thisConfig.Analyzer[4].Calibrations;
+  // We only care about the Calbrations in this app
+  // Save the contents of the Config file for this Histogram file for this source
+  dataStore.sourceInfo[dataStore.currentSource].Config = thisConfig.Analyzer[4].Calibrations;
 
-    console.log('Callback: processConfigFileForCalibrations for '+dataStore.currentSource);
-    console.log(dataStore.sourceInfo[dataStore.currentSource].Config);
+  // If we have not recieved the config files from all runfiles yet, request the config from the next source
+  // Get the keys of all the different sources
+  var keys = Object.keys(dataStore.sourceInfo);
+  if(dataStore.currentSource != keys[keys.length-1]){
+    var j=0;
+    while(keys[j] != dataStore.currentSource){ j++; }
+    j++;
 
-    // If we have not recieved the config files from all runfiles yet, request the config from the next source
-    // Get the keys of all the different sources
-    var keys = Object.keys(dataStore.sourceInfo);
-    if(dataStore.currentSource != keys[keys.length-1]){
-  var j=0;
-  while(keys[j] != dataStore.currentSource){ j++; }
-  j++;
-  console.log('Next source in processConfigFileForCalibrations(): '+dataStore.sourceInfo[keys[j]].title);
-  // update the progress bar
-  dataStore.progressBarTasksCompleted++;
-  console.log('Tasks completed '+dataStore.progressBarTasksCompleted+' of '+dataStore.progressBarNumberTasks+' tasks, '+(100*(dataStore.progressBarTasksCompleted / dataStore.progressBarNumberTasks))+'%');
-  document.getElementById('progress').setAttribute('style', 'width:' + (100*(dataStore.progressBarTasksCompleted / dataStore.progressBarNumberTasks)) + '%' );
+    // update the progress bar
+    dataStore.progressBarTasksCompleted++;
+    document.getElementById('progress').setAttribute('style', 'width:' + (100*(dataStore.progressBarTasksCompleted / dataStore.progressBarNumberTasks)) + '%' );
 
-  // Set the dataStore.histoFileName to this source
-  dataStore.currentSource = keys[j];
-  dataStore.histoFileName = dataStore.sourceInfo[keys[j]].histoFileName;
+    // Set the dataStore.histoFileName to this source
+    dataStore.currentSource = keys[j];
+    dataStore.histoFileName = dataStore.sourceInfo[keys[j]].histoFileName;
 
-  // Request viewConfig from the server for this histrogram file
-  viewConfigOfHisto(dataStore.histoFileName);
-  return;
-    }
+    // Request viewConfig from the server for this histrogram file
+    viewConfigOfHisto(dataStore.histoFileName);
+    return;
+  }
 
-    // If we get to here than we have received all Config files from all sources.
-    // Next launch the fitting.
+  // If we get to here than we have received all Config files from all sources.
+  // Next launch the fitting.
 
-        // change messages
-        deleteNode('downloadMessage');
-        document.getElementById('fittingSinglesMessage').classList.remove('hidden');
+  // change messages
+  deleteNode('downloadMessage');
+  document.getElementById('fittingSinglesMessage').classList.remove('hidden');
 
-        // Populate the list of spectra to be fitted
-        var spectrumKeys = Object.keys(dataStore.rawData);
-        for(var i=0; i<spectrumKeys.length; i++){
-          // List of all singles spectra to be fitted
-          dataStore.spectrumListSingles[spectrumKeys[i]] = dataStore.rawData[spectrumKeys[i]];
-        }
+  // Populate the list of spectra to be fitted
+  var spectrumKeys = Object.keys(dataStore.rawData);
+  for(var i=0; i<spectrumKeys.length; i++){
+    // List of all singles spectra to be fitted
+    dataStore.spectrumListSingles[spectrumKeys[i]] = dataStore.rawData[spectrumKeys[i]];
+  }
 
-        // Set the current task to keep track of our progress
-        dataStore.currentTask = 'SinglesFitting';
+  // Set the current task to keep track of our progress
+  dataStore.currentTask = 'SinglesFitting';
 
-        // Start the whole fitting routine for singles peaks
-        dataStore._energyCalibratorReport.fitAllSinglesPeaks();
+  // Start the whole fitting routine for singles peaks
+  dataStore._energyCalibratorReport.fitAllSinglesPeaks();
 }
