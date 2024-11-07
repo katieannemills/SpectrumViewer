@@ -229,7 +229,6 @@ this.fitAllSinglesPeaks = function(){
               //redo the fits for the named spectrum.
               //<spectrum>: string; name of spectrum, per names from analyzer
               //this: efficiencyFitterReport object
-              console.log("fitSpectra");
 
               var viewerName = dataStore.plots[0];
 
@@ -241,7 +240,6 @@ this.fitAllSinglesPeaks = function(){
 
               // Set the current Source for this spectrum
               dataStore.currentSource = Object.keys(dataStore.sourceInfo).find(key => dataStore.sourceInfo[key].histoFileName.split('.')[0] === spectrum.split(':')[0])
-              console.log('fitSpectra for '+spectrum+', identify key '+dataStore.currentSource);
 
               //set the x axis valueRange
               document.getElementById('maxX').value = dataStore.sourceInfo[dataStore.currentSource].maxXValue;
@@ -249,7 +247,6 @@ this.fitAllSinglesPeaks = function(){
 
               // Set the current detector name (crystalIndex) for this spectrum
               dataStore.currentDetector = dataStore.THESEdetectors.indexOf(dataStore.currentPlot.split(':')[1].split('_')[0]);
-              console.log("currentDetector["+dataStore.currentDetector+"] = "+dataStore.THESEdetectors[dataStore.currentDetector]+"from "+dataStore.currentPlot);
 
               // fitting singles
 
