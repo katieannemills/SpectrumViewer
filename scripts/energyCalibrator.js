@@ -41,7 +41,7 @@ function setupDataStore(){
     // Get the analyzer Server and ODB host names from the URL
     GetURLArguments();
 
-    dataStore.numberOfClovers = 16;                                     // Default number of clovers is all of the array
+    dataStore.numberOfClovers = 1;                                     // Default number of clovers is all of the array
     // shouldn't need to change anything below this line -----------------------------------------------------------------------
 
     // Pagination for the results and plotting display
@@ -53,7 +53,7 @@ function setupDataStore(){
     // Variables for Pagination menu buttons
     dataStore.buttonNames = ["Spectra", "Detector Results", "Fit Coefficients"];                      // Names to appear on the buttons
     dataStore.buttonIDs = ["plotRegionMenuButton", "tableRegionMenuButton", "graphRegionMenuButton"]; // IDs for the buttons
-    dataStore.buttonPages = ["plotRegion", "energyCalibrator", "efficiencyPlotWrap"];                 // Pages (div IDs) to be associated with the buttons
+    dataStore.buttonPages = ["plotRegion", "detectorReportRegion", "resultsTableRegion"];                 // Pages (div IDs) to be associated with the buttons
 
 
     dataStore.pageTitle = 'Efficiency Fitter';                                   //header title
@@ -281,11 +281,51 @@ function setupDataStore(){
     //resolution plot
     dataStore._dataplot = [];                 // Place for all dataplot objects to be created as an array. This makes them indexable and iteratable
     dataStore.dataplotData = [];                                       // place for dataplot data
-    dataStore.efficiencyPlotDataKeyMap = ['Abs', 'Rel', '133Ba', '152Eu', '56Co', '60Co'];
-    dataStore.efficiencyPlotEquationParameters = [];
-    dataStore.efficiencyPlotEquationParameters[0] = [];
-    dataStore.efficiencyPlotEquationParameters[1] = [];
+    dataStore.PlotDetails = {};
+    dataStore.PlotDetails = {
+      'detectorEfficiencyCurve':{
+        'plotID':0,                         // Used for the dataStore._dataplot[plotID]
+        'equationParameters':[],            // Equation for a line to be plotted over data
+        'plotInitData': [[0,0], [1,0], [2,0], [3,0], [4,0]], // initial data has to match number of series
+        'Xdata': [],                        // X axis data points
+        'Ydata': [],                        // Y axis data points
+        'Y2data': [],                       // Y2 axis data points
+        'YAxisMinValue': [[0,0], [0,0], [0,0], [0,0], [0,0], [0,0]], // initial min values for each series,
+        'YAxisMaxValue': [[0,0], [0,0], [0,0], [0,0], [0,0], [0,0]], // initial max values for each series
+        'annotations': [0,0],               // place for annotations
+        'plotStyle' : {                     //dygraphs style object
+          labels: ["Peak Energy (keV)", "Residual (keV)"],
+          title: 'Energy residual in new calibration',
+          axisLabelColor: '#FFFFFF',
+          colors: ["#AAE66A", "#EFB2F0", "#B2D1F0", "#F0DBB2"],
+          labelsDiv: 'detectorReportPlotLegend',
+          drawPoints: 'true',
+          connectSeparatedPoints: 'true',
+          pointSize: '5',
+          strokeWidth: '0',
+          legend: 'always',
+          axes: { x: { valueRange: [0,10000] }, y : { valueRange: [0,10] } }
+        }
+      }
+    };
+    dataStore.plotStyle = [];
+    dataStore.plotStyle[0] = {                     //dygraphs style object
+      labels: ["Peak Energy (keV)", "Residual (keV)"],
+      title: 'Energy residual in new calibration',
+      axisLabelColor: '#FFFFFF',
+      colors: ["#AAE66A", "#EFB2F0", "#B2D1F0", "#F0DBB2"],
+      labelsDiv: 'detectorReportPlotLegend',
+      drawPoints: 'true',
+      connectSeparatedPoints: 'true',
+      pointSize: '5',
+      strokeWidth: '0',
+      legend: 'always',
+      axes: { x: { valueRange: [0,10000] }, y : { valueRange: [0,10] } }
+    }
+    dataStore.efficiencyPlotDataKeyMap = ['Abs', 'Rel', '133Ba', '152Eu', '56Co', '60Co', '11Be'];
+    dataStore.efficiencyPlotEquationParameters = [[],[]];
     dataStore.efficiencyPlotData = [];
+    dataStore.efficiencyPlotDataUnc = [[],[],[],[],[],[],[]]; // Y uncertainty values for drawing the error bars
     dataStore.efficiencyPlotY2Data = [];
     dataStore.efficiencyPlotY2Data[0] = [];
     dataStore.efficiencyPlotY2Data[1] = [];
@@ -298,150 +338,18 @@ function setupDataStore(){
     dataStore.efficiencyPlotData[3] = [];    // 152Eu only
     dataStore.efficiencyPlotData[4] = [];    // 56Co only
     dataStore.efficiencyPlotData[5] = [];    // 60Co only
+    dataStore.efficiencyPlotData[6] = [];    // 11Be only
     dataStore.plotInitData = [];
     dataStore.plotInitData[0] = [[0,0], [1,0], [2,0], [3,0], [4,0]];      //initial dummy data
-    dataStore.plotInitData[1] = [[0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0]];      //initial dummy data
+    dataStore.plotInitData[1] = [[0,0], [1,0], [2,0], [3,0], [4,0]];      //initial dummy data
     dataStore.plotInitData[2] = [[0,0], [1,0], [2,0], [3,0], [4,0]];      //initial dummy data
     dataStore.plotInitData[3] = [[0,0], [1,0], [2,0], [3,0], [4,0]];      //initial dummy data
     dataStore.plotInitData[4] = [[0,0], [1,0], [2,0], [3,0], [4,0]];      //initial dummy data
     dataStore.plotInitData[5] = [[0,0], [1,0], [2,0], [3,0], [4,0]];      //initial dummy data
-    dataStore.YAxisMinValue = [[0,0], [0,0], [0,0], [0,0], [0,0], [0,0]];
-    dataStore.YAxisMaxValue = [[0,0], [0,0], [0,0], [0,0], [0,0], [0,0]];
+    dataStore.plotInitData[6] = [[0,0], [1,0], [2,0], [3,0], [4,0]];      //initial dummy data
+    dataStore.YAxisMinValue = [[0,0], [0,0], [0,0], [0,0], [0,0], [0,0], [0,0]];
+    dataStore.YAxisMaxValue = [[0,0], [0,0], [0,0], [0,0], [0,0], [0,0], [0,0]];
     dataStore.annotations = [0,0];
-    dataStore.plotStyle = [];
-    dataStore.plotStyle[0] = {                                              //dygraphs style object
-        labels: ["Energy (keV)", "Absolute Efficiency"],
-        title: 'Absolute Efficiency',
-        axisLabelColor: '#FFFFFF',
-        colors: ["#AAE66A", "#EFB2F0", "#B2D1F0", "#F0DBB2"],
-        labelsDiv: 'efficiencyPlotAbsLegend',
-        drawPoints: 'true',
-        connectSeparatedPoints: 'true',
-        pointSize: '5',
-	strokeWidth: '0',
-        legend: 'always',
-        axes: {
-            x: {
-		     valueRange: [0,10000]
-            },
-
-            y : {
-		     valueRange: [0,10]
-		    }
-        }
-    }
-
-    dataStore.plotStyle[1] = {                                              //dygraphs style object
-        labels: ["Energy (keV)", "Relative Efficiency", "Relative Efficiency fit"],
-        title: 'Relative Efficiency (no summing corrections)',
-        axisLabelColor: '#FFFFFF',
-        colors: ["#AAE66A", "#EFB2F0", "#B2D1F0", "#F0DBB2"],
-        labelsDiv: 'efficiencyPlotRelLegend',
-        drawPoints: 'true',
-        connectSeparatedPoints: 'true',
-        pointSize: '5',
-	strokeWidth: '0',
-        legend: 'always',
-        series: {
-                  'Relative Efficiency fit': {
-                    strokeWidth: 3,
-                    drawPoints: false,
-                    highlightCircleSize: 3
-                  }
-                },
-        axes: {
-            x: {
-		     valueRange: [0,10000]
-            },
-
-            y : {
-		     valueRange: [0,10]
-		    }
-        }
-    }
-    dataStore.plotStyle[2] = {                                              //dygraphs style object
-        labels: ["Energy (keV)", "Efficiency (arbitary units)"],
-        title: 'Efficiency - 133Ba (unnormalized, no summing corrections)',
-        axisLabelColor: '#FFFFFF',
-        colors: ["#AAE66A", "#EFB2F0", "#B2D1F0", "#F0DBB2"],
-        labelsDiv: 'efficiencyPlot133BaLegend',
-        drawPoints: 'true',
-        pointSize: '5',
-	strokeWidth: '0',
-        legend: 'always',
-        axes: {
-            x: {
-		     valueRange: [0,3000]
-            },
-
-            y : {
-		     valueRange: [0,10]
-		    }
-        }
-    }
-
-    dataStore.plotStyle[3] = {                                              //dygraphs style object
-        labels: ["Energy (keV)", "Efficiency (arbitary units)"],
-        title: 'Efficiency - 152Eu (unnormalized, no summing corrections)',
-        axisLabelColor: '#FFFFFF',
-        colors: ["#AAE66A", "#EFB2F0", "#B2D1F0", "#F0DBB2"],
-        labelsDiv: 'efficiencyPlot152EuLegend',
-        drawPoints: 'true',
-        pointSize: '5',
-	strokeWidth: '0',
-        legend: 'always',
-        axes: {
-            x: {
-		     valueRange: [0,3000]
-            },
-
-            y : {
-		     valueRange: [0,10]
-		    }
-        }
-};
-
-    dataStore.plotStyle[4] = {                                              //dygraphs style object
-        labels: ["Energy (keV)", "Efficiency (arbitary units)"],
-        title: 'Efficiency - 56Co (unnormalized, no summing corrections)',
-        axisLabelColor: '#FFFFFF',
-        colors: ["#AAE66A", "#EFB2F0", "#B2D1F0", "#F0DBB2"],
-        labelsDiv: 'efficiencyPlot56CoLegend',
-        drawPoints: 'true',
-        pointSize: '5',
-	strokeWidth: '0',
-        legend: 'always',
-        axes: {
-            x: {
-		     valueRange: [0,3000]
-            },
-
-            y : {
-		     valueRange: [0,10]
-		    }
-        }
-    }
-
-    dataStore.plotStyle[5] = {                                              //dygraphs style object
-        labels: ["Energy (keV)", "Efficiency (arbitary units)"],
-        title: 'Efficiency - 60Co (unnormalized, no summing corrections)',
-        axisLabelColor: '#FFFFFF',
-        colors: ["#AAE66A", "#EFB2F0", "#B2D1F0", "#F0DBB2"],
-        labelsDiv: 'efficiencyPlot60CoLegend',
-        drawPoints: 'true',
-        pointSize: '5',
-	strokeWidth: '0',
-        legend: 'always',
-        axes: {
-            x: {
-		     valueRange: [0,3000]
-            },
-
-            y : {
-		     valueRange: [0,10]
-		    }
-        }
-    }
 
 
 }
@@ -741,6 +649,13 @@ function submitHistoFilenameChoices(){
   // Generate the Energy Calibrator report table
   dataStore._energyCalibratorReport = new energyCalibratorReport('energyCalibrator');
   dataStore._energyCalibratorReport.setup();
+
+  // Generate the residuals plot
+  dataStore._dataplot[0] = new dataplot('detectorReportPlot',0);
+  dataStore._dataplot[0].setup(0);
+
+  // Hide the subpages. They need to be not hidden while the templates are injected.
+  menuButtonClick(dataStore.buttonIDs[0],0);
 
   // Issue the request for the spectra of the first source.
   // The request for additional sources will be issued in the fetchCallback

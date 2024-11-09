@@ -3,7 +3,6 @@
 <template id='energyCalibratorReport'>
     <div class='sectionWrapper item'>
         <div class='col-md-12'>
-            <div id='tableMenuDiv'></div><div id='reportCardDiv'></div>
             <table id='{{id}}energyCalibratorResults' class='table energyCalibratorTable'></table>
 
             <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myAnalyzerModal">
@@ -125,6 +124,35 @@
                       	    thisSelect.add( new Option(dataStore.THESEdetectors[j], j) );
                       	}
 
+                        // Create the previous Detector button
+                        newButton = document.createElement('button');
+                        newButton.setAttribute('id', 'previousDetButton');
+                        newButton.setAttribute('class', 'btn btn-default btn-sm');
+                        newButton.innerHTML = "Previous Detector";
+                        newButton.style.padding = '4px';
+                        newButton.onclick = function(){
+                          var currentValue = parseInt(document.getElementById('tableMenuSelect').value);
+                          if(currentValue==0){ currentValue=1;}
+                          document.getElementById('tableMenuSelect').value = (currentValue-1);
+                          dataStore._energyCalibratorReport.refreshTableData(currentValue-1);
+                        }.bind(newButton);
+                        document.getElementById('tableMenuDiv').appendChild(newButton);
+
+                        // Create the next Detector button
+                        newButton = document.createElement('button');
+                        newButton.setAttribute('id', 'nextDetButton');
+                        newButton.setAttribute('class', 'btn btn-default btn-sm');
+                        newButton.innerHTML = "Next Detector";
+                        newButton.style.padding = '4px';
+                        newButton.onclick = function(){
+                          var currentValue = parseInt(document.getElementById('tableMenuSelect').value);
+                          if(currentValue==document.getElementById('tableMenuSelect').options.length-1){ currentValue=parseInt(document.getElementById('tableMenuSelect').options.length)-2;
+                        }
+                          document.getElementById('tableMenuSelect').value = (currentValue+1);
+                          dataStore._energyCalibratorReport.refreshTableData(currentValue+1);
+                        }.bind(newButton);
+                        document.getElementById('tableMenuDiv').appendChild(newButton);
+
             //make sure the file name for Cal file download gets passed around:
         document.getElementById('saveCalname').onchange = function(){
             //set the filename to whatever the user has requested:
@@ -174,6 +202,9 @@ this.refreshTableData = function(thisDetectorIndex){
  }
  document.getElementById('reportCardDiv').innerHTML = "Mean of residuals = "+ dataStore.THESEcalibrations[thisDetectorIndex].residualMean.toFixed(2) +
  "keV, Variance of residuals = "+ dataStore.THESEcalibrations[thisDetectorIndex].residualVar.toFixed(2)+"keV";
+
+// Now also refresh the plot with the data from this Detector
+ this.refreshDetectorPlotData(thisDetectorIndex);
 },
 
 this.fitAllSinglesPeaks = function(){
@@ -630,6 +661,11 @@ dataStore.THESEcalibrations[thisDetector].residualVar +=
 
 },
 
+
+
+
+
+
 this.updateEnergies = function(){
             //callback for the calibration source dropdown; updates energy input boxes with standard values
             //this: gainMatchReport object
@@ -733,7 +769,36 @@ this.toggleAllODBWrites = function(){
         toggles[i].checked = state;
     }
 
+},
+
+
+
+this.refreshDetectorPlotData = function(thisDetectorIndex){
+  //arrange the latest residual info for representation in the dygraph.
+
+  // Build the flags array. All zeros but needs to be the correct length
+  var plotIndex = 0; // Plot 0 is the detector results plot
+  var i, evt, dataIndex = [],
+  flags = [];
+  flags.fillN(0, dataStore.THESEcalibrations[thisDetectorIndex].residual.length)
+
+  // Update the Y axis scale for these data
+  var max = 0;
+  for(i=0; i<dataStore.THESEcalibrations[thisDetectorIndex].residual.length; i++){
+    if(Math.abs(dataStore.THESEcalibrations[thisDetectorIndex].residual[i])>max){
+      max = Math.abs(dataStore.THESEcalibrations[thisDetectorIndex].residual[i]);
+    }
+  }
+  dataStore.YAxisMinValue[plotIndex][0] = -1.0 * max * 1.33;
+  dataStore.YAxisMaxValue[plotIndex][0] = max * 1.33;
+
+  dataStore.dataplotData[plotIndex] = arrangePoints(dataStore.THESEcalibrations[thisDetectorIndex].y, [dataStore.THESEcalibrations[thisDetectorIndex].residual], flags );
+  var eventString = 'updateDyData'+plotIndex;
+  dispatcher({ 'data': dataStore.dataplotData[plotIndex] }, eventString);
 }
+
+
+
 
 }
 </script>

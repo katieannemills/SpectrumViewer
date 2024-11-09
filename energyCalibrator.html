@@ -102,25 +102,16 @@
         </div>
 
                 <!--Table of calculations and results-->
-                <div id='energyCalibrator' class='hidden'></div>
+                <div id='detectorReportRegion' class='col-md-12'>
+                <div id='tableMenuDiv' class='col-md-12'></div>
+                <div id='reportCardDiv' class='col-md-6'></div>
+                <div id='energyCalibrator' class='col-md-7'></div>
+                <div id='detectorReportPlot' class='col-md-5'></div>
+              </div>
 
-                <!--Efficiency curve Plotting-->
-                  <div id='efficiencyPlotWrap' class='col-md-12'>
-                    <div class='col-md-12'>
-                      <h3>Efficiency curves:</h3>
-                      <div id='efficiencyPlotAbs' class='col-md-6'></div>
-                      <div id='efficiencyPlotRel' class='col-md-6'></div>
-                    </div>
-                    <div class='col-md-12'>
-                      <h3>Efficiency curves of the individual sources:</h3>
-                      <div id='efficiencyPlot133Ba' class='col-md-6'></div>
-                      <div id='efficiencyPlot152Eu' class='col-md-6'></div>
-                    </div>
-                    <div class='col-md-12'>
-                      <div id='efficiencyPlot56Co' class='col-md-6'></div>
-                      <div id='efficiencyPlot60Co' class='col-md-6'></div>
-                    </div>
-                  </div>
+              <div id='resultsTableRegion' class='col-md-12'>
+            </div>
+
 
         <div id='foot'></div>
 
@@ -129,12 +120,6 @@
 
                 dataStore._plotGrid = new plotGrid('plottingGrid');
                 dataStore._plotControl = new plotControl('plotCtrl', 'horizontal');
-                dataStore._dataplot[0] = new dataplot('efficiencyPlotAbs',0);
-                dataStore._dataplot[1] = new dataplot('efficiencyPlotRel',1);
-                dataStore._dataplot[2] = new dataplot('efficiencyPlot133Ba',2);
-                dataStore._dataplot[3] = new dataplot('efficiencyPlot152Eu',3);
-                dataStore._dataplot[4] = new dataplot('efficiencyPlot56Co',4);
-                dataStore._dataplot[5] = new dataplot('efficiencyPlot60Co',5);
 
                 dataStore.templates = prepareTemplates(['header', 'energyCalibratorMenu', 'energyCalibratorReport', 'energyCalibratorReportTable', 'plotGrid', 'plotControl', 'plotListLite', 'dataplot', 'footer']);
 
@@ -144,12 +129,6 @@
                 dataStore._plotControl.setup();
                 //set up spectrum cell
                 dataStore._plotGrid.manageCellCreation(null, dataStore.plots[0]);
-                dataStore._dataplot[0].setup(0);
-                dataStore._dataplot[1].setup(1);
-                dataStore._dataplot[2].setup(2);
-                dataStore._dataplot[3].setup(3);
-                dataStore._dataplot[4].setup(4);
-                dataStore._dataplot[5].setup(5);
                 setupFooter('foot');
 
                 //don't want additional plots in this app
