@@ -1,9 +1,9 @@
 <link rel="stylesheet" href="energyCalibratorReport.css"/>
 
-<template id='energyCalibratorReport'>
+<template id='energyCalibratorDetectorReport'>
     <div class='sectionWrapper item'>
         <div class='col-md-12'>
-            <table id='{{id}}energyCalibratorResults' class='table energyCalibratorTable'></table>
+            <table id='{{id}}energyCalibratorDetectorResults' class='table energyCalibratorTable'></table>
 
             <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myAnalyzerModal">
                 <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Write calibration to Analyzer
@@ -72,17 +72,31 @@
     </div>
 </template>
 
-<script>
-    function energyCalibratorReport(wrapID){
 
-        this.wrapID = wrapID;
-        this.wrap = document.getElementById(wrapID);
+<template id='energyCalibratorCoefficienctsReport'>
+    <div class='sectionWrapper item'>
+        <div class='col-md-12'>
+            <table id='{{id}}energyCalibratorCoefficienctsResults' class='table energyCalibratorTable'></table>
+        </div>
+    </div>
+</template>
+
+
+<script>
+    function energyCalibratorReport(wrapID1,wrapID2){
+
+        this.wrapID = wrapID1;
+        this.wrap = document.getElementById(wrapID1);
+
+        this.wrapID2 = wrapID2;
+        this.wrap2 = document.getElementById(wrapID2);
 
         this.setup = function(){
 
+// Setup the Detector subpage
             //inject templates
           this.wrap.innerHTML = Mustache.to_html(
-            dataStore.templates.energyCalibratorReport,
+            dataStore.templates.energyCalibratorDetectorReport,
             {
                 'id': this.wrapID,
             }
@@ -93,8 +107,8 @@
           for(var i=0; i<dataStore.THESEcalibrations[0].y.length; i++){
                 peaks.push(dataStore.THESEcalibrations[0].y[i]);
         }
-        document.getElementById(this.wrapID + 'energyCalibratorResults').innerHTML= Mustache.to_html(
-            dataStore.templates.energyCalibratorReportTable,
+        document.getElementById(this.wrapID + 'energyCalibratorDetectorResults').innerHTML= Mustache.to_html(
+            dataStore.templates.energyCalibratorDetectorReportTable,
             content = {
                 'id': this.wrapID,
                 'peaks': peaks
@@ -114,7 +128,7 @@
                       	newSelect.id = 'tableMenuSelect';
                       	newSelect.name = 'tableMenuSelect';
                       	newSelect.onchange = function(){
-                      	   dataStore._energyCalibratorReport.refreshTableData(this.value);
+                      	   dataStore._energyCalibratorReport.refreshDetectorTableData(this.value);
                       	}.bind(newSelect);
                       	document.getElementById('tableMenuDiv').appendChild(newSelect);
 
@@ -134,7 +148,7 @@
                           var currentValue = parseInt(document.getElementById('tableMenuSelect').value);
                           if(currentValue==0){ currentValue=1;}
                           document.getElementById('tableMenuSelect').value = (currentValue-1);
-                          dataStore._energyCalibratorReport.refreshTableData(currentValue-1);
+                          dataStore._energyCalibratorReport.refreshDetectorTableData(currentValue-1);
                         }.bind(newButton);
                         document.getElementById('tableMenuDiv').appendChild(newButton);
 
@@ -149,7 +163,7 @@
                           if(currentValue==document.getElementById('tableMenuSelect').options.length-1){ currentValue=parseInt(document.getElementById('tableMenuSelect').options.length)-2;
                         }
                           document.getElementById('tableMenuSelect').value = (currentValue+1);
-                          dataStore._energyCalibratorReport.refreshTableData(currentValue+1);
+                          dataStore._energyCalibratorReport.refreshDetectorTableData(currentValue+1);
                         }.bind(newButton);
                         document.getElementById('tableMenuDiv').appendChild(newButton);
 
@@ -190,12 +204,48 @@
         }
         promiseScript(dataStore.ODBrequests[0]);
     }
+
+    // Setup the Coefficiencts Results subpage
+                //inject templates
+              this.wrap2.innerHTML = Mustache.to_html(
+                dataStore.templates.energyCalibratorCoefficienctsReport,
+                {
+                    'id': this.wrapID2,
+                }
+                );
+                // table has to be done as a separate template, since templates and tables don't play too nice together
+        // Build the list of rows for the table. Loop through each peak of each source
+              var detectors =[];
+              for(var i=0; i<dataStore.THESEdetectors.length; i++){
+                    detectors.push(dataStore.THESEdetectors[i]);
+            }
+            document.getElementById(this.wrapID2 + 'energyCalibratorCoefficienctsResults').innerHTML= Mustache.to_html(
+                dataStore.templates.energyCalibratorCoefficientsReportTable,
+                content = {
+                    'id': this.wrapID2,
+                    'detectors': detectors
+                }
+                );
+
 },
 
-this.refreshTableData = function(thisDetectorIndex){
+this.refreshCoefficientsTableData = function(){
+
+ for(var i=0; i<dataStore.THESEcalibrations.length; i++){
+   var thisID = 'energyCalibratorResults'+dataStore.THESEcalibrations[i].name;
+   document.getElementById(thisID+'quad').innerHTML = dataStore.THESEcalibrations[i].fit.quad.toPrecision(6);
+   document.getElementById(thisID+'gain').innerHTML = dataStore.THESEcalibrations[i].fit.gain.toFixed(8);
+   document.getElementById(thisID+'offset').innerHTML = dataStore.THESEcalibrations[i].fit.offset.toFixed(8);
+   document.getElementById(thisID+'r2').innerHTML = dataStore.THESEcalibrations[i].fit.r2.toPrecision(10);
+   document.getElementById(thisID+'residual').innerHTML = dataStore.THESEcalibrations[i].residualMean.toFixed(3);
+ }
+
+},
+
+this.refreshDetectorTableData = function(thisDetectorIndex){
 
  for(var i=0; i<dataStore.THESEcalibrations[thisDetectorIndex].y.length; i++){
-   var thisID = 'energyCalibrator'+dataStore.THESEcalibrations[thisDetectorIndex].y[i];
+   var thisID = 'energyCalibratorDetector'+dataStore.THESEcalibrations[thisDetectorIndex].y[i];
    document.getElementById(thisID+'pulseHeightCentroid').innerHTML = dataStore.THESEcalibrations[thisDetectorIndex].xPH[i].toFixed(2);
    document.getElementById(thisID+'energyCentroid').innerHTML = dataStore.THESEcalibrations[thisDetectorIndex].xEn[i].toFixed(2);
    document.getElementById(thisID+'residual').innerHTML = dataStore.THESEcalibrations[thisDetectorIndex].residual[i].toFixed(4);
@@ -602,7 +652,9 @@ this.postFittingTasks = function(){
   }
 
   // Report all results in a table
-  this.refreshTableData(0);
+  this.refreshCoefficientsTableData();
+  // Here populate the table for the first time with the results for the first detector
+  this.refreshDetectorTableData(0);
 
   // We are finished
   dataStore.currentTask = 'Finished';

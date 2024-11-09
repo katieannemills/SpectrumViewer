@@ -646,8 +646,8 @@ function submitHistoFilenameChoices(){
     }
   }
 
-  // Generate the Energy Calibrator report table
-  dataStore._energyCalibratorReport = new energyCalibratorReport('energyCalibrator');
+  // Generate the Energy Calibrator detector report table
+  dataStore._energyCalibratorReport = new energyCalibratorReport('energyCalibratorDetector','energyCalibratorResults');
   dataStore._energyCalibratorReport.setup();
 
   // Generate the residuals plot

@@ -20,8 +20,10 @@
         <!--HTML imports-->
         <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
         <link id='header' rel="import" href="templates/header/header.html">
-        <link id='energyCalibratorReport' rel="import" href="templates/energyCalibratorReport/energyCalibratorReport.html">
-        <link id='energyCalibratorReportTable' rel="import" href="templates/energyCalibratorReport/energyCalibratorReportTable.html">
+        <link id='energyCalibratorDetectorReport' rel="import" href="templates/energyCalibratorReport/energyCalibratorReport.html">
+        <link id='energyCalibratorCoefficienctsReport' rel="import" href="templates/energyCalibratorReport/energyCalibratorReport.html">
+        <link id='energyCalibratorDetectorReportTable' rel="import" href="templates/energyCalibratorReport/energyCalibratorReportTable.html">
+        <link id='energyCalibratorCoefficientsReportTable' rel="import" href="templates/energyCalibratorReport/energyCalibratorReportTable.html">
         <link id='energyCalibratorMenu' rel="import" href="templates/energyCalibratorReport/energyCalibratorMenu.html">
         <link id='plotGrid' rel="import" href="templates/plotGrid/plotGrid.html">
         <link id='plotControl' rel="import" href="templates/plotControl/plotControl.html">
@@ -105,11 +107,12 @@
                 <div id='detectorReportRegion' class='col-md-12'>
                 <div id='tableMenuDiv' class='col-md-12'></div>
                 <div id='reportCardDiv' class='col-md-6'></div>
-                <div id='energyCalibrator' class='col-md-7'></div>
+                <div id='energyCalibratorDetector' class='col-md-7'></div>
                 <div id='detectorReportPlot' class='col-md-5'></div>
               </div>
 
               <div id='resultsTableRegion' class='col-md-12'>
+              <div id='energyCalibratorResults' class='col-md-12'></div>
             </div>
 
 
@@ -121,7 +124,7 @@
                 dataStore._plotGrid = new plotGrid('plottingGrid');
                 dataStore._plotControl = new plotControl('plotCtrl', 'horizontal');
 
-                dataStore.templates = prepareTemplates(['header', 'energyCalibratorMenu', 'energyCalibratorReport', 'energyCalibratorReportTable', 'plotGrid', 'plotControl', 'plotListLite', 'dataplot', 'footer']);
+                dataStore.templates = prepareTemplates(['header', 'energyCalibratorMenu', 'energyCalibratorDetectorReport', 'energyCalibratorCoefficienctsReport', 'energyCalibratorDetectorReportTable', 'energyCalibratorCoefficientsReportTable', 'plotGrid', 'plotControl', 'plotListLite', 'dataplot', 'footer']);
 
                 setupHeader('head', 'Energy Calibrator');
           	    setupEnergyCalibratorMenu('menu');
