@@ -49,8 +49,8 @@ function buildHistosFileTable(){
     cell5.style.width = "5%";
 
     // Insert header content
-    cell1.innerHTML = 'Directory: '+dataStore.histoFileDirectoryPath;
-    cell2.innerHTML = '';
+    cell1.innerHTML = 'Directory: ';
+    cell2.innerHTML = dataStore.histoFileDirectoryPath;
     cell3.innerHTML = '';
     cell4.innerHTML = '';
     cell5.innerHTML = '';
