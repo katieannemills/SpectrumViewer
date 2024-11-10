@@ -156,11 +156,15 @@
 
 	// Grab the histogram list for the default directory
 	getHistoFileListFromServer();
+  getMidasFileListFromServer(); // The request for details follows this
 
 	        $(function () {
                     $('[data-toggle="tooltip"]').tooltip()
                 });
             });
+
+            // Set up event listener
+            listener('histoChoiceBar', 'midasFileDetailsAvailable', addTitlesToHistoListSelect);
         </script>
     </body>
 </html>

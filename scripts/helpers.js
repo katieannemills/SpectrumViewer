@@ -516,27 +516,29 @@ function initiateSortStatusHeartbeat(){
 
 function getConfigFileFromServer(){
   // get the Global conditions, Gates conditions and Histogram definitions from the server/ODB
-  url = dataStore.spectrumServer + '/?cmd=viewConfig';
+  var url = dataStore.spectrumServer + '/?cmd=viewConfig';
   XHR(url, "Problem getting Config file from analyzer server", processConfigFile, function(error){ErrorConnectingToAnalyzerServer(error)});
 }
 
 function getMidasFileListFromServer(){
   // use a one-off XHR request with callback for getting the list of MIDAS files
-  url = dataStore.spectrumServer + '/?cmd=getDatafileList&dir='+dataStore.midasFileDataDirectoryPath;
+  var directoryPath = dataStore.midasFileDataDirectoryPath;
+  if(directoryPath == undefined){ directoryPath = dataStore.midasFileDataDirectoryPath = dataStore.histoFileDirectoryPath; }
+  var url = dataStore.spectrumServer + '/?cmd=getDatafileList&dir='+dataStore.midasFileDataDirectoryPath;
   XHR(url, "Problem getting list of MIDAS files from analyzer server", processMidasFileList, function(error){ErrorConnectingToAnalyzerServer(error)});
 
 }
 
 function getMidasFileDetailsFromServer(){
   // use a one-off XHR request with callback for getting the list of MIDAS files
-  url = dataStore.spectrumServer + '/?cmd=getDatafileDetails&dir='+dataStore.midasFileDataDirectoryPath;
+  var url = dataStore.spectrumServer + '/?cmd=getDatafileDetails&dir='+dataStore.midasFileDataDirectoryPath;
   XHR(url, "Problem getting details of MIDAS files from analyzer server", processMidasFileDetails, function(error){ErrorConnectingToAnalyzerServer(error)});
 
 }
 
 function getHistoFileListFromServer(){
   // use a one-off XHR request with callback for getting the list of Histo files
-  url = dataStore.spectrumServer + '/?cmd=getHistofileList&dir='+dataStore.histoFileDirectoryPath;
+  var url = dataStore.spectrumServer + '/?cmd=getHistofileList&dir='+dataStore.histoFileDirectoryPath;
   XHR(url, "Problem getting list of Histogram files from analyzer server", processHistoFileList, function(error){ErrorConnectingToAnalyzerServer(error)});
 
 }

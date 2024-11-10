@@ -39,7 +39,7 @@ function setupDataStore(){
     dataStore.histoAutoLoad = false;        // Flag set by the presence of a directory and filename in the URL to automatically load it. Default is off.
 
     // Get the analyzer Server and ODB host names from the URL
-    GetURLArguments();
+    GetURLArguments(setMidasDirectoryToHistos);
 
     dataStore.numberOfClovers = 1;                                     // Default number of clovers is all of the array
     // shouldn't need to change anything below this line -----------------------------------------------------------------------
@@ -355,6 +355,14 @@ function setupDataStore(){
 }
 setupDataStore();
 
+function setMidasDirectoryToHistos(){
+  // Callback of GetURLArguments()
+  // Here set the MIDAS file directory to match that set for the Histograms
+  // This will then be used to fetch the run titles of midas files in this Directory
+  // If the midas files are stored in the same directory as the histogram files then we will get titles.
+  dataStore.midasFileDataDirectoryPath = dataStore.histoFileDirectoryPath;
+}
+
 function fetchCallback(){
 
     // If we have not recieved the histograms from all sources yet, request the histograms from the next source
@@ -399,7 +407,7 @@ function setupHistoListSelect(){
 
     // loop over all sources
     for(i=0; i<keys.length; i++){
-	thisTitle = dataStore.sourceInfo[keys[i]].title;
+	var thisTitle = dataStore.sourceInfo[keys[i]].title;
 
 	// Add the title text
 	var newLabel = document.createElement("label");
@@ -412,6 +420,8 @@ function setupHistoListSelect(){
 	var newSelect = document.createElement("select");
 	newSelect.id = 'HistoListSelect'+thisTitle;
 	newSelect.name = 'HistoListSelect'+thisTitle;
+  newSelect.style.width = '185px';
+  newSelect.style.maxWidth = '185px';
 	newSelect.onchange = function(){
 	   var thisKey = this.name.split('Select')[1];
 	   dataStore.sourceInfo[thisKey].histoFileName = this.value;
@@ -487,6 +497,31 @@ function setupHistoListSelect(){
           }.bind(newButton);
             document.getElementById('histoChoiceSubmit').appendChild(newButton);
 
+}
+
+function addTitlesToHistoListSelect(){
+
+  var keys = Object.keys(dataStore.sourceInfo);
+
+  // loop over all sources
+  for(i=0; i<keys.length; i++){
+
+    // Use the title of this source to get the option list of the select
+    var thisTitle = dataStore.sourceInfo[keys[i]].title;
+    numOptions = document.getElementById('HistoListSelect'+thisTitle).options.length;
+    for(var j=0; j<numOptions; j++){
+
+      var thisRunName = document.getElementById('HistoListSelect'+thisTitle).options[j].text.split(".")[0];
+
+      // Find the details for this run
+      var num = dataStore.midasRunList.map(function(e) { return e.RunName; }).indexOf(thisRunName);
+
+      // Only add the run title if this run number was found in the run details list
+      if(num>=0){
+        document.getElementById('HistoListSelect'+thisTitle).options[j].text = thisRunName+'.tar, '+dataStore.midasRunList[num].RunTitle;
+      }
+    }
+  }
 }
 
 function submitHistoFilenameChoices(){
