@@ -79,17 +79,7 @@
     newInput.onchange = function(){
     dataStore.histoFileDirectoryPath = this.value;
     document.getElementById('HistoDirectoryInputViewer').value = this.value;
-
     getHistoFileListFromServer();
-    /*
-const thisPromise = new Promise((resolve, reject) => {
-    getHistoFileListFromServer()
-}).then(
- 	 dispatcher({}, 'requestSortingRefresh'),
- 	 dispatcher({}, 'requestViewerRefresh')
-                               );
-*/
-
     }.bind(newInput);
     document.getElementById('HistoDirectoryInputDivSorting').appendChild(newInput);
 
@@ -140,6 +130,7 @@ const thisPromise = new Promise((resolve, reject) => {
 
     // set up event listeners
     listener(wrapperID, 'requestSortingRefresh', setupSortingContent);
+    listener(wrapperID, 'midasFileDetailsAvailable', addFileDetailsToMidasFileTable);
 
     // Set up the content of this sub page
     setupSortingContent()

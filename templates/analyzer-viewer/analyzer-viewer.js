@@ -40,6 +40,15 @@ function buildHistosFileTable(){
     var cell3 = row.insertCell(2);
     var cell4 = row.insertCell(3);
     var cell5 = row.insertCell(4);
+
+    // The following set the widths of the columns for the whole table
+    cell1.style.width = "10%";
+    cell2.style.width = "40%";
+    cell3.style.width = "20%";
+    cell4.style.width = "20%";
+    cell5.style.width = "5%";
+
+    // Insert header content
     cell1.innerHTML = 'Directory: '+dataStore.histoFileDirectoryPath;
     cell2.innerHTML = '';
     cell3.innerHTML = '';
@@ -68,8 +77,9 @@ function buildHistosFileTable(){
 	    var URLString2DViewer = 'https://griffincollaboration.github.io/SpectrumViewer/2dSpectrumTool.html?backend='+dataStore.spectrumServerBackend+'&port='+dataStore.spectrumServerPort+'&histoDir='+dataStore.histoFileDirectoryPath+'&histoFile='+dataStore.histoFileList[num];
 	    var URLStringGainMatcher = 'https://griffincollaboration.github.io/SpectrumViewer/gainMatcher.html?analyzerBackend='+dataStore.spectrumServerBackend+'&analyzerPort='+dataStore.spectrumServerPort+'&ODBHostBackend='+thisODBhostBackend+'&ODBHostPort='+dataStore.ODBhostPort+'&histoDir='+dataStore.histoFileDirectoryPath+'&histoFile='+dataStore.histoFileList[num];
 
-	    cell1.innerHTML = '<a href=\"'+URLString2DViewer+'\" target=\"_blank\">'+dataStore.histoFileList[num]+'</a>';
-	    cell2.innerHTML = '<a href=\"'+URLString2DViewer+'\" target=\"_blank\">'+'Open in 2D Viewer'+'</a>';
+      cell1.innerHTML = '<a href=\"'+URLString2DViewer+'\" target=\"_blank\">'+dataStore.histoFileList[num]+'</a>';
+      cell1.value = dataStore.histoFileList[num].split(".")[0];  // Used to easily add the run title when available later
+      // cell 2 is the run title which is added later
 	    cell3.innerHTML = '<a href=\"'+URLStringGainMatcher+'\" target=\"_blank\">'+'Open in GainMatcher'+'</a>';
 	    cell4.innerHTML = '';
 
@@ -98,6 +108,28 @@ function buildHistosFileTable(){
 
 	cell1.innerHTML = 'The directory \"'+dataStore.histoFileDirectoryPath+'\" does not contain any histogram files.';
     }
+
+// Fill in the file details as they may already be available
+addFileDetailsToHistosTable();
+}
+
+function addFileDetailsToHistosTable(){
+
+  var table = document.getElementById("HistoFilesTable");
+
+  // Iterate through all rows of the Histos file table
+  for (var i = 1, row; row = table.rows[i]; i++) {
+    // Get the run number from cell0
+    thisRunName = row.cells[0].value;
+
+    // Find the details for this run
+    var num = dataStore.midasRunList.map(function(e) { return e.RunName; }).indexOf(thisRunName);
+
+    // Only add the run title if this run number was found in the run details list
+    if(num>=0){
+      row.cells[1].innerHTML = dataStore.midasRunList[num].RunTitle;
+    }
+  }
 
 }
 

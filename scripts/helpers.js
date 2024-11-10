@@ -830,8 +830,8 @@ function processMidasFileDetails(payload){
     i++;
   }
 
-  // Add these details to the table
-  addFileDetailsToMidasFileTable();
+    // Update content that involves the File Details
+    dispatcher({}, 'midasFileDetailsAvailable');
 }
 
 function processHistoFileList(payload){
