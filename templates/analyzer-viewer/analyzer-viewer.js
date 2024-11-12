@@ -28,89 +28,89 @@ function fetchCallback(){
 }
 
 function buildHistosFileTable(){
-    // Create a row in the table for each histo file in the list provided by the server
-    document.getElementById("HistoFilesTable").innerHTML = '';
-    document.getElementById('AnalyzerViewerDiv').innerHTML ='Click on a histogram file name below to open it in the online viewer. Select files that you wish to sum together then click the button.';
+  // Create a row in the table for each histo file in the list provided by the server
+  document.getElementById("HistoFilesTable").innerHTML = '';
+  document.getElementById('AnalyzerViewerDiv').innerHTML ='Click on a histogram file name below to open it in the online viewer. Select files that you wish to sum together then click the button.';
 
-    // Add a title row to the table
-    var row = document.getElementById("HistoFilesTable").insertRow(document.getElementById("HistoFilesTable").rows.length);
-    row.id = 'histoFileTableRow-'+(0);
-    var cell1 = row.insertCell(0);
-    var cell2 = row.insertCell(1);
-    var cell3 = row.insertCell(2);
-    var cell4 = row.insertCell(3);
-    var cell5 = row.insertCell(4);
+  // Add a title row to the table
+  var row = document.getElementById("HistoFilesTable").insertRow(document.getElementById("HistoFilesTable").rows.length);
+  row.id = 'histoFileTableRow-'+(0);
+  var cell1 = row.insertCell(0);
+  var cell2 = row.insertCell(1);
+  var cell3 = row.insertCell(2);
+  var cell4 = row.insertCell(3);
+  var cell5 = row.insertCell(4);
 
-    // The following set the widths of the columns for the whole table
-    cell1.style.width = "10%";
-    cell2.style.width = "40%";
-    cell3.style.width = "20%";
-    cell4.style.width = "20%";
-    cell5.style.width = "5%";
+  // The following set the widths of the columns for the whole table
+  cell1.style.width = "10%";
+  cell2.style.width = "40%";
+  cell3.style.width = "20%";
+  cell4.style.width = "20%";
+  cell5.style.width = "5%";
 
-    // Insert header content
-    cell1.innerHTML = 'Directory: ';
-    cell2.innerHTML = dataStore.histoFileDirectoryPath;
-    cell3.innerHTML = '';
-    cell4.innerHTML = '';
-    cell5.innerHTML = '';
-   // cell5.innerHTML = '<input type=\"checkbox\" id=\"Primary-checkbox\">';
+  // Insert header content
+  cell1.innerHTML = 'Directory: ';
+  cell2.innerHTML = dataStore.histoFileDirectoryPath;
+  cell3.innerHTML = '';
+  cell4.innerHTML = '';
+  cell5.innerHTML = '';
+  // cell5.innerHTML = '<input type=\"checkbox\" id=\"Primary-checkbox\">';
 
-    // Add a row for each Histo file in the list received from the server
-    if(dataStore.histoFileList.length>0 && dataStore.histoFileList[0].length>3){
-	for(var num=0; num<dataStore.histoFileList.length; num++){
-	    var row = document.getElementById("HistoFilesTable").insertRow(document.getElementById("HistoFilesTable").rows.length);
-	    row.id = 'histoFileTableRow-'+(num+1);
-	    row.onclick = function(e){
-		ToggleCheckboxOfThisHistoFile(this.id);
-	    };
+  // Add a row for each Histo file in the list received from the server
+  if(dataStore.histoFileList.length>0 && dataStore.histoFileList[0].length>3){
+    for(var num=0; num<dataStore.histoFileList.length; num++){
+      var row = document.getElementById("HistoFilesTable").insertRow(document.getElementById("HistoFilesTable").rows.length);
+      row.id = 'histoFileTableRow-'+(num+1);
+      row.onclick = function(e){
+        ToggleCheckboxOfThisHistoFile(this.id);
+      };
 
-	    var cell1 = row.insertCell(0);
-	    var cell2 = row.insertCell(1);
-	    var cell3 = row.insertCell(2);
-	    var cell4 = row.insertCell(3);
-	    var cell5 = row.insertCell(4);
+      var cell1 = row.insertCell(0);
+      var cell2 = row.insertCell(1);
+      var cell3 = row.insertCell(2);
+      var cell4 = row.insertCell(3);
+      var cell5 = row.insertCell(4);
 
       var thisODBhostBackend = dataStore.ODBhostBackend.split('.')[0].split('//')[1];
 
-	    var URLStringViewer = 'https://griffincollaboration.github.io/SpectrumViewer/spectrumViewer2.html?backend='+dataStore.spectrumServerBackend+'&port='+dataStore.spectrumServerPort+'&histoDir='+dataStore.histoFileDirectoryPath+'&histoFile='+dataStore.histoFileList[num];
-	    var URLString2DViewer = 'https://griffincollaboration.github.io/SpectrumViewer/2dSpectrumTool.html?backend='+dataStore.spectrumServerBackend+'&port='+dataStore.spectrumServerPort+'&histoDir='+dataStore.histoFileDirectoryPath+'&histoFile='+dataStore.histoFileList[num];
-	    var URLStringGainMatcher = 'https://griffincollaboration.github.io/SpectrumViewer/gainMatcher.html?analyzerBackend='+dataStore.spectrumServerBackend+'&analyzerPort='+dataStore.spectrumServerPort+'&ODBHostBackend='+thisODBhostBackend+'&ODBHostPort='+dataStore.ODBhostPort+'&histoDir='+dataStore.histoFileDirectoryPath+'&histoFile='+dataStore.histoFileList[num];
+      var URLStringViewer = 'https://griffincollaboration.github.io/SpectrumViewer/spectrumViewer2.html?backend='+dataStore.spectrumServerBackend+'&port='+dataStore.spectrumServerPort+'&histoDir='+dataStore.histoFileDirectoryPath+'&histoFile='+dataStore.histoFileList[num];
+      var URLString2DViewer = 'https://griffincollaboration.github.io/SpectrumViewer/2dSpectrumTool.html?backend='+dataStore.spectrumServerBackend+'&port='+dataStore.spectrumServerPort+'&histoDir='+dataStore.histoFileDirectoryPath+'&histoFile='+dataStore.histoFileList[num];
+      var URLStringGainMatcher = 'https://griffincollaboration.github.io/SpectrumViewer/gainMatcher.html?analyzerBackend='+dataStore.spectrumServerBackend+'&analyzerPort='+dataStore.spectrumServerPort+'&ODBHostBackend='+thisODBhostBackend+'&ODBHostPort='+dataStore.ODBhostPort+'&histoDir='+dataStore.histoFileDirectoryPath+'&histoFile='+dataStore.histoFileList[num];
 
       cell1.innerHTML = '<a href=\"'+URLString2DViewer+'\" target=\"_blank\">'+dataStore.histoFileList[num]+'</a>';
       cell1.value = dataStore.histoFileList[num].split(".")[0];  // Used to easily add the run title when available later
       // cell 2 is the run title which is added later
-	    cell3.innerHTML = '<a href=\"'+URLStringGainMatcher+'\" target=\"_blank\">'+'Open in GainMatcher'+'</a>';
-	    cell4.innerHTML = '';
+      cell3.innerHTML = '<a href=\"'+URLStringGainMatcher+'\" target=\"_blank\">'+'Open in GainMatcher'+'</a>';
+      cell4.innerHTML = '';
 
-    // Create button for View Config
-    newButton = document.createElement('button');
-	    newButton.setAttribute('id', 'viewConfigButton'+dataStore.histoFileList[num].split('.')[0]);
-    newButton.setAttribute('class', 'btn btn-default btn-sm');
-    newButton.value = dataStore.histoFileList[num];
-    newButton.innerHTML = "View Config";
-    newButton.style.padding = '4px';
-    newButton.onclick = function(){
-	viewConfigOfHisto(this.value);
-    }.bind(newButton);
-    cell4.appendChild(newButton);
+      // Create button for View Config
+      newButton = document.createElement('button');
+      newButton.setAttribute('id', 'viewConfigButton'+dataStore.histoFileList[num].split('.')[0]);
+      newButton.setAttribute('class', 'btn btn-default btn-sm');
+      newButton.value = dataStore.histoFileList[num];
+      newButton.innerHTML = "View Config";
+      newButton.style.padding = '4px';
+      newButton.onclick = function(){
+        viewConfigOfHisto(this.value);
+      }.bind(newButton);
+      cell4.appendChild(newButton);
 
-	    cell5.innerHTML = '<input type=\"checkbox\" id=\"'+dataStore.histoFileList[num]+'-checkbox'+'\" value=\"'+dataStore.histoFileList[num].trim()+'\" onclick=ToggleCheckboxOfThisHistoFile(\"histoFileTableRow-'+(num+1)+'\")>';
+      cell5.innerHTML = '<input type=\"checkbox\" id=\"'+dataStore.histoFileList[num]+'-checkbox'+'\" value=\"'+dataStore.histoFileList[num].trim()+'\" onclick=ToggleCheckboxOfThisHistoFile(\"histoFileTableRow-'+(num+1)+'\")>';
 
-	}
-    }else{
-	// Add a single row and write a message that no hisotgram files were found.
-	document.getElementById('AnalyzerViewerDiv').innerHTML ='';
-	document.getElementById("HistoFilesTable").deleteRow(0);
-	var row = document.getElementById("HistoFilesTable").insertRow(document.getElementById("HistoFilesTable").rows.length);
-	row.id = 'histoFileTableRow-'+(num+1);
-	var cell1 = row.insertCell(0);
-
-	cell1.innerHTML = 'The directory \"'+dataStore.histoFileDirectoryPath+'\" does not contain any histogram files.';
     }
+  }else{
+    // Add a single row and write a message that no hisotgram files were found.
+    document.getElementById('AnalyzerViewerDiv').innerHTML ='';
+    document.getElementById("HistoFilesTable").deleteRow(0);
+    var row = document.getElementById("HistoFilesTable").insertRow(document.getElementById("HistoFilesTable").rows.length);
+    row.id = 'histoFileTableRow-'+(num+1);
+    var cell1 = row.insertCell(0);
 
-// Fill in the file details as they may already be available
-addFileDetailsToHistosTable();
+    cell1.innerHTML = 'The directory \"'+dataStore.histoFileDirectoryPath+'\" does not contain any histogram files.';
+  }
+
+  // Fill in the file details as they may already be available
+  addFileDetailsToHistosTable();
 }
 
 function addFileDetailsToHistosTable(){
