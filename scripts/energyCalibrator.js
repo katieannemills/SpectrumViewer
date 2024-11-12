@@ -528,10 +528,16 @@ function submitHistoFilenameChoices(){
   // this is the main setup and start of the automatic process.
 
   // TRIGGERING THIS FUNCTION SHOULD DISABLE CHANGING THE SELECTS
+  var group = document.getElementsByTagName('select');
+  for(var i=0; i<group.length; i++){
+    group[i].disabled = true;
+  }
+  /*
   document.getElementById('HistoListSelect133Ba').disabled = true;
   document.getElementById('HistoListSelect152Eu').disabled = true;
   document.getElementById('HistoListSelect56Co').disabled = true;
   document.getElementById('HistoListSelect60Co').disabled = true;
+  */
   document.getElementById('HistoDirectoryInput').disabled = true;
   document.getElementById('submitHistoFilenameChoicesButton').disabled = true;
 
