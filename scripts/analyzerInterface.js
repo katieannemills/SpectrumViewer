@@ -70,13 +70,14 @@ function setupDataStore(){
     dataStore.SortStatusCurrentSortSpeed = 10000;
     dataStore.SortStatusCurrentPercentageComplete = 10.0;
     dataStore.SortStatusCurrentRemainingSortTime = 10.0;
+    dataStore.SortStatusPreviousRunNumber = 1;
     dataStore.SortStatusPreviousTimestamp = 10;
     dataStore.SortStatusPreviousBytesSorted = 10;
     dataStore.SortStatusPreviousMegaBytesSorted = 10;
     dataStore.SortStatusAverageSortSpeed = 10000;
     dataStore.SortStatusSortSpeedHistory = [];
     dataStore.SortStatusHistory = [];
-    dataStore.SortStatusPreviousState = 'IDLE';              // Previous state to determine if a file has recently finished sorting. IDLE or BUSY or ONLINE-IDLE or ONLINE-BUSY
+    dataStore.previousSortStatus = 'IDLE';              // Previous state to determine if a file has recently finished sorting. IDLE or BUSY or ONLINE-IDLE or ONLINE-BUSY
 
 
     // Gating and Histogram variables
@@ -326,9 +327,11 @@ function processSortStatus(payload){
 	if(payload.split(' ')[1] == 'Stopped'){
 	    var string = 'Analyzer is connected to MIDAS but the run is stopped.';
 
-      // If the run has just stopped then refresh the histogram list
+      // If the run has just stopped then refresh the midas file and histogram lists
       if(dataStore.previousSortStatus != 'ONLINE-IDLE'){
-          getHistoFileListFromServer();
+        console.log("SortStatus now ONLINE-IDLE, previously "+dataStore.previousSortStatus);
+        getMidasFileListFromServer();
+        getHistoFileListFromServer();
       }
       // Remember this status
       dataStore.previousSortStatus = 'ONLINE-IDLE';
@@ -352,10 +355,12 @@ function processSortStatus(payload){
 	// Check the timestamp of the most recent config file saved on the server
 	checkConfigTimestamps(payload.split(' ')[1]);
 
-	// Check if a file just finished sorting and if so, grab the latest list of histogram files
-	// Need to add somewhere a way to detect that one file in the queue has completed, while others are still sorting
+	// Check if a file just finished sorting and if so, grab the latest list of midas and histogram files
+	// Need to add somewhere a way to detect that one file in the queue has completed, while others are still sorting - done below after the payload is unpacked
 	if(dataStore.previousSortStatus != 'IDLE'){
-	    getHistoFileListFromServer();
+    console.log("SortStatus now IDLE, previously "+dataStore.previousSortStatus);
+    getMidasFileListFromServer();
+    getHistoFileListFromServer();
 	}
 	dataStore.previousSortStatus = 'IDLE';
 
@@ -408,6 +413,14 @@ function processSortStatus(payload){
     console.log(dataStore.SortStatusCurrentBytesSorted);
     console.log(thisPayload[6]);
     */
+
+    // one file in the queue has completed, while others are still sorting. Update the midas file and histogram lists
+    // Skip the update for the first instance following initialization of the dataStore.SortStatusPreviousRunNumber
+    if(dataStore.SortStatusCurrentRunNumber != dataStore.SortStatusPreviousRunNumber && dataStore.SortStatusPreviousRunNumber>10){
+      console.log("SortStatus now BUSY, with run number "+dataStore.SortStatusCurrentRunNumber+", previously "+dataStore.SortStatusPreviousRunNumber);
+      getMidasFileListFromServer();
+      getHistoFileListFromServer();
+    }
 
     // Check the timestamp of the most recent config file saved on the server
     checkConfigTimestamps(thisPayload[6].split(',')[0]);
@@ -467,9 +480,10 @@ function processSortStatus(payload){
     if(dataStore.SortStatusCurrentPercentageComplete == 100){ string += ", saving tar file to disk"; }
     document.getElementById('progress').innerHTML = string;
 
-    // Save the timestamp and bytes sorted for use at the next update
+    // Save the timestamp, run number and bytes sorted for use at the next update
     dataStore.SortStatusPreviousTimestamp = dataStore.SortStatusCurrentTimestamp;
     dataStore.SortStatusPreviousMegaBytesSorted = dataStore.SortStatusCurrentMegaBytesSorted;
+    dataStore.SortStatusPreviousRunNumber = dataStore.SortStatusCurrentRunNumber;
 
     // Update the Sort queue table
     var thisPayloadArray = payload.split(",");

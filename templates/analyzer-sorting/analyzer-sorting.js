@@ -202,20 +202,20 @@ function buildMidasFileTable(){
 }
 
 function addFileDetailsToMidasFileTable(){
-    var table = document.getElementById("MidFilesTable");
+  var table = document.getElementById("MidFilesTable");
 
-    // Iterate through all rows of the MIDAS data file table
-    for (var i = 1, row; row = table.rows[i]; i++) {
-	// Get the run number from cell0
-	thisRunName = row.cells[0].innerHTML;
+  // Iterate through all rows of the MIDAS data file table
+  for (var i = 1, row; row = table.rows[i]; i++) {
+    // Get the run number from cell0
+    thisRunName = row.cells[0].innerHTML;
 
-	// Find the details for this run
-	num = dataStore.midasRunList.map(function(e) { return e.RunName; }).indexOf(thisRunName);
+    // Find the details for this run
+    num = dataStore.midasRunList.map(function(e) { return e.RunName; }).indexOf(thisRunName);
 
-	// Find the run title and update the contents of cell0
-	let string = thisRunName + ', ' + dataStore.midasRunList[num].RunTitle;
-	row.cells[0].innerHTML = string;
-    }
+    // Find the run title and update the contents of cell0
+    let string = thisRunName + ', ' + dataStore.midasRunList[num].RunTitle;
+    row.cells[0].innerHTML = string;
+  }
 
 }
 
