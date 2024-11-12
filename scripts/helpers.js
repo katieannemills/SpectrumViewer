@@ -928,6 +928,10 @@ function processSpectrumList(payload,callback){
   }
   catch(err){
     console.log('Problem with format of the Spectrum list provided by the server for histogram file, '+dataStore.histoFileName);
+    if(document.getElementById('navbar-content-div')){
+      document.getElementById('navbar-content-div').innerHTML = 'Error: Problem getting the Spectrum list from the server.';
+      document.getElementById('navbar-content-div').style.color = 'black';
+    }
     console.log(err);
     return;
   }
@@ -1025,6 +1029,8 @@ function constructNewSpectrumMenu(){
   dataStore.counter++;
   if(dataStore.counter>5){
     console.log('The spectrum menu failed to generate correctly after five attempts.');
+    document.getElementById('navbar-content-div').innerHTML = 'Error: The spectrum menu failed to load correctly.';
+    document.getElementById('navbar-content-div').style.color = 'black';
     return;
   }
 
@@ -1044,7 +1050,7 @@ function constructNewSpectrumMenu(){
     dataStore._plotList.setup();
   }
   catch(err){
-    const thisTimeout = setTimeout(function() { constructNewSpectrumMenu(); }, 200);
+    const thisTimeout = setTimeout(function() { constructNewSpectrumMenu(); }, 500);
   }
 }
 

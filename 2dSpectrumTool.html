@@ -156,8 +156,9 @@
 
     dataStore._plotListHeader = new plotListHeader('navbar-header-div');
     _plotControl2d = new plotControl2d('plotControl');
-
     dataStore._plotListHeader.setup();
+    document.getElementById('navbar-content-div').innerHTML = 'Spectrum menu is loading...';
+    
     _plotControl2d.setup();
     setupFooter('foot');
 
