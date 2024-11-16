@@ -520,10 +520,10 @@
       functionVals = [],
       i, x, sigmas = 5, stepSize = 0.01;
       //calculate peak area in excess of background, for <sigmas> up and down.
-      for(i=0; i<2*sigmas*width/stepSize; i++){
-        x = center - sigmas*width + i*stepSize
-        functionVals.push( gauss(amplitude, center, width, x)*stepSize )
-        integral = functionVals.integrate()
+      for(var i=0; i<2*sigmas*width/stepSize; i++){
+        x = center - sigmas*width + i*stepSize;
+        functionVals.push( gauss(amplitude, center, width, x)*stepSize );
+        integral = functionVals.integrate();
       }
 
       // Bail out if this is not singles spectrum fitting
@@ -543,7 +543,12 @@
 
         dataStore.sourceInfo[dataStore.currentSource].uncorrectedArea[dataStore.currentPeak] = integral.toFixed(0);
         dataStore.sourceInfo[dataStore.currentSource].uncorrectedAreaUnc[dataStore.currentPeak] = Math.ceil(Math.sqrt(dataStore.sourceInfo[dataStore.currentSource].uncorrectedArea[dataStore.currentPeak]));
-        console.log(dataStore.currentPlot + ', '+dataStore.currentSource + ', Peak '+dataStore.currentPeak+', centroid='+center.toFixed(2)+', height='+amplitude.toFixed(2)+', FWHM='+(width*2.35).toFixed(2)+', Net Area = '+dataStore.sourceInfo[dataStore.currentSource].uncorrectedArea[dataStore.currentPeak]);
+        console.log(dataStore.currentPlot + ', '+dataStore.currentSource + ', Peak '+dataStore.currentPeak+', centroid='+center.toFixed(2)+', height='+amplitude.toFixed(2)+', FWHM='+(width*2.35).toFixed(2)+', Net Area (from integral) = '+dataStore.sourceInfo[dataStore.currentSource].uncorrectedArea[dataStore.currentPeak]);
+        // Use direct equation to calculate area under Guassian
+        // Do not need to subtract background (again) because this guassian is already drawn above the background.
+        var thisNetArea = amplitude*width/0.3989; // where 0.3989 equals the reciprocal of the square root of two pi.
+        dataStore.sourceInfo[dataStore.currentSource].uncorrectedAreaUnc[dataStore.currentPeak] = Math.ceil(Math.sqrt(dataStore.sourceInfo[dataStore.currentSource].uncorrectedArea[dataStore.currentPeak]));
+        console.log(dataStore.currentPlot + ', '+dataStore.currentSource + ', Peak '+dataStore.currentPeak+', centroid='+center.toFixed(2)+', height='+amplitude.toFixed(2)+', FWHM='+(width*2.35).toFixed(2)+', Net Area (from direct equation) = '+thisNetArea);
 
       }else{
         // Fitting projections

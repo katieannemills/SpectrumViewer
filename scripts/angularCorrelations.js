@@ -891,7 +891,7 @@ async function createLocalMatrices(i){
     // Unpack the raw data to the local storage
     // The last argument as false, suppresses the generation of a colorMap used for displaying as a heatmap
     // Unpack the compressed matrix data received from the server
-    var thisMatrixData = packZcompressed(dataStore.rawData[thisKey].data2, dataStore.rawData[thisKey].XaxisLength, dataStore.rawData[thisKey].YaxisLength, dataStore.rawData[thisKey].ZaxisMax, false);
+    var thisMatrixData = packZcompressed(dataStore.rawData[thisKey].data2, dataStore.rawData[thisKey].XaxisLength, dataStore.rawData[thisKey].YaxisLength, dataStore.rawData[thisKey].ZaxisMax,dataStore.rawData[thisKey].symmetrized, false);
 
     // Trim the matrix and save it in the object
     dataStore.matrix[thisKey].data = trimMatrix(thisMatrixData,3);

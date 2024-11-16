@@ -1396,7 +1396,7 @@ repack2[0][i] = 0;
 return repack2;
 }
 
-function packZcompressed(raw2,XaxisLength,YaxisLength,Zmax,generateColorMap){
+function packZcompressed(raw2,XaxisLength,YaxisLength,Zmax,symmeterize,generateColorMap){
   // histo z values arrive as [row length, x0y0, x1y0, ..., x0y1, x1y1, ..., xmaxymax]
   // heatmap wants it as [[x0y0, x1y0, ..., xmaxy0], [x0y1, x1y1, ..., xmaxy1], ...]
   //  console.log('unpackZ');
@@ -1410,6 +1410,7 @@ function packZcompressed(raw2,XaxisLength,YaxisLength,Zmax,generateColorMap){
   if(XaxisLength == 'undefined'){ XaxisLength = activeMatrixXaxisLength; }
   if(YaxisLength == 'undefined'){ YaxisLength = activeMatrixYaxisLength; }
   if(Zmax == 'undefined'){ Zmax = dataStore.hm.zmaxfull; }
+  if(symmeterize == 'undefined'){ symmeterize = false; }
 
   // Declare local variables
   var repack = [], repack2 = [],
@@ -1536,9 +1537,11 @@ for(subMatrixIndex=0; subMatrixIndex<raw2.length; subMatrixIndex++){
           }
           //console.log('Type'+subMatrixType+'['+thisYindex+']['+thisXindex+']='+thisValue);
           repack2[thisYindex][thisXindex] = thisValue;
+          if(symmeterize){ repack2[thisXindex][thisYindex] = thisValue; }
           if(thisValue>matrixMaxValue){ matrixMaxValue = thisValue; } // Update the max Z value
           if(generateColorMap){
             dataStore.hm.addPointToColorMap(objectIndex,thisYindex,thisXindex,thisValue); // Add this point to the color Map
+            if(symmeterize){ dataStore.hm.addPointToColorMap(objectIndex,thisXindex,thisYindex,thisValue); }
           }
           thisIndex += thisArrayValueSize;
         }
@@ -1592,9 +1595,12 @@ for(subMatrixIndex=0; subMatrixIndex<raw2.length; subMatrixIndex++){
 
         //  console.log('Type'+subMatrixType+'['+thisYindex+']['+thisXindex+']='+thisValue);
           repack2[thisYindex][thisXindex] = thisValue;
+          if(symmeterize){ repack2[thisXindex][thisYindex] = thisValue; }
           if(thisValue>matrixMaxValue){ matrixMaxValue = thisValue; } // Update the max Z value
           if(generateColorMap){
             dataStore.hm.addPointToColorMap(objectIndex,thisYindex,thisXindex,thisValue); // Add this point to the color Map
+            if(symmeterize){ dataStore.hm.addPointToColorMap(objectIndex,thisXindex,thisYindex,thisValue);
+            }
           }
         }
       }
@@ -1626,9 +1632,12 @@ for(subMatrixIndex=0; subMatrixIndex<raw2.length; subMatrixIndex++){
           thisValue = raw2[subMatrixIndex][i*subMatrixXlength+j];
           //	    console.log('['+thisYindex+']['+thisXindex+']='+thisValue);
           repack2[thisYindex][thisXindex] = thisValue;
+          if(symmeterize){ repack2[thisXindex][thisYindex] = thisValue; }
           if(thisValue>matrixMaxValue){ matrixMaxValue = thisValue; } // Update the max Z value
           if(generateColorMap){
             dataStore.hm.addPointToColorMap(objectIndex,thisYindex,thisXindex,thisValue); // Add this point to the color Map
+            if(symmeterize){ dataStore.hm.addPointToColorMap(objectIndex,thisXindex,thisYindex,thisValue);
+            }
           }
         }
       }
@@ -1645,9 +1654,12 @@ for(subMatrixIndex=0; subMatrixIndex<raw2.length; subMatrixIndex++){
         thisValue = raw2[subMatrixIndex][j+1];
         //	console.log('['+thisYindex+']['+thisXindex+']='+thisValue);
         repack2[thisYindex][thisXindex] = thisValue;
+        if(symmeterize){ repack2[thisXindex][thisYindex] = thisValue; }
         if(thisValue>matrixMaxValue){ matrixMaxValue = thisValue; } // Update the max Z value
         if(generateColorMap){
           dataStore.hm.addPointToColorMap(objectIndex,thisYindex,thisXindex,thisValue); // Add this point to the color Map
+          if(symmeterize){ dataStore.hm.addPointToColorMap(objectIndex,thisXindex,thisYindex,thisValue);
+          }
         }
       }
       break;

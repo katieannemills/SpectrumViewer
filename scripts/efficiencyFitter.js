@@ -128,8 +128,8 @@ efficiencyRegression(thisX,thisY,thisYerror);
       "summingInCorrectionPeaks": [ //[[]],// An array of arrays of literautre peak energies which need to be gated on and fit to obtain the summing-In correction for the corresponding (by index number) 'literaturePeak' [fit_energy,gate_energy]
         [[]], // for 80keV
         [[53.16,223]],      // for 276keV. 79 and 80keV are hard to fit.
-        [[223,79.61]],      // for 302keV. 79 and 80keV are hard to fit.
-        [[276.4,79.61],[53.16,302.85]], // for 356keV
+        [[80,223]],      // for 302keV. 79 and 80keV are hard to fit.
+        [[276.4,80],[53.16,302.85]], // for 356keV
         [[302.85,80],[223,160]] ],   // for 383keV
         "summingInCorrectionCounts": [],  // An array of arrays of the counts found in the peak in the 180 degree coincidence matrix projection.
         "summingInCorrectionCountsUnc": [],  // Uncertainty in An array of arrays of the counts found in the peak in the 180 degree coincidence matrix projection.
@@ -1264,128 +1264,128 @@ function buildGNUfile(){
 }
 
 function projectAllMatrices(){
-            //make the projections for the matrix of each source based on the peaks defined.
-            console.log(dataStore);
+  //make the projections for the matrix of each source based on the peaks defined.
+  console.log(dataStore);
 
-            // Change rawData to another list that is just the Opp spectrum
-    var i,j,k, plotName, thisKey, oppKeys = Object.keys(dataStore.spectrumListOpp),
-                buffer = dataStore.currentPlot //keep track of whatever was originally plotted so we can return to it
+  // Change rawData to another list that is just the Opp spectrum
+  var i,j,k, plotName, thisKey, oppKeys = Object.keys(dataStore.spectrumListOpp),
+  buffer = dataStore.currentPlot //keep track of whatever was originally plotted so we can return to it
 
-            releaser(
-                function(i){
-                    // Change rawData to another list that is just the Sum_Energy_ spectrum
-                    var oppKeys = Object.keys(dataStore.spectrumListOpp);
+  releaser(
+    function(i){
+      // Change rawData to another list that is just the Sum_Energy_ spectrum
+      var oppKeys = Object.keys(dataStore.spectrumListOpp);
 
-		    // Identify the source from the histogram name in the spectrum title
-		    dataStore.currentSource = Object.keys(dataStore.sourceInfo).find(key => dataStore.sourceInfo[key].histoFileName.split('.')[0] === oppKeys[i].split(':')[0])
+      // Identify the source from the histogram name in the spectrum title
+      dataStore.currentSource = Object.keys(dataStore.sourceInfo).find(key => dataStore.sourceInfo[key].histoFileName.split('.')[0] === oppKeys[i].split(':')[0])
 
-		    // Set the details for this matrix and then unpack it
-		    dataStore.activeMatrix = oppKeys[i];
-			dataStore.raw2 = dataStore.rawData[oppKeys[i]].data2;
-			dataStore.activeMatrixXaxisLength = dataStore.rawData[oppKeys[i]].XaxisLength;
-			dataStore.activeMatrixYaxisLength = dataStore.rawData[oppKeys[i]].YaxisLength;
-			dataStore.activeMatrixSymmetrized = dataStore.rawData[oppKeys[i]].symmetrized;
-      dataStore.hm._raw = packZcompressed(dataStore.rawData[oppKeys[i]].data2,dataStore.activeMatrixXaxisLength,dataStore.activeMatrixYaxisLength,dataStore.activeMatrixZaxisMax,false);
+      // Set the details for this matrix and then unpack it
+      dataStore.activeMatrix = oppKeys[i];
+      dataStore.raw2 = dataStore.rawData[oppKeys[i]].data2;
+      dataStore.activeMatrixXaxisLength = dataStore.rawData[oppKeys[i]].XaxisLength;
+      dataStore.activeMatrixYaxisLength = dataStore.rawData[oppKeys[i]].YaxisLength;
+      dataStore.activeMatrixSymmetrized = dataStore.rawData[oppKeys[i]].symmetrized;
+      dataStore.hm._raw = packZcompressed(dataStore.rawData[oppKeys[i]].data2,dataStore.activeMatrixXaxisLength,dataStore.activeMatrixYaxisLength,dataStore.activeMatrixZaxisMax,dataStore.activeMatrixSymmetrized,false);
 
 
-		    // Loop through the making all the projections required for this source
-		    for(j=0; j<dataStore.sourceInfo[dataStore.currentSource].literaturePeaks.length; j++){
+      // Loop through the making all the projections required for this source
+      for(j=0; j<dataStore.sourceInfo[dataStore.currentSource].literaturePeaks.length; j++){
 
-      // Convenient to set the summing-in counts to zero here for all literature peaks
-      dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionCounts[j] = 0;
-      dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionCountsUnc[j] = 0;
+        // Convenient to set the summing-in counts to zero here for all literature peaks
+        dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionCounts[j] = 0;
+        dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionCountsUnc[j] = 0;
 
-      // Set limits for the projections
-			console.log('Make projection for '+dataStore.sourceInfo[dataStore.currentSource].literaturePeaks[j]);
-      var thisPeakWidth = typicalPeakWidth(dataStore.sourceInfo[dataStore.currentSource].literaturePeaks[j],"HPGe"); // HPGe singles peak width
-			min = Math.floor(dataStore.sourceInfo[dataStore.currentSource].literaturePeaks[j]-thisPeakWidth);
-			max = Math.ceil(dataStore.sourceInfo[dataStore.currentSource].literaturePeaks[j]+thisPeakWidth);
+        // Set limits for the projections
+        console.log('Make projection for '+dataStore.sourceInfo[dataStore.currentSource].literaturePeaks[j]);
+        var thisPeakWidth = typicalPeakWidth(dataStore.sourceInfo[dataStore.currentSource].literaturePeaks[j],"HPGe"); // HPGe singles peak width
+        min = Math.floor(dataStore.sourceInfo[dataStore.currentSource].literaturePeaks[j]-thisPeakWidth);
+        max = Math.ceil(dataStore.sourceInfo[dataStore.currentSource].literaturePeaks[j]+thisPeakWidth);
 
-			plotName = projectXaxis(min,max);
-			console.log('Created '+plotName);
-			// Add this projection to the rawData storage for plotting
-			// Add this projection spectrum to the list which need to be fitted
-			dataStore.rawData[plotName] = dataStore.createdSpectra[plotName];
-			dataStore.spectrumListProjections[plotName] = dataStore.createdSpectra[plotName];
-			dataStore.spectrumListProjectionsPeaks[plotName] = {
-        'parentPeakId': j,
-        'peaks': []
-      };
+        plotName = projectYaxis(min,max);
+        console.log('Created '+plotName);
+        // Add this projection to the rawData storage for plotting
+        // Add this projection spectrum to the list which need to be fitted
+        dataStore.rawData[plotName] = dataStore.createdSpectra[plotName];
+        dataStore.spectrumListProjections[plotName] = dataStore.createdSpectra[plotName];
+        dataStore.spectrumListProjectionsPeaks[plotName] = {
+          'parentPeakId': j,
+          'peaks': []
+        };
 
-			// Add this projection to the spectrum menu
-			newMenuItem = document.createElement('li');
-			newMenuItem.setAttribute('id', 'plotList'+plotName);
-			newMenuItem.setAttribute('value', plotName);
-			newMenuItem.setAttribute('class', 'list-group-item toggle');
-			newMenuItem.innerHTML = plotName.split(':')[1].trim()+'<span id=\'plotListbadge'+plotName+'\' class=\"badge plotPresence hidden\">&#x2713;</span>';
-			document.getElementById('plotListplots'+dataStore.currentSource).appendChild(newMenuItem);
-			document.getElementById('plotList'+plotName).onclick = function(){ dataStore._plotListLite.exclusivePlot(this.id.split('plotList')[1], dataStore.viewers[dataStore.plots[0]]); }
+        // Add this projection to the spectrum menu
+        newMenuItem = document.createElement('li');
+        newMenuItem.setAttribute('id', 'plotList'+plotName);
+        newMenuItem.setAttribute('value', plotName);
+        newMenuItem.setAttribute('class', 'list-group-item toggle');
+        newMenuItem.innerHTML = plotName.split(':')[1].trim()+'<span id=\'plotListbadge'+plotName+'\' class=\"badge plotPresence hidden\">&#x2713;</span>';
+        document.getElementById('plotListplots'+dataStore.currentSource).appendChild(newMenuItem);
+        document.getElementById('plotList'+plotName).onclick = function(){ dataStore._plotListLite.exclusivePlot(this.id.split('plotList')[1], dataStore.viewers[dataStore.plots[0]]); }
 
-			// The summing-out correction is the total number of counts in this 180 degree coincidence multiplied by the F factor.
-			// The F factor is determined from the number of active crystals which contributed to this 180degree coincidence matrix.
-			// F factor will be deduced from the Hittpattern for this source histrogram file.
-			dataStore.sourceInfo[dataStore.currentSource].summingOutCorrectionCounts[j] = dataStore.createdSpectra[plotName].reduce((partialSum, a) => parseFloat(partialSum) + parseFloat(a), 0);
-			dataStore.sourceInfo[dataStore.currentSource].summingOutCorrectionCountsUnc[j] = Math.ceil(Math.sqrt(dataStore.sourceInfo[dataStore.currentSource].summingOutCorrectionCounts[j]));
+        // The summing-out correction is the total number of counts in this 180 degree coincidence multiplied by the F factor.
+        // The F factor is determined from the number of active crystals which contributed to this 180degree coincidence matrix.
+        // F factor will be deduced from the Hittpattern for this source histrogram file.
+        dataStore.sourceInfo[dataStore.currentSource].summingOutCorrectionCounts[j] = dataStore.createdSpectra[plotName].reduce((partialSum, a) => parseFloat(partialSum) + parseFloat(a), 0);
+        dataStore.sourceInfo[dataStore.currentSource].summingOutCorrectionCountsUnc[j] = Math.ceil(Math.sqrt(dataStore.sourceInfo[dataStore.currentSource].summingOutCorrectionCounts[j]));
 
-			// Build the list of peaks to be fitted for this projection spectrum - these contribute to the summing-in corrections.
-			for(k=0; k<dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j].length; k++){
-			    // This is an array of two peak energies. The first will be the peak energy to fit in the projection of the second energy.
-			    // Check if this projection has been made yet and if not make it.
-			    // Make a list of the peaks to fit for this projection name.
-			    console.log('Process summingInCorrectionPeaks:');
-			    console.log(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j]);
-			    console.log(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][0].length);
-			    if(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][0].length==0){ continue; }
+        // Build the list of peaks to be fitted for this projection spectrum - these contribute to the summing-in corrections.
+        for(k=0; k<dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j].length; k++){
+          // This is an array of two peak energies. The first will be the peak energy to fit in the projection of the second energy.
+          // Check if this projection has been made yet and if not make it.
+          // Make a list of the peaks to fit for this projection name.
+          console.log('Process summingInCorrectionPeaks:');
+          console.log(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j]);
+          console.log(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][0].length);
+          if(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][0].length==0){ continue; }
 
-			    if(dataStore.sourceInfo[dataStore.currentSource].literaturePeaks.indexOf(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1])<0){
-				// This peak is not a peak we are fitting as a single, so it does not have a projection spectrum yet.
-				// Make it now, unless it has already been created
+          if(dataStore.sourceInfo[dataStore.currentSource].literaturePeaks.indexOf(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1])<0){
+            // This peak is not a peak we are fitting as a single, so it does not have a projection spectrum yet.
+            // Make it now, unless it has already been created
 
-			console.log('Projections: This peak is not a literature peak, '+dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1]);
-      var thisPeakWidth = typicalPeakWidth(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1]); // HPGe singles peak width
-			min = Math.floor(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1]-thisPeakWidth);
-			max = Math.ceil(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1]+thisPeakWidth);
+            console.log('Projections: This peak is not a literature peak, '+dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1]);
+            var thisPeakWidth = typicalPeakWidth(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1]); // HPGe singles peak width
+            min = Math.floor(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1]-thisPeakWidth);
+            max = Math.ceil(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1]+thisPeakWidth);
 
-			thisKey = dataStore.activeMatrix+'y-'+min+'-'+max;
-				if(!(thisKey in dataStore.createdSpectra)){
-				    console.log('This projection is not in createdSpectra so make it now');
+            thisKey = dataStore.activeMatrix+'y-'+min+'-'+max;
+            if(!(thisKey in dataStore.createdSpectra)){
+              console.log('This projection is not in createdSpectra so make it now');
 
-			plotName = projectXaxis(min,max);
-			console.log('Created '+plotName);
-			// Add this projection to the rawData storage for plotting
-			// Add this projection spectrum to the list which need to be fitted
-			dataStore.rawData[plotName] = dataStore.createdSpectra[plotName];
-			dataStore.spectrumListProjections[plotName] = dataStore.createdSpectra[plotName];
-			dataStore.spectrumListProjectionsPeaks[plotName] = {
-        'parentPeakId': j,
-        'peaks': []
-      };
+              plotName = projectYaxis(min,max);
+              console.log('Created '+plotName);
+              // Add this projection to the rawData storage for plotting
+              // Add this projection spectrum to the list which need to be fitted
+              dataStore.rawData[plotName] = dataStore.createdSpectra[plotName];
+              dataStore.spectrumListProjections[plotName] = dataStore.createdSpectra[plotName];
+              dataStore.spectrumListProjectionsPeaks[plotName] = {
+                'parentPeakId': j,
+                'peaks': []
+              };
 
-			// Add this projection to the spectrum menu
-			newMenuItem = document.createElement('li');
-			newMenuItem.setAttribute('id', 'plotList'+plotName);
-			newMenuItem.setAttribute('value', plotName);
-			newMenuItem.setAttribute('class', 'list-group-item toggle');
-			newMenuItem.innerHTML = plotName.split(':')[1].trim()+'<span id=\'plotListbadge'+plotName+'\' class=\"badge plotPresence hidden\">&#x2713;</span>';
-			document.getElementById('plotListplots'+dataStore.currentSource).appendChild(newMenuItem);
-			document.getElementById('plotList'+plotName).onclick = function(){ dataStore._plotListLite.exclusivePlot(this.id.split('plotList')[1], dataStore.viewers[dataStore.plots[0]]); }
-			    }
-			    }
-			    // Add the peak to the list to fit in this projection spectrum
-			    dataStore.spectrumListProjectionsPeaks[plotName].peaks.push(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0]);
-			    console.log('Save this peak '+dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0]+' for the projection '+plotName);
+              // Add this projection to the spectrum menu
+              newMenuItem = document.createElement('li');
+              newMenuItem.setAttribute('id', 'plotList'+plotName);
+              newMenuItem.setAttribute('value', plotName);
+              newMenuItem.setAttribute('class', 'list-group-item toggle');
+              newMenuItem.innerHTML = plotName.split(':')[1].trim()+'<span id=\'plotListbadge'+plotName+'\' class=\"badge plotPresence hidden\">&#x2713;</span>';
+              document.getElementById('plotListplots'+dataStore.currentSource).appendChild(newMenuItem);
+              document.getElementById('plotList'+plotName).onclick = function(){ dataStore._plotListLite.exclusivePlot(this.id.split('plotList')[1], dataStore.viewers[dataStore.plots[0]]); }
+            }
+          }
+          // Add the peak to the list to fit in this projection spectrum
+          dataStore.spectrumListProjectionsPeaks[plotName].peaks.push(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0]);
+          console.log('Save this peak '+dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0]+' for the projection '+plotName);
 
-			    // Count the total number of peaks to fit for use in the progress bar
-			    dataStore.progressBarNumberTasks++;
+          // Count the total number of peaks to fit for use in the progress bar
+          dataStore.progressBarNumberTasks++;
 
-			    // Save the ROI for projections so it can be used for drawing the fitlines
-			    if(!dataStore.ROIprojections[plotName]) dataStore.ROIprojections[plotName] = [];
+          // Save the ROI for projections so it can be used for drawing the fitlines
+          if(!dataStore.ROIprojections[plotName]) dataStore.ROIprojections[plotName] = [];
           var ROIwidth= typicalPeakWidth(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0])*2; // HPGe singles ROI width
-			    dataStore.ROIprojections[plotName].push([Math.floor(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0]-ROIwidth),Math.ceil(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0]+ROIwidth)]);
-			}
-			console.log(dataStore.spectrumListProjectionsPeaks[plotName].peaks);
+          dataStore.ROIprojections[plotName].push([Math.floor(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0]-ROIwidth),Math.ceil(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0]+ROIwidth)]);
+        }
+        console.log(dataStore.spectrumListProjectionsPeaks[plotName].peaks);
 
-		    }
+      }
                 }.bind(this),
 
                 function(){
