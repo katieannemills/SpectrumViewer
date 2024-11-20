@@ -682,13 +682,17 @@ this.fitEnergyCalibrationData = function(thisDetector){
 
   // Also save the address which is needed in the Cal file
   // Need to find a source that was not excluded.
-  if(dataStore.sourceInfo["152Eu"].Config){
+  /*
+  if(typeof dataStore.sourceInfo["152Eu"].Config !== 'undefined'){
     var thisSource = "152Eu";
-  }else if(dataStore.sourceInfo["133Ba"].Config){
+  }else if(typeof dataStore.sourceInfo["133Ba"].Config !== 'undefined'){
     var thisSource = "133Ba";
   }else{
     var thisSource = "56Co";
   }
+  */
+  var keys = Object.keys(dataStore.sourceInfo);
+  var thisSource = dataStore.sourceInfo[keys[0]].title;
   var thisCalibrationIndex = dataStore.sourceInfo[thisSource].Config.map(function(e) { return e.name; }).indexOf(dataStore.THESEdetectors[thisDetector]);
   dataStore.THESEcalibrations[thisDetector].address = dataStore.sourceInfo[thisSource].Config[thisCalibrationIndex].address;
 
