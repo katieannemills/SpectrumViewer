@@ -39,6 +39,10 @@ function setupDataStore(){
     }
 
     //generate ARIES detector nomenclature codes
+    ariesCodes.push('ART01XF01X');
+    ariesCodes.push('ART01XF02X');
+    ariesCodes.push('ART01XF03X');
+    ariesCodes.push('ART01XF04X');
     for(i=1; i<77; i++){
         ariesCodes.push('ART' + alwaysThisLong(i,2) + 'XS00X');
     }
@@ -68,15 +72,21 @@ function setupDataStore(){
     }
 
     //generate LaBr3 TACs detector nomenclature codes
-    for(i=1; i<9; i++){
+    for(i=1; i<13; i++){
         tacCodes.push('LBT' + alwaysThisLong(i,2) + 'XT00X');
     }
 
+/*
     //generate DESCANT detector nomenclature codes
     for(i=1; i<61; i++){
 	if(i>70 && i<80){ continue; }
         descantCodes.push('DSW' + alwaysThisLong(i,2) + 'XN00X');
     }
+    */
+        //generate DESCANT detector nomenclature codes
+        for(i=1; i<8; i++){
+            descantCodes.push('DSG' + alwaysThisLong(i,2) + 'XN00X');
+        }
 
     //generate OGS detector nomenclature codes
     for(i=1; i<9; i++){
