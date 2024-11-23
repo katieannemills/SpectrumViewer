@@ -1002,19 +1002,23 @@ function processSpectrumList(payload,callback){
         }
       }
     }
+
+      // Add the Projections subfolder for the gating tool
+      // Only needed if there are 2d objects in this spectrum list
+      if(newGroup.name == "Coinc"){
+      newSubgroup = {
+        "subname": 'Projections',
+        "id": 'proj',
+        "items": []
+      }
+        // Add this subGroup to the topGroup
+        newGroup.subGroups.push(newSubgroup);
+    }
+
     // Add this new topGroup to the topGroups object
     topGroups.push(newGroup)
   }
 
-  // Add the Projections subfolder for the gating tool
-  // Only needed if there are 2d objects in this spectrum list
-  newSubgroup = {
-    "subname": 'Projections',
-    "id": 'proj',
-    "items": []
-  }
-  // Add this subGroup to the topGroup
-  newGroup.subGroups.push(newSubgroup);
 
   dataStore.topGroups = topGroups;
 
