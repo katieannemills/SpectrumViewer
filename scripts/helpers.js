@@ -1907,9 +1907,15 @@ function typicalPeakWidth(energy,detector){
   if(detector == undefined){ detector = "HPGe"; }
   let width = 1.0;
 
-if(detector == "HPGe"){
-  width = parseFloat(energy)*0.0014 + 2.2;
-}
+  if(detector == "HPGe"){
+    width = parseFloat(energy)*0.0014 + 2.2;
+  }
+  if(detector == "LaBr3"){
+    width = parseFloat(energy)*0.0187 + 11.247;
+  }
+  if(detector == "RCMP"){
+    width = 40;
+  }
  if(width<1.0){ return(1); }
  return(width);
 }

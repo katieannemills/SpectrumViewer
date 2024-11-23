@@ -128,7 +128,8 @@ function setupDataStore(){
               ],
             'LaBr3':
               [
-                {"name": "LBL207Bi", "title":  "22Na", "lowEnergy":  511.00, "midEnergy": 1274.53, "highEnergy": 1435.8, "vhiEnergy": 1785.53, "energies": [511.00,1274.53,1435.8,1785.53], "maxXValue":2000 },
+                {"name": "LBL22Na", "title":  "22Na", "lowEnergy":  511.00, "midEnergy": 1274.53, "highEnergy": 1435.8, "vhiEnergy": 1785.53, "energies": [511.00,1274.53,1435.8,1785.53], "maxXValue":2000 },
+                {"name":  "LBL60Co", "title":  "60Co", "lowEnergy":  74.97, "midEnergy": 1173.23, "highEnergy": 1332.49, "vhiEnergy": 2614.52, "energies": [32.1,1173.23,1332.49,2614.52], "maxXValue":2650 },
                   {"name": "LBL207Bi", "title":  "207Bi", "lowEnergy":  74.97, "midEnergy":  569.70, "highEnergy": 1063.66, "vhiEnergy": 1770.23, "energies": [74.97,569.70,1063.66,1770.23], "maxXValue":2000 },
                 {"name": "LBLA224",  "title":  "A=224", "lowEnergy": 131.61, "midEnergy":  215.98, "highEnergy":  837.03, "vhiEnergy": 2614.52, "energies": [131.61,215.98,837.03,2614.52], "maxXValue":2650 }
               ],

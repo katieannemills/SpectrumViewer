@@ -183,7 +183,7 @@ function setupDataStore(){
 	           },
 	'56Co' : {"name":  "Co-56", "title":  "56Co", 'histoFileName' : '', "maxXValue":4000,       // General source details
               "Config": {},         // Place to store the Calibrations from the Config file of this run
-	          "literaturePeaks": [ 846.76, 1037.84, 1175.1, 1238.29, 1360.21, 1771.35, 2015.18, 2034.76, 2598.46, 3009.56, 3201.95,
+	          "literaturePeaks": [ 122.06, 846.76, 1037.84, 1175.1, 1238.29, 1360.21, 1771.35, 2034.76, 2598.46, 3009.56, 3201.95,
               3253.42,
               // 3272.99,
                3451.15,
@@ -653,7 +653,7 @@ function submitHistoFilenameChoices(){
     for(i=0; i<dataStore.THESEdetectors.length; i++){
       dataStore.ROI[keys[thisKey]][i] = [];
     for(j=0; j<dataStore.sourceInfo[keys[thisKey]]['literaturePeaks'].length; j++){
-      ROIwidth = typicalPeakWidth(dataStore.sourceInfo[keys[thisKey]].literaturePeaks[j],"HPGe")*2;
+      ROIwidth = typicalPeakWidth(dataStore.sourceInfo[keys[thisKey]].literaturePeaks[j],"HPGe")*3;
       dataStore.ROI[keys[thisKey]][i][j] = [parseInt(Math.floor(dataStore.sourceInfo[keys[thisKey]].literaturePeaks[j]) - ROIwidth), parseInt(Math.floor(dataStore.sourceInfo[keys[thisKey]].literaturePeaks[j]) + ROIwidth)];
 
       // Count the total number of peaks to fit for use in the progress bar
