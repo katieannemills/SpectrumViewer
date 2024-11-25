@@ -344,7 +344,7 @@
           var centers = this.identifyCorrectPeaks(foundPeaks, foundId);
 
           // Likely a mistake in the literature energies or search regions
-          if(centers.length<2){ console.log("Failed to guess peaks correctly, but continuing."); console.log(dataStore); }
+          if(centers.length<2){ console.log("Failed to guess peaks correctly, but continuing."); }
 
           // Define the Regions of Interest for the full peak fitting based on the peaks found
             if(typeof(dataStore.ROI[spectrumName]) == 'undefined'){ dataStore.ROI[spectrumName] = []; }
