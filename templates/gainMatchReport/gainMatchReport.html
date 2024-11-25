@@ -249,7 +249,6 @@
                 //dump data so it doesn't stack up
                 dataStore.viewers[viewerName].removeData(spectrum);
 
-
         },
 
         this.addFitLines = function(){
@@ -312,7 +311,6 @@
             thisSearchRegion[0] = dataStore.searchRegion[thisPeakIndex][0];
             thisSearchRegion[1] = dataStore.searchRegion[thisPeakIndex][1];
             ROIwidth = 2*typicalPeakWidth(dataStore.sourceInfo[dataStore.detectorType][index].energies[thisPeakIndex],dataStore.detectorType); // ROIwidth is detector type and energy dependent
-            console.log("guessPeaks1: Source "+dataStore.sourceType+", Energy "+dataStore.sourceInfo[dataStore.detectorType][index].energies[thisPeakIndex]+", ROIwidth "+ROIwidth);
 
             while(foundId[thisPeakIndex]<3){
               thisPeak=thisSearchRegion[0];
@@ -340,22 +338,20 @@
             }
             centers[thisPeakIndex]=foundPeaks[thisPeakIndex][0];
           }
-console.log(foundPeaks);
-console.log(foundId);
+
           // Perform sanity checks on the Guessed peaks here to identify which set is correct.
           // The peak with the highest number of counts might not be the correct peak for the energy we are looking for
           var centers = this.identifyCorrectPeaks(foundPeaks, foundId);
 
           // Likely a mistake in the literature energies or search regions
-          if(centers.length<2){ console.log("Failed to guess peaks correctly. This is a hard stop."); console.log(dataStore); }
+          if(centers.length<2){ console.log("Failed to guess peaks correctly, but continuing."); console.log(dataStore); }
 
           // Define the Regions of Interest for the full peak fitting based on the peaks found
             if(typeof(dataStore.ROI[spectrumName]) == 'undefined'){ dataStore.ROI[spectrumName] = []; }
 
             for(i=0; i<dataStore.sourceInfo[dataStore.detectorType][index].energies.length; i++){
               ROIwidth = typicalPeakWidth(dataStore.sourceInfo[dataStore.detectorType][index].energies[i],dataStore.detectorType); // ROIwidth is detector type and energy dependent
-              console.log("guessPeaks2: Source "+dataStore.sourceType+", Energy "+dataStore.sourceInfo[dataStore.detectorType][index].energies[i]+", ROIwidth "+ROIwidth);
-              dataStore.ROI[spectrumName][i] = [centers[i] - ROIwidth, centers[i] + ROIwidth];
+              dataStore.ROI[spectrumName][i] = [Math.floor(centers[i] - ROIwidth), Math.ceil(centers[i] + ROIwidth)];
             }
 
 

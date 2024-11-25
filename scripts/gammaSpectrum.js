@@ -781,7 +781,8 @@ function spectrumViewer(canvasID){
 			'slope': estimate[1]
 		}
 		fitLine = this.addFitLine(this.FitLimitLower, fitdata.length, max, cent, width, estimate[0], estimate[1])
-		/*
+
+/*
 		console.log('ML fitter: (this.FitLimitLower, fitdata.length, max, cent, width, estimate[0], estimate[1])');
 		console.log(originalFitdata);
 		console.log(fitdata);
