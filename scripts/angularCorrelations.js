@@ -657,7 +657,7 @@ console.log("Detector choice is "+dataStore.detectorType)
     });
     var histoName = dataStore.histoFileName.split(".")[0] + ":";
     var thesePlots = [];
-    for(i=1; i<dataStore.THESEdetectors.length; i++){
+    for(i=0; i<dataStore.THESEdetectors.length; i++){
       thesePlots.push(
         {
           "plotID": histoName + dataStore.THESEdetectors[i] + '_Energy',
@@ -704,7 +704,7 @@ console.log("Detector choice is "+dataStore.detectorType)
       var histoName = dataStore.histoFileName.split(".")[0] + ":";
       var theseGRGPlots = [];
       var theseARTPlots = [];
-      for(i=1; i<dataStore.THESEdetectors.length; i++){
+      for(i=0; i<dataStore.THESEdetectors.length; i++){
         if(dataStore.THESEdetectors[i].includes('GRG')){
           theseGRGPlots.push(
             {
@@ -756,7 +756,7 @@ console.log("Detector choice is "+dataStore.detectorType)
       });
       var histoName = dataStore.histoFileName.split(".")[0] + ":";
       var thesePlots = [];
-      for(i=1; i<dataStore.THESEdetectors.length; i++){
+      for(i=0; i<dataStore.THESEdetectors.length; i++){
         thesePlots.push(
           {
             "plotID": histoName + dataStore.THESEdetectors[i] + '_CTOF', // Use corrected TOF
@@ -920,7 +920,6 @@ function projectAngularCorrelations(){
   // Get the peak energies from the User input
   var g1E = parseInt(document.getElementById('gamma1Input').value);
   var g2E = parseInt(document.getElementById('gamma2Input').value);
-  var gateWidth = 3;
 
   // Use the higher energy peak as the gate because that will likely give less background
   var gateE = (g1E > g2E) ? g1E : g2E;
@@ -929,7 +928,10 @@ function projectAngularCorrelations(){
   // Save these to the dataStore for use during the fitting
   dataStore.gatePeakEnergy = gateE;
   dataStore.fitPeakEnergies = [fitE]; // Must be an array in order to fit N peaks per spectrum
-  dataStore.peakWidth = parseInt(gateWidth*2);
+  dataStore.peakWidth = Math.ceil(typicalPeakWidth(fitE,"HPGe")*3);
+
+  // Set the gate width
+  var gateWidth = Math.ceil(typicalPeakWidth(gateE,"HPGe")*2);
 
   // Set limits for the projections
   var min = gateE - gateWidth;
@@ -1226,7 +1228,6 @@ function fitPeaksInSeriesOfHistograms(spectra){
             dataStore.viewers[viewerName].containerFit.addChild(fitLines[i]);
           }
 
-
         dataStore.viewers[viewerName].stage.update();
       }
 
@@ -1280,6 +1281,9 @@ console.log(dataStore.angular_bins_145mm[i]+","+dataStore.angularBinData[i]);
 
 // Plot the data
 populateDataPlot();
+
+// Show the download button
+document.getElementById('downloadDiv').classList.remove('hidden');
 }
 
     function populateDataPlot(){
@@ -1311,8 +1315,15 @@ console.log(dataStore.dataplotDataY[thisPlotID]);
       flags.fillN(0, dataStore.dataplotDataX[thisPlotID].length);
 
       // Update the Y axis scale if needed
-        dataStore.YAxisMinValue[thisPlotID][0] = 0.9;
-        dataStore.YAxisMaxValue[thisPlotID][0] = 1.4;
+      var max = 0;
+      for(i=0; i<dataStore.dataplotDataY[thisPlotID].length; i++){
+        if(Math.abs(dataStore.dataplotDataY[thisPlotID][i])>max){
+          max = dataStore.dataplotDataY[thisPlotID][i];
+        }
+      }
+      max *= 1.2;
+      dataStore.YAxisMinValue[thisPlotID][0] = parseFloat(1)-max;
+      dataStore.YAxisMaxValue[thisPlotID][0] = parseFloat(1)+max;
 
       // Send the data to the plot
       dataStore.dataplotData[thisPlotID] = arrangePoints(dataStore.dataplotDataX[thisPlotID], [dataStore.dataplotDataY[thisPlotID]], flags );
@@ -1334,7 +1345,6 @@ function buildCSVfile(){
 
     // List the run files used for this calibration
     CSV += 'Runfile:,' + dataStore.histoFileName + '\n';
-
 
     // Print the column titles
     CSV += '\nAngular Bin Index,';

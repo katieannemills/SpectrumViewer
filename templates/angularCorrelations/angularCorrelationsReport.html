@@ -338,6 +338,7 @@ function angularCorrelationsReport(wrapID){
     dataStore.currentPlot = spectrum;
     dataStore.viewers[viewerName].plotData() //kludge to update limits, could be nicer
     dataStore.viewers[viewerName].fitTarget = spectrum;
+    console.log("exclusivePlot for "+spectrum);
     dataStore._plotListLite.exclusivePlot(spectrum, dataStore.viewers[dataStore.plots[0]]);
 
     if(dataStore.currentTask == 'SinglesFitting'){
