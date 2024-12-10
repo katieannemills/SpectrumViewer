@@ -82,7 +82,11 @@ function setupDataStore(){
   dataStore.angularBinData = [];             // place to store the data value for each angular bin. raw area * bin weight * Normalization
   dataStore.angularBinDataUnc = [];          // place to store the data value uncertainty for each angular bin. raw area * bin weight * Normalization
   dataStore.singlesPeakArea = [];            // place to store the peak areas from each angular bin
+  dataStore.numCrystalPairs = [];            // place to store the number of crystal pairs for each angular bin
   dataStore.iteration = 0;
+
+  dataStore.theseAngularBins = [];   // At initalization the appropriate 110/145mm data will be copied into here
+  dataStore.theseGeAngles = []; // At initalization the appropriate 110/145mm data will be copied into here
 
   // angular differences in degrees for the 110mm distance. There are
   // 110mm
@@ -269,7 +273,8 @@ function setupDataStore(){
   ];
 
   dataStore.detectorChoice = [
-  {"name": "GRG-GRG", "title": "Ge-Ge"},
+  {"name": "GRG-GRG-145mm", "title": "Ge-Ge, 145mm"},
+  {"name": "GRG-GRG-110mm", "title": "Ge-Ge, 110mm"},
   {"name": "GRG-ART", "title": "Ge-ARIES"},
   {"name": "DSW-DSW", "title": "DSW-DSW (Descant Wall)"}
   ];       // Detector choice information to generate buttons
@@ -631,11 +636,25 @@ console.log("Detector choice is "+dataStore.detectorType)
   // fill the angularMatrices array of 2d histogram names
   switch(dataStore.detectorType){
 
-    case "GRG-GRG": // Ge-Ge angular correlations
+    case "GRG-GRG-110mm": // Ge-Ge angular correlations for HPGe at 110mm
+    case "GRG-GRG-145mm": // Ge-Ge angular correlations for HPGe at 145mm
+
+    // Copy the corresponding angular bin data into the arrays to use
+    if(dataStore.detectorType == "GRG-GRG-145mm"){
+      dataStore.theseAngularBins = dataStore.angular_bins_145mm;
+      dataStore.theseGeAngles = dataStore.ge_angles_145mm;
+      dataStore.HPGeDistance = 145;
+      var matrixNameString = "Ge-Ge_145mm_angular_bin";
+    }else{
+      dataStore.theseAngularBins = dataStore.angular_bins_110mm;
+      dataStore.theseGeAngles = dataStore.ge_angles_110mm;
+      dataStore.HPGeDistance = 110;
+      var matrixNameString = "Ge-Ge_110mm_angular_bin";
+    }
 
     // Names of Angular correlation matrices that we need to fetch and use for GRG-GRG
     for(let i=0; i<52; i++){
-      dataStore.angularMatrices[i] = "Ge-Ge_angular_bin"+i;
+      dataStore.angularMatrices[i] = matrixNameString+i;
     }
 
     // Set up GRIFFIN detectors for GRG-GRG type
@@ -894,7 +913,8 @@ async function createLocalMatrices(i){
     var thisMatrixData = packZcompressed(dataStore.rawData[thisKey].data2, dataStore.rawData[thisKey].XaxisLength, dataStore.rawData[thisKey].YaxisLength, dataStore.rawData[thisKey].ZaxisMax,dataStore.rawData[thisKey].symmetrized, false);
 
     // Trim the matrix and save it in the object
-    dataStore.matrix[thisKey].data = trimMatrix(thisMatrixData,3);
+  //  dataStore.matrix[thisKey].data = trimMatrix(thisMatrixData,3);
+    dataStore.matrix[thisKey].data = thisMatrixData;
 
     // Delete the raw version to reduce total memory usage
     delete dataStore.rawData[thisKey];
@@ -920,10 +940,14 @@ function projectAngularCorrelations(){
   // Get the peak energies from the User input
   var g1E = parseInt(document.getElementById('gamma1Input').value);
   var g2E = parseInt(document.getElementById('gamma2Input').value);
-
+/*
   // Use the higher energy peak as the gate because that will likely give less background
   var gateE = (g1E > g2E) ? g1E : g2E;
   var fitE  = (g1E > g2E) ? g2E : g1E;
+  */
+  // Use the lower energy peak as the gate
+  var gateE = (g1E > g2E) ? g2E : g1E;
+  var fitE  = (g1E > g2E) ? g1E : g2E;
 
   // Save these to the dataStore for use during the fitting
   dataStore.gatePeakEnergy = gateE;
@@ -945,11 +969,11 @@ function projectAngularCorrelations(){
       // Change rawData to another list that is just the Sum_Energy_ spectrum
       var matrixKeys = Object.keys(dataStore.matrix);
 
-      // Set the details for this matrix needed by the projectYaxis function
+      // Set the details for this matrix needed by the projectXaxis function
       dataStore.activeMatrix = matrixKeys[i];
       dataStore.hm._raw = dataStore.matrix[matrixKeys[i]].data;
 
-      plotName = projectYaxis(min,max);
+      plotName = projectXaxis(min,max);
       console.log('Created '+plotName);
       // Add this projection to the rawData storage for plotting
       dataStore.rawData[plotName] = dataStore.createdSpectra[plotName];
@@ -1237,13 +1261,18 @@ function processAngularCorrelationData(){
 
   var sumAngularBinAreas = 0;
   var sumSinglesAreas = [0,0];
+  //var sumSinglesAreas = [];
 
   // Collect the angular bin peak areas
-  for(var i=0; i<dataStore.angCorrProjections.length; i++){
+  // skip the zero bin - not needed in the sum
+  for(var i=1; i<dataStore.angCorrProjections.length; i++){
      dataStore.angularBinPeakArea[i] = dataStore.fitResults[dataStore.angCorrProjections[i]][0][5];
      sumAngularBinAreas += dataStore.angularBinPeakArea[i];
      dataStore.angularBinWeight[i] = 0; // zero the weighting factors here
+     dataStore.numCrystalPairs[i] = 0;  // zero the number of crystal pairs here
+    // sumSinglesAreas[i] = [0,0]; // create space for the sum for this angular bin
   }
+//  sumSinglesAreas[i] = [0,0]; // create space for the sum for this angular bin
   dataStore.normalizationFactor = sumAngularBinAreas;
   console.log("dataStore.normalizationFactor = "+dataStore.normalizationFactor);
 
@@ -1252,22 +1281,33 @@ function processAngularCorrelationData(){
      dataStore.singlesPeakArea[i] = [0,0]; // initialize this element
      dataStore.singlesPeakArea[i][0] = dataStore.fitResults[dataStore.singlesSpectra[i]][0][5]; // the fit energy peak
      dataStore.singlesPeakArea[i][1] = dataStore.fitResults[dataStore.singlesSpectra[i]][1][5]; // the gate energy peak
-     sumSinglesAreas[0] += dataStore.singlesPeakArea[i][0]; // the fit energy peak
-     sumSinglesAreas[1] += dataStore.singlesPeakArea[i][1]; // the gate energy peak
+     sumSinglesAreas[0] += dataStore.fitResults[dataStore.singlesSpectra[i]][0][5]; // the fit energy peak
+     sumSinglesAreas[1] += dataStore.fitResults[dataStore.singlesSpectra[i]][1][5]; // the gate energy peak
   }
 
+/*
+    // Calculate the sum of the singles for the weighting factors
+    for(i=0; i<64; i++){
+    for(var j=0; j<64; j++){
+      var angleIndex = dataStore.theseGeAngles[i][j];
+      console.log("i="+i+",j="+j+",index="+angleIndex);
+      sumSinglesAreas[angleIndex][0] += dataStore.fitResults[dataStore.singlesSpectra[i]][0][5]; // the fit energy peak
+      sumSinglesAreas[angleIndex][1] += dataStore.fitResults[dataStore.singlesSpectra[i]][1][5]; // the gate energy peak
+   }
+  }
+  */
   console.log(sumAngularBinAreas);
-  console.log(sumSinglesAreas[0]);
-  console.log(sumSinglesAreas[1]);
+  console.log(sumSinglesAreas);
 
 console.log(dataStore);
 
   // Calculate the weighting factors
   for(i=0; i<64; i++){
   for(var j=0; j<64; j++){
-    var angleIndex = dataStore.ge_angles_145mm[i][j];
+    var angleIndex = dataStore.theseGeAngles[i][j];
     dataStore.angularBinWeight[angleIndex] += (dataStore.singlesPeakArea[i][0]/sumSinglesAreas[0])*(dataStore.singlesPeakArea[j][1]/sumSinglesAreas[1]) * 0.5;
     dataStore.angularBinWeight[angleIndex] += (dataStore.singlesPeakArea[j][0]/sumSinglesAreas[0])*(dataStore.singlesPeakArea[i][1]/sumSinglesAreas[1]) * 0.5;
+    dataStore.numCrystalPairs[angleIndex]++;
  }
 }
 
@@ -1276,7 +1316,7 @@ console.log("Angular Correlation Data:");
 for(i=0; i<dataStore.angularBinPeakArea.length; i++){
 dataStore.angularBinData[i] = dataStore.angularBinPeakArea[i] / (dataStore.angularBinWeight[i] * dataStore.normalizationFactor);
 //console.log(i+" = "+dataStore.angularBinData[i]+", W= "+dataStore.angularBinWeight[i]);
-console.log(dataStore.angular_bins_145mm[i]+","+dataStore.angularBinData[i]);
+console.log(dataStore.theseAngularBins[i]+","+dataStore.angularBinData[i]);
 }
 
 // Plot the data
@@ -1303,7 +1343,7 @@ document.getElementById('downloadDiv').classList.remove('hidden');
 
       // Fill the arrays with the data
       for(var i=0; i<dataStore.angularBinData.length; i++){
-        dataStore.dataplotDataX[thisPlotID].push( Math.cos(dataStore.angular_bins_145mm[i]*(Math.PI / 180.000)) );
+        dataStore.dataplotDataX[thisPlotID].push( Math.cos(dataStore.theseAngularBins[i]*(Math.PI / 180.000)) );
         dataStore.dataplotDataY[thisPlotID].push( dataStore.angularBinData[i] );
       //  dataStore.efficiencyPlotDataUnc[thisPlotID].push( data[i].YUnc );
       }
@@ -1344,43 +1384,59 @@ function buildCSVfile(){
     CSV += 'GRIFFIN Gamma-Gamma Angular Correlations Data\n\n';
 
     // List the run files used for this calibration
-    CSV += 'Runfile:,' + dataStore.histoFileName + '\n';
+    CSV += 'Histogram file:,' + dataStore.histoFileName + '\n';
+    CSV += dataStore.detectorType + '\n';
 
     // Print the column titles
     CSV += '\nAngular Bin Index,';
     CSV += 'Angular Bin (deg),';
     CSV += 'Angular Bin cos(),';
-    CSV += 'Gate Peak Energy (keV),';
-    CSV += 'Singles Area,';
-    CSV += 'Singles Area Uncertainty,';
-    CSV += 'Fitted Peak Energy (keV),';
-    CSV += 'Singles Area,';
-    CSV += 'Singles Area Uncertainty,';
+    CSV += 'Num Ge pairs,';
     CSV += 'Angular Bin Area,';
     CSV += 'Angular Bin Area Uncertainty,';
     CSV += 'Angular Bin Weight,';
     CSV += 'Normalization Factor,';
     CSV += 'Angular Correlation Value,';
-    CSV += 'Ang. Corr. Value Uncertainty\n';
+    CSV += 'Ang. Corr. Value Uncertainty, , ,';
+    CSV += 'Crystal Index,';
+    CSV += 'Gate Peak Energy (keV),';
+    CSV += 'Singles Area,';
+    CSV += 'Singles Area Uncertainty,';
+    CSV += 'Fitted Peak Energy (keV),';
+    CSV += 'Singles Area,';
+    CSV += 'Singles Area Uncertainty\n';
 
     // Loop through all angular bins to provide the data
-    for(i=0; i<dataStore.angularBinData.length; i++){
+    for(i=1; i<=dataStore.singlesPeakArea.length; i++){
 
-        CSV += i + ',';
-        CSV += dataStore.angular_bins_145mm[i] + ',';
-        CSV += Math.cos(dataStore.angular_bins_145mm[i]*(Math.PI / 180.000)) + ',';
-        CSV += dataStore.gatePeakEnergy + ',';
-        CSV += dataStore.singlesPeakArea[i][1] + ',';
-        CSV += '-' + ',';
-        CSV += dataStore.fitPeakEnergies[0] + ',';
-        CSV += dataStore.singlesPeakArea[i][0] + ',';
-        CSV += '-' + ',';
+if(i<dataStore.angularBinData.length){
+        CSV += (i-1) + ',';
+        CSV += dataStore.theseAngularBins[i] + ',';
+        CSV += Math.cos(dataStore.theseAngularBins[i]*(Math.PI / 180.000)) + ',';
+        CSV += dataStore.numCrystalPairs[i] + ',';
         CSV += dataStore.angularBinPeakArea[i] + ',';
         CSV += '-' + ',';
         CSV += dataStore.angularBinWeight[i] + ',';
         CSV += dataStore.normalizationFactor + ',';
         CSV += dataStore.angularBinData[i] + ',';
+        CSV += '-' + ', , ,';
+        CSV += i + ',';
+        CSV += dataStore.gatePeakEnergy + ',';
+        CSV += dataStore.singlesPeakArea[i-1][1] + ',';
+        CSV += '-' + ',';
+        CSV += dataStore.fitPeakEnergies[0] + ',';
+        CSV += dataStore.singlesPeakArea[i-1][0] + ',';
         CSV += '-' + '\n';
+      }else{
+      CSV += ' , , , , , , , , , , , ,';
+      CSV += i + ',';
+      CSV += dataStore.gatePeakEnergy + ',';
+      CSV += dataStore.singlesPeakArea[i-1][1] + ',';
+      CSV += '-' + ',';
+      CSV += dataStore.fitPeakEnergies[0] + ',';
+      CSV += dataStore.singlesPeakArea[i-1][0] + ',';
+      CSV += '-' + '\n';
+      }
 
      }
 

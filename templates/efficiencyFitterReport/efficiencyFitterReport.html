@@ -567,8 +567,8 @@
         dataStore.ROIprojections[dataStore.currentPlot][dataStore.currentPeak][1] = dataStore.viewers[viewerName].FitLimitUpper;
 
         // Add the area of this fit to the Summing-In correction of the appropriate peak
-        dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionCounts[dataStore.spectrumListProjectionsPeaks[dataStore.currentPlot].parentPeakId] += parseInt(integral);
-        dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionCountsUnc[dataStore.spectrumListProjectionsPeaks[dataStore.currentPlot].parentPeakId] += parseInt(Math.sqrt(integral)*Math.sqrt(integral));
+        dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionCounts[dataStore.spectrumListProjectionsPeaks[dataStore.currentPlot].peaks[dataStore.currentPeak][1]] += parseInt(integral);
+        dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionCountsUnc[dataStore.spectrumListProjectionsPeaks[dataStore.currentPlot].peaks[dataStore.currentPeak][1]] += parseInt(Math.sqrt(integral)*Math.sqrt(integral));
 
         console.log('fitCallback during Summing corrections but anything else to do here?');
       }

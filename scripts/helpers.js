@@ -1540,6 +1540,9 @@ for(subMatrixIndex=0; subMatrixIndex<raw2.length; subMatrixIndex++){
             thisShift++;
           }
           //console.log('Type'+subMatrixType+'['+thisYindex+']['+thisXindex+']='+thisValue);
+          if(thisYindex==2478){	console.log('['+thisYindex+']['+thisXindex+']='+thisValue);
+          console.log(raw2[subMatrixIndex]);
+         }
           repack2[thisYindex][thisXindex] = thisValue;
           if(symmeterize){ repack2[thisXindex][thisYindex] = thisValue; }
           if(thisValue>matrixMaxValue){ matrixMaxValue = thisValue; } // Update the max Z value
@@ -1598,6 +1601,9 @@ for(subMatrixIndex=0; subMatrixIndex<raw2.length; subMatrixIndex++){
           }
 
         //  console.log('Type'+subMatrixType+'['+thisYindex+']['+thisXindex+']='+thisValue);
+        if(thisYindex==2478){	console.log('['+thisYindex+']['+thisXindex+']='+thisValue);
+        console.log(raw2[subMatrixIndex]);
+       }
           repack2[thisYindex][thisXindex] = thisValue;
           if(symmeterize){ repack2[thisXindex][thisYindex] = thisValue; }
           if(thisValue>matrixMaxValue){ matrixMaxValue = thisValue; } // Update the max Z value
@@ -1635,6 +1641,9 @@ for(subMatrixIndex=0; subMatrixIndex<raw2.length; subMatrixIndex++){
           thisYindex = subMatrixYbaseCoordinate+i;
           thisValue = raw2[subMatrixIndex][i*subMatrixXlength+j];
           //	    console.log('['+thisYindex+']['+thisXindex+']='+thisValue);
+          if(thisYindex==2478){	console.log('['+thisYindex+']['+thisXindex+']='+thisValue);
+          console.log(raw2[subMatrixIndex]);
+         }
           repack2[thisYindex][thisXindex] = thisValue;
           if(symmeterize){ repack2[thisXindex][thisYindex] = thisValue; }
           if(thisValue>matrixMaxValue){ matrixMaxValue = thisValue; } // Update the max Z value
@@ -1657,6 +1666,9 @@ for(subMatrixIndex=0; subMatrixIndex<raw2.length; subMatrixIndex++){
         thisYindex = subMatrixYbaseCoordinate+Math.floor(raw2[subMatrixIndex][j]/subMatrixXlength);
         thisValue = raw2[subMatrixIndex][j+1];
         //	console.log('['+thisYindex+']['+thisXindex+']='+thisValue);
+        if(thisYindex==2478 && thisXindex>50){	console.log('['+thisYindex+']['+thisXindex+']='+thisValue);
+        console.log(raw2[subMatrixIndex]);
+       }
         repack2[thisYindex][thisXindex] = thisValue;
         if(symmeterize){ repack2[thisXindex][thisYindex] = thisValue; }
         if(thisValue>matrixMaxValue){ matrixMaxValue = thisValue; } // Update the max Z value
@@ -1689,6 +1701,12 @@ repack2[0][i] = 0;
 }
 */
 
+if(repack2.length>=2482){
+for(var ii=2478; ii<2479; ii++){
+  console.log(ii+":");
+  console.log(repack2[ii]);
+}
+}
 
 if(generateColorMap){
   // set the zmax value for this matrix
@@ -1705,7 +1723,7 @@ return repack2;
 
 function trimMatrix(data,minCount){
   // Function will receive a matrix and return an array with the trailing low-count channels removed.
-  // The legnth of each array will be reduced. Not all original row will be present.
+  // The length of each array will be reduced. Not all original row will be present.
   console.log("trimMatrix min="+minCount+", data length = "+data.length);
   var i;
   for(i=0; i<data.length; i++){

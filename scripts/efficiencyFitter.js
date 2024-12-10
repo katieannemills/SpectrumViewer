@@ -128,7 +128,7 @@ efficiencyRegression(thisX,thisY,thisYerror);
       "summingInCorrectionPeaks": [ //[[]],// An array of arrays of literautre peak energies which need to be gated on and fit to obtain the summing-In correction for the corresponding (by index number) 'literaturePeak' [fit_energy,gate_energy]
         [[]], // for 80keV
         [[53.16,223]],      // for 276keV. 79 and 80keV are hard to fit.
-        [[80,223]],      // for 302keV. 79 and 80keV are hard to fit.
+        [[223,80]],      // for 302keV. 79 and 80keV are hard to fit.
         [[276.4,80],[53.16,302.85]], // for 356keV
         [[302.85,80],[223,160]] ],   // for 383keV
         "summingInCorrectionCounts": [],  // An array of arrays of the counts found in the peak in the 180 degree coincidence matrix projection.
@@ -169,11 +169,11 @@ efficiencyRegression(thisX,thisY,thisYerror);
         "FCorrectionFactor": [],           // F factor determined from the number of active/inactive crystals which contribute to the 180 degree coincidence matrix
         "summingInCorrectionPeaks": [ [[]],  [[]],  [[]],  [[]], // An array of arrays of literautre peak energies which need to be gated on and fit to obtain the summing-In correction for the corresponding (by index number) 'literaturePeak' [fit_energy,gate_energy]
         [[367,411.1],[192,586]], // for 778.9 keV
-        [[210,656],[148,719],[423,444]], // for 867.4 keV
-        [[719,244.7],[401,562],[275,689]], // for 964.0 keV
+        [[210,656]], // for 867.4 keV
+        [[719,244.7],[275,689]], // for 964.0 keV
         // [[964,121],[275,810]],           // for 1085.8 keV. Doublet is hard to fit, omit for now.
         //  [[678,411],[503,586],[324,764]], // for 1089.7 keV. Doublet is hard to fit, omit for now.
-        [[867.4,244.7],[688,423],[210,901],[148,964.0]], // for 1112.1 keV
+        [[867.4,244.7],[210,901]], // for 1112.1 keV
         //  [[768,444],[556,656],[538,674],[493,719],[345,867],[286,926],[207,1005]], // for 1212.9 keV. low statistics, omit for now.
         //  [[712,586],[534,764],[520,778],[328,970],[324,974],[209,1089]], // for 1299.1 keV. low statistics, omit for now.
         [[719,688],[566,841],[488,919],[443,964.0],[295,1112.1],[237,1170]] // for 1408.0 keV
@@ -209,13 +209,13 @@ efficiencyRegression(thisX,thisY,thisYerror);
     "FWHM": [],
     "FCorrectionFactor": [],           // F factor determined from the number of active/inactive crystals which contribute to the 180 degree coincidence matrix
     "summingInCorrectionPeaks": [ [[]],  [[]],  [[]],  [[]],  [[]], // An array of arrays of literautre peak energies which need to be gated on and fit to obtain the summing-In correction for the corresponding (by index number) 'literaturePeak' [fit_energy,gate_energy]
-    [[733,1037.84],[411,1360]], // for 1771.35 keV
-    [[977,1037.84],[655,1360]], // for 2015.18 keV
-    [[996,1037.84],[674,1360],[263,1771]], // for 2034.76 keV
-    [[1360,1238],[787,1810]], // for 2598.46 keV
-    [[1963,1238],[1088,2113]], // for 3201.95 keV
-    [[2015.18,1238],[1442,1810],[1140,2113],[977,2276],[655,2598.46]], // for 3253.42 keV
-    [[2212,1238],[1640,1810],[1175.1,2276],[852,2598.46]], // for 3451.15 keV
+    [[733,1037.84]], // for 1771.35 keV
+    [[977,1037.84]], // for 2015.18 keV
+    [[263,1771.35]], // for 2034.76 keV
+    [[1360,1238.29],[787,1810]], // for 2598.46 keV
+    [[1963,1238.29],[1088,2113]], // for 3201.95 keV
+    [[2015.18,1238.29],[1442,1810],[1140,2113],[977,2276],[655,2598.46]], // for 3253.42 keV
+    [[2212,1238.29],[1640,1810]], // for 3451.15 keV
     [[1271,2276]] // for 3548.27 keV
   ],
   "summingInCorrectionCounts": [],  // An array of arrays of the counts found in the peak in the 180 degree coincidence matrix projection.
@@ -780,6 +780,47 @@ function setupHistoListSelect(){
     }.bind(newButton);
       document.getElementById('histoChoiceSubmit').appendChild(newButton);
 
+
+          // Create the Auto-fill for development button
+          newButton = document.createElement('button');
+          newButton.setAttribute('id', 'submitHistoFilenameChoicesButton');
+          newButton.setAttribute('class', 'btn btn-default btn-lg');
+          newButton.innerHTML = "Auto-fill for development, S2319";
+          newButton.style.padding = '4px';
+          newButton.onclick = function(){
+
+            document.getElementById('HistoListSelect133Ba').value = "run28177.tar";
+            document.getElementById('HistoListSelect152Eu').value = "run28171.tar";
+            document.getElementById('HistoListSelect56Co').value = "run28174.tar";
+            document.getElementById('HistoListSelect60Co').value = "run28175.tar";
+            document.getElementById('HistoListSelect133Ba').onchange();
+            document.getElementById('HistoListSelect152Eu').onchange();
+            document.getElementById('HistoListSelect56Co').onchange();
+            document.getElementById('HistoListSelect60Co').onchange();
+          }.bind(newButton);
+            document.getElementById('histoChoiceSubmit').appendChild(newButton);
+
+          // Create the Auto-fill for development button
+          newButton = document.createElement('button');
+          newButton.setAttribute('id', 'submitHistoFilenameChoicesButton');
+          newButton.setAttribute('class', 'btn btn-default btn-lg');
+          newButton.innerHTML = "Auto-fill for development, S1723";
+          newButton.style.padding = '4px';
+          newButton.onclick = function(){
+
+            document.getElementById('HistoListSelect133Ba').value = "run20567.tar";
+            document.getElementById('HistoListSelect152Eu').value = "run20570.tar";
+            document.getElementById('HistoListSelect56Co').value = "run20573.tar";
+            document.getElementById('HistoListSelect60Co').value = "run20571.tar";
+            document.getElementById('SourceChoiceSelect60Co').value = "R-1105";
+            document.getElementById('HistoListSelect133Ba').onchange();
+            document.getElementById('HistoListSelect152Eu').onchange();
+            document.getElementById('HistoListSelect56Co').onchange();
+            document.getElementById('HistoListSelect60Co').onchange();
+            document.getElementById('SourceChoiceSelect60Co').onchange();
+          }.bind(newButton);
+            document.getElementById('histoChoiceSubmit').appendChild(newButton);
+
 }
 
 function submitHistoFilenameChoices(){
@@ -900,7 +941,13 @@ for(i=0; i<keys.length; i++){
     for(i=0; i<keys.length; i++){
 	dataStore.ROI[keys[i]] = [];
 	for(j=0; j<dataStore.sourceInfo[keys[i]]['literaturePeaks'].length; j++){
-      var ROIwidth= typicalPeakWidth(dataStore.sourceInfo[keys[i]].literaturePeaks[j],"HPGe")*2; // HPGe singles ROI width
+      var ROIwidth= typicalPeakWidth(dataStore.sourceInfo[keys[i]].literaturePeaks[j],"HPGe")*3; // HPGe singles ROI width
+      if(dataStore.sourceInfo[keys[i]].literaturePeaks[j] == 2015.18 ||
+         dataStore.sourceInfo[keys[i]].literaturePeaks[j] == 2034.76 ||
+         dataStore.sourceInfo[keys[i]].literaturePeaks[j] == 3253.42){
+        // Special cases for close-lying peaks.
+        ROIwidth *= 0.5;
+      }
 	    dataStore.ROI[keys[i]][j] = [Math.floor(dataStore.sourceInfo[keys[i]].literaturePeaks[j] - ROIwidth), Math.ceil(dataStore.sourceInfo[keys[i]].literaturePeaks[j] + ROIwidth)];
 
 	    // Count the total number of peaks to fit for use in the progress bar
@@ -1308,7 +1355,7 @@ function projectAllMatrices(){
         dataStore.rawData[plotName] = dataStore.createdSpectra[plotName];
         dataStore.spectrumListProjections[plotName] = dataStore.createdSpectra[plotName];
         dataStore.spectrumListProjectionsPeaks[plotName] = {
-          'parentPeakId': j,
+          // First entry is the peak index, second entry is the Parent peak index
           'peaks': []
         };
 
@@ -1357,7 +1404,7 @@ function projectAllMatrices(){
               dataStore.rawData[plotName] = dataStore.createdSpectra[plotName];
               dataStore.spectrumListProjections[plotName] = dataStore.createdSpectra[plotName];
               dataStore.spectrumListProjectionsPeaks[plotName] = {
-                'parentPeakId': j,
+                // First entry is the peak index, second entry is the Parent peak index
                 'peaks': []
               };
 
@@ -1370,9 +1417,16 @@ function projectAllMatrices(){
               document.getElementById('plotListplots'+dataStore.currentSource).appendChild(newMenuItem);
               document.getElementById('plotList'+plotName).onclick = function(){ dataStore._plotListLite.exclusivePlot(this.id.split('plotList')[1], dataStore.viewers[dataStore.plots[0]]); }
             }
+          }else{
+            // This peak for summing-in corrections is also a literature peak so it already has a projection spectrum.
+            // Set the plotname variable so that the peak to be fitted are added to the correct list.
+            var thisPeakWidth = typicalPeakWidth(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1]); // HPGe singles peak width
+            min = Math.floor(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1]-thisPeakWidth);
+            max = Math.ceil(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1]+thisPeakWidth);
+            plotName = dataStore.activeMatrix+'y-'+min+'-'+max;
           }
           // Add the peak to the list to fit in this projection spectrum
-          dataStore.spectrumListProjectionsPeaks[plotName].peaks.push(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0]);
+          dataStore.spectrumListProjectionsPeaks[plotName].peaks.push([dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0],j]);
           console.log('Save this peak '+dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0]+' for the projection '+plotName);
 
           // Count the total number of peaks to fit for use in the progress bar
@@ -1380,7 +1434,13 @@ function projectAllMatrices(){
 
           // Save the ROI for projections so it can be used for drawing the fitlines
           if(!dataStore.ROIprojections[plotName]) dataStore.ROIprojections[plotName] = [];
-          var ROIwidth= typicalPeakWidth(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0])*2; // HPGe singles ROI width
+          var ROIwidth= typicalPeakWidth(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0])*3; // HPGe singles ROI width
+          if(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0] == 2015.18 ||
+             dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0] == 2034.76 ||
+             dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0] == 3253.42){
+            // Special cases for close-lying peaks.
+            ROIwidth *= 0.5;
+          }
           dataStore.ROIprojections[plotName].push([Math.floor(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0]-ROIwidth),Math.ceil(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0]+ROIwidth)]);
         }
         console.log(dataStore.spectrumListProjectionsPeaks[plotName].peaks);
