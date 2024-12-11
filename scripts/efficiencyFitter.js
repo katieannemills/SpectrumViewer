@@ -99,9 +99,9 @@ efficiencyRegression(thisX,thisY,thisYerror);
   dataStore.currentTask = 'Setup';               // keep track of which task we are on to determine the behaviour of certain function. Mostly used to decide where to write fit results. Singles, Summing
   dataStore.currentSource = '133Ba';                                           // index for the dataStore.sourceInfo while looping through sources.
   dataStore.sourceCalibration = {                                              // NIST-certification of 60Co sources. Used for calculating absolute efficiency.
-    'R-0793': {"date": 1180724400,  "activity": 38480, "halflife": 1.66372e+8, "lambda": 4.1653e-9},
-    'R-0850': {"date": 1221505200,  "activity": 35350, "halflife": 1.66372e+8, "lambda": 4.1653e-9},
-    'R-1105': {"date": 1462129200,  "activity": 38180, "halflife": 1.66372e+8, "lambda": 4.1653e-9}
+    'R-0793': {"date": 1180724400,  "activity": 38480,  "activityUnc": 384.8, "halflife": 1.66372e+8, "lambda": 4.1653e-9},
+    'R-0850': {"date": 1221505200,  "activity": 35350,  "activityUnc": 353.5, "halflife": 1.66372e+8, "lambda": 4.1653e-9},
+    'R-1105': {"date": 1462129200,  "activity": 38180,  "activityUnc": 381.8, "halflife": 1.66372e+8, "lambda": 4.1653e-9}
   };
   dataStore.sourceInfo = {                                                  // Source information and settings
     '133Ba' : {"name": "Ba-133", "title": "133Ba", 'histoFileName' : '', "maxXValue": 2000,       // General source details
@@ -302,12 +302,14 @@ efficiencyRegression(thisX,thisY,thisYerror);
 "normalizationFactorParameter": [],  // paremeters of the fitting used to determine the Normalization factor
 "normalizationFactor": 0,            // Normalization factor for the relative efficiency curve of this source
 "normalizationAbsFactor": 0,         // Normalization factor for the absolute efficiency curve of this source
+"normalizationAbsFactorUnc": 0,      // Uncertainty for Normalization factor for the absolute efficiency curve of this source
 "absoluteEfficiency": [],            // Absolute efficiency calculated for this peak energy after summing corrections
 "absoluteEfficiencyUnc": [],         // Uncertainty for Absolute efficiency calculated for this peak energy after summing corrections
 "sourceCalibration": {},             // NIST-certified calibration details for this source
 "Midas": {},                          // Midas info of this historgram file; Title, StartTime, Duration
 "timeSinceCertification": 0,         // time in seconds between the certification of the source activity and the start of the run
 "sourceActivity": 0,                // source Activity in becquerels at the start of the run
+"sourceActivityUnc": 0,             // uncertainty for the source Activity in becquerels at the start of the run
 "sourceTotalDecaysDuringThisRun": 0 // Total number of decays of this source during this run
 }
 };
@@ -367,7 +369,7 @@ dataStore.plotStyle[0] = {                                              //dygrap
   drawPoints: true,
   underlayCallback: drawDygraphCanvasObjects,
   //connectSeparatedPoints: 'true',
-//  customBars: true,
+  //customBars: true,
   pointSize: 5,
   highlightCircleSize: 7,
   strokeWidth: 0.0,
@@ -1480,10 +1482,12 @@ function processConfigFileForRuntime(payload){
 
     // Calculate the source activity at the time of the run start
     dataStore.sourceInfo['60Co'].sourceActivity = dataStore.sourceInfo['60Co'].sourceCalibration.activity * Math.exp(-1.0*dataStore.sourceInfo['60Co'].sourceCalibration.lambda*dataStore.sourceInfo['60Co'].timeSinceCertification);
+    dataStore.sourceInfo['60Co'].sourceActivityUnc = dataStore.sourceInfo['60Co'].sourceActivity * (dataStore.sourceInfo['60Co'].sourceCalibration.activityUnc / dataStore.sourceInfo['60Co'].sourceCalibration.activity);
 
     // Calculate the number of decays of this source during the full run duration
     dataStore.sourceInfo['60Co'].sourceTotalDecaysDuringThisRun = dataStore.sourceInfo['60Co'].sourceActivity * dataStore.sourceInfo['60Co'].Midas.Duration;
     dataStore.sourceInfo['60Co'].normalizationAbsFactor = 1.0/dataStore.sourceInfo['60Co'].sourceTotalDecaysDuringThisRun;
+    dataStore.sourceInfo['60Co'].normalizationAbsFactorUnc = dataStore.sourceInfo['60Co'].normalizationAbsFactor * (dataStore.sourceInfo['60Co'].sourceActivityUnc/dataStore.sourceInfo['60Co'].sourceActivity);
 
     console.log('Source activity at Run start:');
     console.log(dataStore.sourceInfo['60Co'].timeSinceCertification);

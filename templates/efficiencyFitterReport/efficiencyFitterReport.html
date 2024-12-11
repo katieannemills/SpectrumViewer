@@ -332,11 +332,27 @@
 
             // Calculate the corrected Area from the uncorrected area, summing-in and summing-out
             dataStore.sourceInfo[currentSource].correctedArea[currentPeak] = parseInt(dataStore.sourceInfo[currentSource].uncorrectedArea[currentPeak]) + parseInt(dataStore.sourceInfo[currentSource].summingOutCorrectionCounts[currentPeak]) - parseInt(dataStore.sourceInfo[currentSource].summingInCorrectionCounts[currentPeak]);
-            dataStore.sourceInfo[currentSource].correctedAreaUnc[currentPeak] = parseInt((dataStore.sourceInfo[currentSource].uncorrectedAreaUnc[currentPeak]/dataStore.sourceInfo[currentSource].uncorrectedArea[currentPeak])*dataStore.sourceInfo[currentSource].correctedArea[currentPeak]  );
+
+            // Add in quadrature the uncertainties for the summing corrections and uncorrected area
+            dataStore.sourceInfo[currentSource].correctedAreaUnc[currentPeak] = parseInt(
+            Math.ceil(Math.sqrt(
+            (dataStore.sourceInfo[currentSource].uncorrectedAreaUnc[currentPeak]*dataStore.sourceInfo[currentSource].uncorrectedAreaUnc[currentPeak])
+            + (dataStore.sourceInfo[currentSource].summingOutCorrectionCountsUnc[currentPeak]*dataStore.sourceInfo[currentSource].summingOutCorrectionCountsUnc[currentPeak])
+            +
+            (dataStore.sourceInfo[currentSource].summingInCorrectionCountsUnc[currentPeak]*dataStore.sourceInfo[currentSource].summingInCorrectionCountsUnc[currentPeak])
+            ))
+            );
 
             // Calculate the relative efficiency (relative efficiency with summing corrections)
             dataStore.sourceInfo[currentSource].relativeEfficiency[currentPeak] = (dataStore.sourceInfo[currentSource].correctedArea[currentPeak]/dataStore.sourceInfo[currentSource].literatureIntensity[currentPeak]).toFixed(2);
-            dataStore.sourceInfo[currentSource].relativeEfficiencyUnc[currentPeak] = (dataStore.sourceInfo[currentSource].correctedAreaUnc[currentPeak]/dataStore.sourceInfo[currentSource].correctedArea[currentPeak])*dataStore.sourceInfo[currentSource].relativeEfficiency[currentPeak];
+
+            // Combine in quadrature the uncertainties in the input quantities
+            dataStore.sourceInfo[currentSource].relativeEfficiencyUnc[currentPeak] =  parseInt(
+            Math.ceil(Math.sqrt(
+            (dataStore.sourceInfo[currentSource].correctedAreaUnc[currentPeak]*dataStore.sourceInfo[currentSource].correctedAreaUnc[currentPeak])
+            + (dataStore.sourceInfo[currentSource].literatureIntensityUnc[currentPeak]*dataStore.sourceInfo[currentSource].literatureIntensityUnc[currentPeak])
+            ))
+            );
 
           }// end of peak for
         }// end of source for
@@ -638,8 +654,18 @@
       // Now calculate the absolute efficiency
       for(i=0; i<dataStore.sourceInfo['60Co'].relativeEfficiency.length; i++){
         dataStore.sourceInfo['60Co'].absoluteEfficiency.push((dataStore.sourceInfo['60Co'].relativeEfficiency[i]*dataStore.sourceInfo['60Co'].normalizationAbsFactor).toFixed(4));
-        dataStore.sourceInfo['60Co'].absoluteEfficiencyUnc.push((dataStore.sourceInfo['60Co'].relativeEfficiencyUnc[i]*dataStore.sourceInfo['60Co'].normalizationAbsFactor).toFixed(5));
+        var uncertValue = dataStore.sourceInfo['60Co'].absoluteEfficiency[i] *
+         Math.sqrt(
+         ((dataStore.sourceInfo['60Co'].relativeEfficiencyUnc[i]/dataStore.sourceInfo['60Co'].relativeEfficiency[i]) *
+         (dataStore.sourceInfo['60Co'].relativeEfficiencyUnc[i]/dataStore.sourceInfo['60Co'].relativeEfficiency[i]))
+         +
+         ((dataStore.sourceInfo['60Co'].normalizationAbsFactorUnc / dataStore.sourceInfo['60Co'].normalizationAbsFactor) * (dataStore.sourceInfo['60Co'].normalizationAbsFactorUnc / dataStore.sourceInfo['60Co'].normalizationAbsFactor))
+       );
+        dataStore.sourceInfo['60Co'].absoluteEfficiencyUnc.push(uncertValue.toFixed(5));
       }
+
+    // Normalize the relative 56Co to the absolute 60Co
+    // Then copy the same normalization factor to the other sources because they were already normalized together
       dataStore.sourceInfo['56Co'].normalizationAbsFactor = this.normalizeSourceData('56Co','60Co');
       dataStore.sourceInfo['152Eu'].normalizationAbsFactor = dataStore.sourceInfo['56Co'].normalizationAbsFactor;
 
@@ -650,24 +676,55 @@
         dataStore.sourceInfo['11Be'].normalizationAbsFactor = dataStore.sourceInfo['56Co'].normalizationAbsFactor;
        }
 
+        // Apply the absolute normalization factor to all points
+        // and calculate the uncertainty by combining on quadrature
        if("133Ba" in dataStore.sourceInfo){
       for(i=0; i<dataStore.sourceInfo['133Ba'].normalizedEfficiency.length; i++){
         dataStore.sourceInfo['133Ba'].absoluteEfficiency.push((dataStore.sourceInfo['133Ba'].normalizedEfficiency[i]*dataStore.sourceInfo['133Ba'].normalizationAbsFactor).toFixed(4));
-        dataStore.sourceInfo['133Ba'].absoluteEfficiencyUnc.push((dataStore.sourceInfo['133Ba'].normalizedEfficiencyUnc[i]*dataStore.sourceInfo['133Ba'].normalizationAbsFactor).toFixed(5));
+
+        var uncertValue = dataStore.sourceInfo['133Ba'].absoluteEfficiency[i] *
+         Math.sqrt(
+         ((dataStore.sourceInfo['133Ba'].relativeEfficiencyUnc[i]/dataStore.sourceInfo['133Ba'].relativeEfficiency[i]) *
+         (dataStore.sourceInfo['133Ba'].relativeEfficiencyUnc[i]/dataStore.sourceInfo['133Ba'].relativeEfficiency[i]))
+         +
+         ((dataStore.sourceInfo['60Co'].normalizationAbsFactorUnc / dataStore.sourceInfo['60Co'].normalizationAbsFactor) * (dataStore.sourceInfo['60Co'].normalizationAbsFactorUnc / dataStore.sourceInfo['60Co'].normalizationAbsFactor))
+       );
+        dataStore.sourceInfo['133Ba'].absoluteEfficiencyUnc.push(uncertValue.toFixed(5));
       }
     }
       for(i=0; i<dataStore.sourceInfo['152Eu'].normalizedEfficiency.length; i++){
         dataStore.sourceInfo['152Eu'].absoluteEfficiency.push((dataStore.sourceInfo['152Eu'].normalizedEfficiency[i]*dataStore.sourceInfo['152Eu'].normalizationAbsFactor).toFixed(4));
-        dataStore.sourceInfo['152Eu'].absoluteEfficiencyUnc.push((dataStore.sourceInfo['152Eu'].normalizedEfficiencyUnc[i]*dataStore.sourceInfo['152Eu'].normalizationAbsFactor).toFixed(5));
+                var uncertValue = dataStore.sourceInfo['152Eu'].absoluteEfficiency[i] *
+                 Math.sqrt(
+                 ((dataStore.sourceInfo['152Eu'].relativeEfficiencyUnc[i]/dataStore.sourceInfo['152Eu'].relativeEfficiency[i]) *
+                 (dataStore.sourceInfo['152Eu'].relativeEfficiencyUnc[i]/dataStore.sourceInfo['152Eu'].relativeEfficiency[i]))
+                 +
+                 ((dataStore.sourceInfo['60Co'].normalizationAbsFactorUnc / dataStore.sourceInfo['60Co'].normalizationAbsFactor) * (dataStore.sourceInfo['60Co'].normalizationAbsFactorUnc / dataStore.sourceInfo['60Co'].normalizationAbsFactor))
+               );
+                dataStore.sourceInfo['152Eu'].absoluteEfficiencyUnc.push(uncertValue.toFixed(5));
       }
       for(i=0; i<dataStore.sourceInfo['56Co'].normalizedEfficiency.length; i++){
         dataStore.sourceInfo['56Co'].absoluteEfficiency.push((dataStore.sourceInfo['56Co'].normalizedEfficiency[i]*dataStore.sourceInfo['56Co'].normalizationAbsFactor).toFixed(4));
-        dataStore.sourceInfo['56Co'].absoluteEfficiencyUnc.push((dataStore.sourceInfo['56Co'].normalizedEfficiencyUnc[i]*dataStore.sourceInfo['56Co'].normalizationAbsFactor).toFixed(5));
+                var uncertValue = dataStore.sourceInfo['56Co'].absoluteEfficiency[i] *
+                 Math.sqrt(
+                 ((dataStore.sourceInfo['56Co'].relativeEfficiencyUnc[i]/dataStore.sourceInfo['56Co'].relativeEfficiency[i]) *
+                 (dataStore.sourceInfo['56Co'].relativeEfficiencyUnc[i]/dataStore.sourceInfo['56Co'].relativeEfficiency[i]))
+                 +
+                 ((dataStore.sourceInfo['60Co'].normalizationAbsFactorUnc / dataStore.sourceInfo['60Co'].normalizationAbsFactor) * (dataStore.sourceInfo['60Co'].normalizationAbsFactorUnc / dataStore.sourceInfo['60Co'].normalizationAbsFactor))
+               );
+                dataStore.sourceInfo['56Co'].absoluteEfficiencyUnc.push(uncertValue.toFixed(5));
       }
       if("11Be" in dataStore.sourceInfo){
       for(i=0; i<dataStore.sourceInfo['11Be'].normalizedEfficiency.length; i++){
         dataStore.sourceInfo['11Be'].absoluteEfficiency.push((dataStore.sourceInfo['11Be'].normalizedEfficiency[i]*dataStore.sourceInfo['11Be'].normalizationAbsFactor).toFixed(4));
-        dataStore.sourceInfo['11Be'].absoluteEfficiencyUnc.push((dataStore.sourceInfo['11Be'].normalizedEfficiencyUnc[i]*dataStore.sourceInfo['11Be'].normalizationAbsFactor).toFixed(5));
+                var uncertValue = dataStore.sourceInfo['11Be'].absoluteEfficiency[i] *
+                 Math.sqrt(
+                 ((dataStore.sourceInfo['11Be'].relativeEfficiencyUnc[i]/dataStore.sourceInfo['11Be'].relativeEfficiency[i]) *
+                 (dataStore.sourceInfo['11Be'].relativeEfficiencyUnc[i]/dataStore.sourceInfo['11Be'].relativeEfficiency[i]))
+                 +
+                 ((dataStore.sourceInfo['60Co'].normalizationAbsFactorUnc / dataStore.sourceInfo['60Co'].normalizationAbsFactor) * (dataStore.sourceInfo['60Co'].normalizationAbsFactorUnc / dataStore.sourceInfo['60Co'].normalizationAbsFactor))
+               );
+                dataStore.sourceInfo['11Be'].absoluteEfficiencyUnc.push(uncertValue.toFixed(5));
       }
     }
       console.log(dataStore.sourceInfo['60Co'].normalizationFactor);
