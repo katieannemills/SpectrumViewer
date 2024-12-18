@@ -59,6 +59,8 @@ function setupDataStore(){
   dataStore.hm = {};                                                 //object for 2d matrix stuff
   dataStore.hm._raw = [0];                                                 //buffer for raw matrix data
   dataStore.createdSpectra = {};                                       //initialize empty object for created spectra
+	dataStore.createdBG1Spectra = {},                                    //initialize empty object for created background (BG1) spectra
+  dataStore.createdBG2Spectra = {},                                    //initialize empty object for created background (BG2) spectra
   dataStore.THESEdetectors = [];                                    //10-char codes of all possible griffin/paces detectors. Contents based on detectorChoice
   dataStore.angularMatrices = [];                                   // list of the names of the angular correlation matrices
   dataStore.angCorrProjections = [];                                // list of the names of the projections to be fitted
@@ -76,6 +78,9 @@ function setupDataStore(){
   dataStore.fitResultsProjections = {};                                 //fit results of Projections: 'plotname': [[amplitude, center, width, intercept, slope], [amplitude, center, width, intercept, slope]]
 
 // Custom settings for Angular Correlations
+  dataStore.angularBinRawPeakArea = [];         // place to store the raw peak area for each angular bin
+  dataStore.angularBinTRBGPeakArea = [];         // place to store the time-random background peak area for each angular bin
+  dataStore.angularBinTRBGFactor = [];         // place to store the time-random background factor for each angular bin
   dataStore.angularBinPeakArea = [];         // place to store the peak area for each angular bin
   dataStore.angularBinWeight = [];           // place to store the weighting factor for each angular bin
   dataStore.normalizationFactor = [];        // place to store the Normalization Factor for the angular correlation
@@ -101,8 +106,13 @@ function setupDataStore(){
 
 
   // ge_angles_110mm[c1][c2] = angularIndex of the angular_bins_110mm array of angular differences in degrees
+  // angularIndex runs from 0 to 51.
+  // c1 and c2 run from 0 to 63
+  // Used in angularCorrelations.js to calculate weighting factors
   dataStore.ge_angles_110mm = [
-    [0,1,3,1,9,11,7,5,19,26,25,17,9,14,20,12,11,20,24,18,6,13,15,8,10,18,14,7,21,28,22,16,31,40,33,27,38,45,43,36,33,41,44,37,23,30,35,29,25,32,34,26,37,42,39,31,50,51,50,48,40,42,46,44],
+    [0,1,3,1,9,11,7,5,19,26,25,17,9,14,20,12,11,20,24,18,6,13,15,8,
+    10,18,14,7,21,28,22,16,31,40,33,27,38,45,43,36,33,41,44,37,23,30,35,29,25,32,
+    34,26,37,42,39,31,50,51,50,48,40,42,46,44],
     [1,0,1,3,14,18,10,7,26,34,32,25,11,18,24,20,9,12,20,14,2,6,8,4,7,11,9,5,22,28,21,16,39,42,37,31,45,49,47,43,40,44,46,42,23,29,35,30,17,25,26,19,33,40,31,27,51,50,48,50,33,37,44,41],
     [3,1,0,1,20,24,18,11,25,32,34,26,7,10,18,14,5,9,11,7,4,8,6,2,14,20,12,9,30,35,29,23,42,46,44,40,43,47,49,45,31,37,42,39,16,21,28,22,19,26,25,17,41,44,37,33,50,48,50,51,27,31,40,33],
     [1,3,1,0,12,20,14,9,17,25,26,19,5,7,11,9,7,14,18,10,8,15,13,6,18,24,20,11,29,35,30,23,37,44,41,33,36,43,45,38,27,33,40,31,16,22,28,21,26,34,32,25,44,46,42,40,48,50,51,50,31,39,42,37],
@@ -179,6 +189,7 @@ function setupDataStore(){
   ];
 
   // ge_angles_145mm[c1][c2] = angularIndex of the angular_bins_145mm array of angular differences in degrees
+  // Used in angularCorrelations.js to calculate weighting factors
   dataStore.ge_angles_145mm = [
     [0,1,2,1,9,12,8,5,20,26,25,19,9,15,18,14,12,18,22,16,6,11,13,7,10,16,15,8,21,27,23,17,33,39,35,29,40,45,44,38,35,41,43,36,24,30,34,28,25,31,32,26,36,42,37,33,50,51,50,49,39,42,46,43],
     [1,0,1,2,15,16,10,8,26,32,31,25,12,16,22,18,9,14,18,15,3,6,7,4,8,12,9,5,23,27,21,17,37,42,36,33,45,48,47,44,39,43,46,42,24,28,34,30,19,25,26,20,35,39,33,29,51,50,49,50,35,36,43,41],
@@ -940,32 +951,39 @@ function projectAngularCorrelations(){
   // Get the peak energies from the User input
   var g1E = parseInt(document.getElementById('gamma1Input').value);
   var g2E = parseInt(document.getElementById('gamma2Input').value);
-/*
+
   // Use the higher energy peak as the gate because that will likely give less background
   var gateE = (g1E > g2E) ? g1E : g2E;
   var fitE  = (g1E > g2E) ? g2E : g1E;
-  */
+/*
   // Use the lower energy peak as the gate
   var gateE = (g1E > g2E) ? g2E : g1E;
   var fitE  = (g1E > g2E) ? g1E : g2E;
-
+*/
   // Save these to the dataStore for use during the fitting
+  // Fit the gate peak also and subtract it from the fit peak as a time-random background
   dataStore.gatePeakEnergy = gateE;
-  dataStore.fitPeakEnergies = [fitE]; // Must be an array in order to fit N peaks per spectrum
-  dataStore.peakWidth = Math.ceil(typicalPeakWidth(fitE,"HPGe")*3);
+  dataStore.fitPeakEnergies = [fitE,gateE]; // Must be an array in order to fit N peaks per spectrum
+  dataStore.peakWidth = Math.ceil(typicalPeakWidth(fitE,"HPGe")*4);
 
   // Set the gate width
-  var gateWidth = Math.ceil(typicalPeakWidth(gateE,"HPGe")*2);
+  var gateWidth = Math.ceil(typicalPeakWidth(gateE,"HPGe"));
 
   // Set limits for the projections
-  var min = gateE - gateWidth;
-  var max = gateE + gateWidth;
+  var gateMin = gateE - gateWidth;
+  var gateMax = gateE + gateWidth;
+
+  // Set limits for the backgrounds to be subtracted from the projections
+  var BG1Max = gateMin - Math.floor(gateWidth*1.5);
+  var BG1Min = BG1Max - gateWidth;
+  var BG2Min = gateMax + Math.floor(gateWidth*1.5);
+  var BG2Max = BG2Min + gateWidth;
 
   // Get the list of keys for the matrices to be projected
   matrixKeys = Object.keys(dataStore.matrix);
 
   releaser(
-    function(i){
+    async function(i){
       // Change rawData to another list that is just the Sum_Energy_ spectrum
       var matrixKeys = Object.keys(dataStore.matrix);
 
@@ -973,14 +991,15 @@ function projectAngularCorrelations(){
       dataStore.activeMatrix = matrixKeys[i];
       dataStore.hm._raw = dataStore.matrix[matrixKeys[i]].data;
 
-      plotName = projectXaxis(min,max);
+      // First make the total projection that we need for the time-random background subtraction
+      plotName = projectXaxis(undefined,undefined);
       console.log('Created '+plotName);
-      // Add this projection to the rawData storage for plotting
+      // Add this total projection to the rawData storage for plotting
       dataStore.rawData[plotName] = dataStore.createdSpectra[plotName];
-      // Add this projection spectrum to the list which need to be fitted
+      // Add this total projection spectrum to the list which need to be fitted
       dataStore.angCorrProjections.push(plotName);
 
-      // Add this projection to the spectrum menu
+      // Add this total projection to the spectrum menu
       newMenuItem = document.createElement('li');
       newMenuItem.setAttribute('id', 'plotList'+plotName);
       newMenuItem.setAttribute('value', plotName);
@@ -989,9 +1008,14 @@ function projectAngularCorrelations(){
       document.getElementById('plotListplots'+"Angular Bins").appendChild(newMenuItem);
       document.getElementById('plotList'+plotName).onclick = function(){ dataStore._plotListLite.exclusivePlot(this.id.split('plotList')[1], dataStore.viewers[dataStore.plots[0]]); }
 
+      // Now make the projection around the gate energy
+      // and the associated background projections
+      await createNewProjection("x",gateMin,gateMax,BG1Min,BG1Max,BG2Min,BG2Max);
+
     }.bind(this),
 
     function(){
+
       //leave the viewer pointing at the first spectrum for fitting
       dispatcher({target: buffer}, 'fitAllComplete')
       console.log('Completed all projections.');
@@ -1004,6 +1028,66 @@ function projectAngularCorrelations(){
 };
 
 
+async function createNewProjection(axis,min,max,BG1Min,BG1Max,BG2Min,BG2Max){
+  //create the projections for the gate energy and the BG1 and BG2 regions
+  var i, evt, plotName;
+
+  // Return a new promise.
+  return new Promise(function(resolve) {
+
+    // Make the gated spectrum
+    if(axis === 'y'){
+      plotName = projectYaxis(min,max,'gate');
+    }else{
+      plotName = projectXaxis(min,max,'gate');
+    }
+
+    // Make the BG spectra if requested
+    if(typeof(BG1Min) != 'undefined'){
+      if(axis === 'y'){
+        plotNameBG1 = projectYaxis(BG1Min,BG1Max,'BG1',plotName);
+        plotNameBG2 = projectYaxis(BG2Min,BG2Max,'BG2',plotName);
+      }else{
+        plotNameBG1 = projectXaxis(BG1Min,BG1Max,'BG1',plotName);
+        plotNameBG2 = projectXaxis(BG2Min,BG2Max,'BG2',plotName);
+      }
+    }
+
+    var subtractedHistogram = dataStore.createdSpectra[plotName];
+    var scalingFactor = 0.5;
+    for(var j=0; j<dataStore.createdBG1Spectra[plotName].length; j++){
+      subtractedHistogram[i] -= Math.floor(dataStore.createdBG1Spectra[plotName][j]*scalingFactor);
+    }
+    for(j=0; j<dataStore.createdBG2Spectra[plotName].length; j++){
+      subtractedHistogram[i] -= Math.floor(dataStore.createdBG2Spectra[plotName][j]*scalingFactor);
+    }
+
+    // Add this projection to the rawData storage for plotting
+    dataStore.rawData[plotName] = subtractedHistogram;
+
+    // Remove these items from the BG1 and BG2 objects so they are not subtracted in gammaSpectrum
+    delete dataStore.createdBG1Spectra[plotName];
+    delete dataStore.createdBG2Spectra[plotName];
+
+    console.log("subtractBackground, adding "+plotName+" to rawData");
+
+    // Add this projection spectrum to the list which need to be fitted
+    dataStore.angCorrProjections.push(plotName);
+
+    // Add this projection to the spectrum menu
+    newMenuItem = document.createElement('li');
+    newMenuItem.setAttribute('id', 'plotList'+plotName);
+    newMenuItem.setAttribute('value', plotName);
+    newMenuItem.setAttribute('class', 'list-group-item toggle');
+    newMenuItem.innerHTML = plotName.split(':')[1].trim()+'<span id=\'plotListbadge'+plotName+'\' class=\"badge plotPresence hidden\">&#x2713;</span>';
+    document.getElementById('plotListplots'+"Angular Bins").appendChild(newMenuItem);
+    document.getElementById('plotList'+plotName).onclick = function(){ dataStore._plotListLite.exclusivePlot(this.id.split('plotList')[1], dataStore.viewers[dataStore.plots[0]]); }
+
+    // resolve the promise
+    setTimeout(function(){resolve('Success!')},5);
+  });
+
+};
 
 
 function projectionsCallback(){
@@ -1017,43 +1101,10 @@ function projectionsCallback(){
     deleteNode('projectionsMessage');
 
     // Fit the peaks in the projections
+    // Also fit the peaks in the total projections for time-random background subtraction
     // Then fit the peaks in the singles spectra
     // Provide the list of 1d histogram keys
-    // second argument is the callback function, and third argument is the argument to be passed to that callback
-  //  fitPeaksInSeriesOfHistograms(dataStore.angCorrProjections,fitPeaksInSeriesOfHistograms,dataStore.singlesSpectra);
   fitPeaksInSeriesOfHistograms(dataStore.angCorrProjections);
-
-/*
-    var argumentsList = [dataStore.angCorrProjections,dataStore.singlesSpectra];
-
-
-    let firstPromise = new Promise(function(myResolve, myReject) {
-      fitPeaksInSeriesOfHistograms(dataStore.angCorrProjections);
-      resolve('Success!');
-    });
-
-    firstPromise.then(
-      (value) => {
-        console.log("Then of first promise");
-        let secondPromise = new Promise(function(myResolve, myReject) {
-          fitPeaksInSeriesOfHistograms(dataStore.singlesSpectra);
-          resolve('Success!');
-        });
-
-        secondPromise.then(
-          (value) => {
-            console.log("Then of second promise");
-
-            // Do this after all fitting is completed
-            // Arrange the angular bin peak areas, calculate weighting factors and normalization factor
-            console.log("All fitting is complete, now calculate the results");
-            console.log(dataStore);
-          }
-        );
-      }
-    );
-*/
-
 
 }
 
@@ -1094,7 +1145,7 @@ function fitPeaksInSeriesOfHistograms(spectra){
         //resolve('Success!');
         if(dataStore.iteration == 0){
           dataStore.iteration++;
-          dataStore.fitPeakEnergies.push(dataStore.gatePeakEnergy);
+        //  dataStore.fitPeakEnergies.push(dataStore.gatePeakEnergy); // we added these earlier to use as a time-random subtraction
           fitPeaksInSeriesOfHistograms(dataStore.singlesSpectra);
         }else if(dataStore.iteration == 1){
           dataStore.iteration++;
@@ -1144,6 +1195,10 @@ function fitPeaksInSeriesOfHistograms(spectra){
           //set up peak fit
           console.log('fitting '+spectrum+', peak '+peakIndex);
           dataStore.currentPeak = peakIndex;
+          if(!dataStore.ROI[dataStore.currentPlot]){ dataStore.ROI[dataStore.currentPlot] =[]; }
+          if(!dataStore.ROI[dataStore.currentPlot][dataStore.currentPeak]){ dataStore.ROI[dataStore.currentPlot][dataStore.currentPeak] = []; }
+          dataStore.ROI[dataStore.currentPlot][dataStore.currentPeak][0] = dataStore.fitPeakEnergies[peakIndex] - dataStore.peakWidth;
+          dataStore.ROI[dataStore.currentPlot][dataStore.currentPeak][1] = dataStore.fitPeakEnergies[peakIndex] + dataStore.peakWidth;
           dataStore.viewers[viewerName].FitLimitLower = dataStore.fitPeakEnergies[peakIndex] - dataStore.peakWidth;
           dataStore.viewers[viewerName].FitLimitUpper = dataStore.fitPeakEnergies[peakIndex] + dataStore.peakWidth;
           dataStore.viewers[viewerName].fitData(spectrum, 0);
@@ -1192,12 +1247,9 @@ function fitPeaksInSeriesOfHistograms(spectra){
           dataStore.fitResults[dataStore.currentPlot][dataStore.currentPeak] = [amplitude, center, width, intercept, slope, area];
 
           // Update the ROI in case they were modified by the fitting routine
-          // DO WE NEED ROI ANY MORE?
-          //dataStore.ROI[dataStore.currentSource][dataStore.currentPeak][0] = dataStore.viewers[viewerName].FitLimitLower;
-          //dataStore.ROI[dataStore.currentSource][dataStore.currentPeak][1] = dataStore.viewers[viewerName].FitLimitUpper;
-
-          //convenient to arrange resolution data here
-        //  dataStore.sourceInfo[dataStore.currentSource].FWHM[dataStore.currentPeak] = (width*2.35).toFixed(2);
+          // DO WE NEED ROI ANY MORE? Yes, for addFitLines
+          dataStore.ROI[dataStore.currentPlot][dataStore.currentPeak][0] = dataStore.viewers[viewerName].FitLimitLower;
+          dataStore.ROI[dataStore.currentPlot][dataStore.currentPeak][1] = dataStore.viewers[viewerName].FitLimitUpper;
 
         //disengage fit mode buttons
         if( parseInt(refitPeak.getAttribute('engaged'),10) == 1)
@@ -1209,7 +1261,6 @@ function fitPeaksInSeriesOfHistograms(spectra){
     function addFitLines(){
         //add current fits to the plot
         console.log('addFitLines in angularCorrections');
-        return;
 
         var fitLines = [];
         var lower, upper, middle
@@ -1217,36 +1268,31 @@ function fitPeaksInSeriesOfHistograms(spectra){
 
         dataStore.viewers[viewerName].containerFit.removeAllChildren();
 
-        // Set the current Source for this spectrum
-        dataStore.currentSource = Object.keys(dataStore.sourceInfo).find(key => dataStore.sourceInfo[key].histoFileName.split('.')[0] === dataStore.currentPlot.split(':')[0])
-        console.log('addFitLines for '+dataStore.currentPlot+', identify key '+dataStore.currentSource+' during '+dataStore.currentTask);
-
-
           // fitting projections for summing corrections
           console.log(dataStore);
-          console.log(dataStore.ROIprojections);
-          console.log(dataStore.fitResultsProjections);
+          console.log(dataStore.ROI);
+          console.log(dataStore.fitResults);
           console.log(dataStore.currentSource);
           console.log(dataStore.currentPlot);
 
           // Bail out of no fitResults yet
-          if(!dataStore.fitResultsProjections[dataStore.currentPlot]){
+          if(!dataStore.fitResults[dataStore.currentPlot]){
             console.log('No fitResults yet for '+dataStore.currentPlot+' in addFitLines so bailing out');
             return;
           }
 
           // Loop through the peaks for this spectrum
-          for(i=0; i<dataStore.spectrumListProjectionsPeaks[dataStore.currentPlot].peaks.length; i++){
+          for(i=0; i<dataStore.ROI[dataStore.currentPlot].length; i++){
             //add fit lines
             console.log('Add fit lines for '+dataStore.currentPlot+', peak '+i);
             fitLines[i] = dataStore.viewers[viewerName].addFitLine(
-              dataStore.ROIprojections[dataStore.currentPlot][i][0],
-              dataStore.ROIprojections[dataStore.currentPlot][i][1] - dataStore.ROIprojections[dataStore.currentPlot][i][0],
-              dataStore.fitResultsProjections[dataStore.currentPlot][i][0],
-              dataStore.fitResultsProjections[dataStore.currentPlot][i][1],
-              dataStore.fitResultsProjections[dataStore.currentPlot][i][2],
-              dataStore.fitResultsProjections[dataStore.currentPlot][i][3],
-              dataStore.fitResultsProjections[dataStore.currentPlot][i][4]
+              dataStore.ROI[dataStore.currentPlot][i][0],
+              dataStore.ROI[dataStore.currentPlot][i][1] - dataStore.ROI[dataStore.currentPlot][i][0],
+              dataStore.fitResults[dataStore.currentPlot][i][0],
+              dataStore.fitResults[dataStore.currentPlot][i][1],
+              dataStore.fitResults[dataStore.currentPlot][i][2],
+              dataStore.fitResults[dataStore.currentPlot][i][3],
+              dataStore.fitResults[dataStore.currentPlot][i][4]
             );
 
             dataStore.viewers[viewerName].containerFit.addChild(fitLines[i]);
@@ -1265,14 +1311,25 @@ function processAngularCorrelationData(){
 
   // Collect the angular bin peak areas
   // skip the zero bin - not needed in the sum
-  for(var i=1; i<dataStore.angCorrProjections.length; i++){
-     dataStore.angularBinPeakArea[i] = dataStore.fitResults[dataStore.angCorrProjections[i]][0][5];
-     sumAngularBinAreas += dataStore.angularBinPeakArea[i];
-     dataStore.angularBinWeight[i] = 0; // zero the weighting factors here
-     dataStore.numCrystalPairs[i] = 0;  // zero the number of crystal pairs here
-    // sumSinglesAreas[i] = [0,0]; // create space for the sum for this angular bin
+  // This list contains both total projection and peak-gated projection
+  for(var i=2; i<dataStore.angCorrProjections.length; i+=2){
+    // Here we make the subtraction of the gateE peak from the fitE peak to account for time-random coincidences
+    // Peak index 0 is fitE, index 1 is gateE
+    var index = parseInt(i/2);
+
+    // Determine the time-random background subtraction factor from the ratio of the two peaks in the total projection
+    dataStore.angularBinTRBGFactor[index] = dataStore.fitResults[dataStore.angCorrProjections[i]][0][5] / dataStore.fitResults[dataStore.angCorrProjections[i]][1][5];
+
+    // Save the raw area for the peak and time-random coincidence peak
+    dataStore.angularBinRawPeakArea[index] = dataStore.fitResults[dataStore.angCorrProjections[i+1]][0][5];
+    dataStore.angularBinTRBGPeakArea[index] = dataStore.fitResults[dataStore.angCorrProjections[i+1]][1][5];
+
+     dataStore.angularBinPeakArea[index] = dataStore.angularBinRawPeakArea[index] -
+                                          (dataStore.angularBinTRBGPeakArea[index] * dataStore.angularBinTRBGFactor[index]);
+     sumAngularBinAreas += dataStore.angularBinPeakArea[index];
+     dataStore.angularBinWeight[index] = 0; // zero the weighting factors here
+     dataStore.numCrystalPairs[index] = 0;  // zero the number of crystal pairs here
   }
-//  sumSinglesAreas[i] = [0,0]; // create space for the sum for this angular bin
   dataStore.normalizationFactor = sumAngularBinAreas;
   console.log("dataStore.normalizationFactor = "+dataStore.normalizationFactor);
 
@@ -1285,17 +1342,6 @@ function processAngularCorrelationData(){
      sumSinglesAreas[1] += dataStore.fitResults[dataStore.singlesSpectra[i]][1][5]; // the gate energy peak
   }
 
-/*
-    // Calculate the sum of the singles for the weighting factors
-    for(i=0; i<64; i++){
-    for(var j=0; j<64; j++){
-      var angleIndex = dataStore.theseGeAngles[i][j];
-      console.log("i="+i+",j="+j+",index="+angleIndex);
-      sumSinglesAreas[angleIndex][0] += dataStore.fitResults[dataStore.singlesSpectra[i]][0][5]; // the fit energy peak
-      sumSinglesAreas[angleIndex][1] += dataStore.fitResults[dataStore.singlesSpectra[i]][1][5]; // the gate energy peak
-   }
-  }
-  */
   console.log(sumAngularBinAreas);
   console.log(sumSinglesAreas);
 
@@ -1315,7 +1361,6 @@ console.log("Angular Correlation Data:");
 // Calculate the angular correlation data points
 for(i=0; i<dataStore.angularBinPeakArea.length; i++){
 dataStore.angularBinData[i] = dataStore.angularBinPeakArea[i] / (dataStore.angularBinWeight[i] * dataStore.normalizationFactor);
-//console.log(i+" = "+dataStore.angularBinData[i]+", W= "+dataStore.angularBinWeight[i]);
 console.log(dataStore.theseAngularBins[i]+","+dataStore.angularBinData[i]);
 }
 
@@ -1392,6 +1437,9 @@ function buildCSVfile(){
     CSV += 'Angular Bin (deg),';
     CSV += 'Angular Bin cos(),';
     CSV += 'Num Ge pairs,';
+    CSV += 'Angular Bin Raw Area,';
+    CSV += 'Angular Bin BKG Area,';
+    CSV += 'Angular Bin BKG Factor,';
     CSV += 'Angular Bin Area,';
     CSV += 'Angular Bin Area Uncertainty,';
     CSV += 'Angular Bin Weight,';
@@ -1414,6 +1462,9 @@ if(i<dataStore.angularBinData.length){
         CSV += dataStore.theseAngularBins[i] + ',';
         CSV += Math.cos(dataStore.theseAngularBins[i]*(Math.PI / 180.000)) + ',';
         CSV += dataStore.numCrystalPairs[i] + ',';
+        CSV += dataStore.angularBinRawPeakArea[i] + ',';
+        CSV += dataStore.angularBinTRBGPeakArea[i] + ',';
+        CSV += dataStore.angularBinTRBGFactor[i] + ',';
         CSV += dataStore.angularBinPeakArea[i] + ',';
         CSV += '-' + ',';
         CSV += dataStore.angularBinWeight[i] + ',';
@@ -1428,7 +1479,7 @@ if(i<dataStore.angularBinData.length){
         CSV += dataStore.singlesPeakArea[i-1][0] + ',';
         CSV += '-' + '\n';
       }else{
-      CSV += ' , , , , , , , , , , , ,';
+      CSV += ' , , , , , , , , , , , , , , ,';
       CSV += i + ',';
       CSV += dataStore.gatePeakEnergy + ',';
       CSV += dataStore.singlesPeakArea[i-1][1] + ',';

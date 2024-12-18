@@ -1539,10 +1539,6 @@ for(subMatrixIndex=0; subMatrixIndex<raw2.length; subMatrixIndex++){
             thisValue = thisValue | (thisByte << (thisShift * 6));
             thisShift++;
           }
-          //console.log('Type'+subMatrixType+'['+thisYindex+']['+thisXindex+']='+thisValue);
-          if(thisYindex==2478){	console.log('['+thisYindex+']['+thisXindex+']='+thisValue);
-          console.log(raw2[subMatrixIndex]);
-         }
           repack2[thisYindex][thisXindex] = thisValue;
           if(symmeterize){ repack2[thisXindex][thisYindex] = thisValue; }
           if(thisValue>matrixMaxValue){ matrixMaxValue = thisValue; } // Update the max Z value
@@ -1600,10 +1596,6 @@ for(subMatrixIndex=0; subMatrixIndex<raw2.length; subMatrixIndex++){
             thisShift++;
           }
 
-        //  console.log('Type'+subMatrixType+'['+thisYindex+']['+thisXindex+']='+thisValue);
-        if(thisYindex==2478){	console.log('['+thisYindex+']['+thisXindex+']='+thisValue);
-        console.log(raw2[subMatrixIndex]);
-       }
           repack2[thisYindex][thisXindex] = thisValue;
           if(symmeterize){ repack2[thisXindex][thisYindex] = thisValue; }
           if(thisValue>matrixMaxValue){ matrixMaxValue = thisValue; } // Update the max Z value
@@ -1640,10 +1632,7 @@ for(subMatrixIndex=0; subMatrixIndex<raw2.length; subMatrixIndex++){
           thisXindex = subMatrixXbaseCoordinate+j;
           thisYindex = subMatrixYbaseCoordinate+i;
           thisValue = raw2[subMatrixIndex][i*subMatrixXlength+j];
-          //	    console.log('['+thisYindex+']['+thisXindex+']='+thisValue);
-          if(thisYindex==2478){	console.log('['+thisYindex+']['+thisXindex+']='+thisValue);
-          console.log(raw2[subMatrixIndex]);
-         }
+
           repack2[thisYindex][thisXindex] = thisValue;
           if(symmeterize){ repack2[thisXindex][thisYindex] = thisValue; }
           if(thisValue>matrixMaxValue){ matrixMaxValue = thisValue; } // Update the max Z value
@@ -1665,10 +1654,7 @@ for(subMatrixIndex=0; subMatrixIndex<raw2.length; subMatrixIndex++){
         thisXindex = subMatrixXbaseCoordinate+Math.floor(raw2[subMatrixIndex][j]%subMatrixXlength);
         thisYindex = subMatrixYbaseCoordinate+Math.floor(raw2[subMatrixIndex][j]/subMatrixXlength);
         thisValue = raw2[subMatrixIndex][j+1];
-        //	console.log('['+thisYindex+']['+thisXindex+']='+thisValue);
-        if(thisYindex==2478 && thisXindex>50){	console.log('['+thisYindex+']['+thisXindex+']='+thisValue);
-        console.log(raw2[subMatrixIndex]);
-       }
+
         repack2[thisYindex][thisXindex] = thisValue;
         if(symmeterize){ repack2[thisXindex][thisYindex] = thisValue; }
         if(thisValue>matrixMaxValue){ matrixMaxValue = thisValue; } // Update the max Z value
@@ -1700,13 +1686,6 @@ for(i=0; i<rowLength-1; i++){
 repack2[0][i] = 0;
 }
 */
-
-if(repack2.length>=2482){
-for(var ii=2478; ii<2479; ii++){
-  console.log(ii+":");
-  console.log(repack2[ii]);
-}
-}
 
 if(generateColorMap){
   // set the zmax value for this matrix
