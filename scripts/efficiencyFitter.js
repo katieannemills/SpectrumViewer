@@ -87,6 +87,7 @@ efficiencyRegression(thisX,thisY,thisYerror);
   dataStore.searchRegionP3 = [];                                         //[x_start, x_finish, y for peak search bar]
   dataStore.searchRegionP4 = [];                                         //[x_start, x_finish, y for peak search bar]
 
+  dataStore.dataType = 'Singles';                                         //mode of operation: Singles or Addback.
   dataStore.modeType = 'Histo';                                         //mode of operation: Online or Histo.
   dataStore.modeChoice = [                                               // Mode choice (online/histogram file) information to generate buttons
     {"name": "Online", "text": "Use online data"},
@@ -647,9 +648,15 @@ function fetchCallback(){
     // Now we have all the spectra received...
 
     // Revise the spectrum list to include the histogram names.
-    dataStore.THESEdetectors =   [
-	'Ge_Sum_Energy'
-    ];
+    if(dataStore.dataType == 'Addback'){
+  	    dataStore.THESEdetectors =   [
+      'Addback_Sum_Energy'
+      ];
+    }else{ // Singles
+    	    dataStore.THESEdetectors =   [
+    		'Ge_Sum_Energy'
+        ];
+    }
 
     var spectrumKeys = Object.keys(dataStore.rawData);
     for(i=0; i<spectrumKeys.length; i++){
@@ -770,18 +777,31 @@ function setupHistoListSelect(){
     document.getElementById('SourceChoiceSelect60Co').onchange();
 
 
-    // Create the Submit button
+    // Create the singles Submit button
     newButton = document.createElement('button');
     newButton.setAttribute('id', 'submitHistoFilenameChoicesButton');
     newButton.setAttribute('class', 'btn btn-default btn-lg');
-    newButton.innerHTML = "Build efficiency curve";
+    newButton.innerHTML = "Build Singles efficiency curve";
     newButton.style.padding = '4px';
     newButton.onclick = function(){
         document.getElementById('progressDiv').classList.remove('hidden');
+        dataStore.dataType = 'Singles';
 	submitHistoFilenameChoices();
     }.bind(newButton);
       document.getElementById('histoChoiceSubmit').appendChild(newButton);
 
+          // Create the addback Submit button
+          newButton = document.createElement('button');
+          newButton.setAttribute('id', 'submitHistoFilenameChoicesButton');
+          newButton.setAttribute('class', 'btn btn-default btn-lg');
+          newButton.innerHTML = "Build Addback efficiency curve";
+          newButton.style.padding = '4px';
+          newButton.onclick = function(){
+              document.getElementById('progressDiv').classList.remove('hidden');
+              dataStore.dataType = 'Addback';
+      	submitHistoFilenameChoices();
+          }.bind(newButton);
+            document.getElementById('histoChoiceSubmit').appendChild(newButton);
 
           // Create the Auto-fill for development button
           newButton = document.createElement('button');
@@ -871,18 +891,28 @@ for(i=0; i<keys.length; i++){
 
 
     // setup the dataStore for this choice of detectorType
-    var i, num=0, groups = [];
+    var i, num=0, groups = [], spectrumNameString;
 
     // Save the lists of spectrum names to the dataStore for this detectorType
     if(dataStore.detectorType == 'HPGe'){
 	// Set up GRIFFIN detectors
 
 	//10-char codes of all possible griffin detectors.
+  if(dataStore.dataType == 'Addback'){
 	    dataStore.THESEdetectors =   [
-		'Ge_Sum_Energy',
+    'Addback_Sum_Energy',
 		'Hitpattern_Energy',
-		'GGoppo'
+    'Addback_GGoppo'
     ];
+    spectrumNameString = 'Addback_Sum_Energy';
+  }else{ // Singles
+  	    dataStore.THESEdetectors =   [
+  		'Ge_Sum_Energy',
+  		'Hitpattern_Energy',
+  		'GGoppo'
+      ];
+      spectrumNameString = 'Ge_Sum_Energy';
+  }
 
 	for(i=0; i<keys.length; i++){
 
@@ -892,9 +922,13 @@ for(i=0; i<keys.length; i++){
             "groupTitle": dataStore.sourceInfo[keys[i]].title+':'+dataStore.sourceInfo[keys[i]].histoFileName.split('.')[0],
             "plots": [
                 {
-                    "plotID": dataStore.sourceInfo[keys[i]].histoFileName.split('.')[0]+':'+'Ge_Sum_Energy',
-                    "title": 'Ge_Sum_Energy'
+                    "plotID": dataStore.sourceInfo[keys[i]].histoFileName.split('.')[0]+':'+spectrumNameString,
+                    "title": spectrumNameString
                 }//,
+                //    {
+                //        "plotID": dataStore.sourceInfo[keys[i]].histoFileName.split('.')[0]+':'+'Addback_Sum_Energy',
+                //        "title": 'Addback_Sum_Energy'
+                //    }//,
                // {
                //     "plotID": dataStore.sourceInfo[keys[i]].histoFileName+':'+'Hitpattern_Energy',
               //      "title": 'Hitpattern_Energy'
@@ -975,113 +1009,6 @@ for(i=0; i<keys.length; i++){
     console.log(dataStore);
 }
 
-function updateAnalyzer(){
-
-    // For the ODB it first grabs the PSB table and then sets values only for the channels that are defined there.
-    // For the Analyzer we can get a similar list from the viewConfig command with the Histogram file as the argument.
-    // That should probably be done for the building of the initial spectrum list for gain-matching if Histogram mode is selected.
-    // Need to reformat the URLs generated here for the Analyzer
-
-    // bail out if there's no fit yet
-    if(Object.keys(dataStore.fitResults).length == 0)
-        return;
-
-    var  gain =[], offset = [], quad = [];
-    var i, j=0, q, g, o, num=0, position, urls = [];
-
-    //for every channel, update the quads, gains and offsets:
-    urls[0]=dataStore.spectrumServer + '?cmd=setCalibration';
-    for(i=0; i<dataStore.THESEdetectors.length; i++){
-        if( document.getElementById(dataStore.THESEdetectors[i]+'write').checked){
-            q = dataStore.fitResults[dataStore.THESEdetectors[i]+'_Pulse_Height'][4][2];
-            q = isNumeric(q) ? q : 1;
-            quad[i] = q;
-            g = dataStore.fitResults[dataStore.THESEdetectors[i]+'_Pulse_Height'][4][1];
-            g = isNumeric(g) ? g : 1;
-            gain[i] = g;
-            o = dataStore.fitResults[dataStore.THESEdetectors[i]+'_Pulse_Height'][4][0];
-            o = isNumeric(o) ? o : 0;
-            offset[i] = o;
-
-	    // Write a separate URL for each clover
-	    if(i>0 && (dataStore.THESEdetectors[i].includes('GRG')) && ((i%4) == 0)){ num++; j=0; urls[num]= dataStore.spectrumServer + '?cmd=setCalibration';}
-	    urls[num] += '&channelName'+j+'='+dataStore.THESEdetectors[i]+'&quad'+j+'='+quad[i]+'&gain'+j+'='+gain[i]+'&offset'+j+'='+offset[i];
-	    j++;
-
-        }else{
-	    // Set some values rather than have these entries undefined for unchecked channels
-	    // Channels that did not produce good coefficients are not included in the URLs
-            quad[i] = 1;
-            gain[i] = 1;
-            offset[i] = 0;
-	}
-    }
-
-    //send requests
-    for(i=0; i<urls.length; i++){
-        XHR(urls[i],
-            'check ODB - response rejected. This will happen despite successful ODB write if this app is served from anywhere other than the same host and port as MIDAS (ie, as a custom page).',
-            function(){return 0},
-            function(error){console.log(error)}
-        )
-    }
-
-    //get rid of the modal
-    document.getElementById('dismissAnalyzermodal').click();
-}
-
-function updateODB(obj){
-
-    //bail out if there's no fit yet
-    if(Object.keys(dataStore.fitResults).length == 0)
-        return;
-
-    var channel = obj[0].chan,
-        gain = obj[1].gain,
-        offset = obj[2].offset,
-        quad = obj[3].quadratic,
-        i, q, g, o, position, urls = [];
-
-    //for every channel, update the quads, gains and offsets:
-    for(i=0; i<channel.length; i++){
-        position = dataStore.THESEdetectors.indexOf(channel[i]);
-        if( (position != -1) && (document.getElementById(channel[i]+'write').checked)){
-            q = dataStore.fitResults[dataStore.THESEdetectors[position]+'_Pulse_Height'][4][2];
-            q = isNumeric(q) ? q : 1;
-            quad[i] = q;
-            g = dataStore.fitResults[dataStore.THESEdetectors[position]+'_Pulse_Height'][4][1];
-            g = isNumeric(g) ? g : 1;
-            gain[i] = g;
-            o = dataStore.fitResults[dataStore.THESEdetectors[position]+'_Pulse_Height'][4][0];
-            o = isNumeric(o) ? o : 0;
-            offset[i] = o;
-        }
-    }
-
-    //turn gain and offset arrays into csv strings
-    quad = JSON.stringify(quad).slice(1,-1)
-    gain = JSON.stringify(gain).slice(1,-1)
-    offset = JSON.stringify(offset).slice(1,-1)
-
-    //construct urls to post to
-    urls[0] = dataStore.ODBhost + '?cmd=jset&odb=DAQ/PSC/quadratic[*]&value='+quad;
-    urls[1] = dataStore.ODBhost + '?cmd=jset&odb=DAQ/PSC/gain[*]&value='+gain;
-    urls[2] = dataStore.ODBhost + '?cmd=jset&odb=DAQ/PSC/offset[*]&value='+offset;
-
-    //send requests
-    for(i=0; i<urls.length; i++){
-        XHR(urls[i],
-            'check ODB - response rejected. This will happen despite successful ODB write if this app is served from anywhere other than the same host and port as MIDAS (ie, as a custom page).',
-            function(){return 0},
-            function(error){console.log(error)}
-        )
-    }
-
-    //get rid of the modal
-    document.getElementById('dismissODBmodal').click();
-}
-
-
 function buildCSVfile(){
     console.log('Download initiated');
     var keys = Object.keys(dataStore.sourceInfo);
@@ -1089,7 +1016,7 @@ function buildCSVfile(){
     // Write the table of results to a CSV file for download.
     var CSV = '';
 
-    CSV += 'GRIFFIN Efficiency Data\n\n';
+    CSV += 'GRIFFIN '+dataStore.dataType+' Efficiency Data\n\n';
 
     // List the run files used for this calibration
     for(i=0; i<keys.length; i++){
@@ -1180,7 +1107,7 @@ function buildDatafile(){
     URL.revokeObjectURL(window.textBlobURL);
     const downloadLink = document.createElement('a');
     downloadLink.href = URL.createObjectURL(textBlob);
-    downloadLink.download = "GRIFFIN_efficiency_data.dat";
+    downloadLink.download = "GRIFFIN_"+dataStore.dataType+"_efficiency_data.dat";
 
     // Trigger the download
     document.body.appendChild(downloadLink);
@@ -1197,7 +1124,7 @@ function buildRootfile(){
     ROOT += 'void efficiency_curve_GRIFFIN(){\n';
     ROOT += '\n';
     ROOT += '  //reading output file from grif_replay:\n';
-    ROOT += '  ifstream * f = new ifstream(\"GRIFFIN_efficiency_data.dat\");\n';
+    ROOT += '  ifstream * f = new ifstream(\"GRIFFIN_'+dataStore.dataType+'_efficiency_data.dat\");\n';
     ROOT += '\n';
     ROOT += '  float energy, efficiency, error;\n';
     ROOT += '  std::vector<float> v_energies;\n';
@@ -1229,7 +1156,7 @@ function buildRootfile(){
     ROOT += '  TGraph *gCurve = new TGraph(v_energies.size(), &(v_energies.at(0)),&(v_efficiencies.at(0)));\n';
     ROOT += '  gCurve->GetXaxis()->SetTitle(\"E_{#gamma} [keV]\");\n';
     ROOT += '  gCurve->GetYaxis()->SetTitle(\"Efficiency\");\n';
-    ROOT += '  gCurve->SetTitle(\"Efficiency Fit\");\n';
+    ROOT += '  gCurve->SetTitle(\"'+dataStore.dataType+' Efficiency Fit\");\n';
     ROOT += '  gCurve->SetLineColor(kBlue); //https://root.cern.ch/doc/v632/classTColor.html\n';
     ROOT += '  gCurve->SetMarkerStyle(8);\n';
     ROOT += '  gCurve->SetMarkerSize(1);\n';
@@ -1260,7 +1187,7 @@ function buildGNUfile(){
     // Generate the table of results to a GNUplot file for download.
     var GNU = '';
 
-    GNU += '# GRIFFIN Efficiency curve GNU plot file\n\n';
+    GNU += '# GRIFFIN '+dataStore.dataType+' Efficiency curve GNU plot file\n\n';
     GNU += '# set terminal pngcairo  transparent enhanced font \"arial,10\" fontscale 1.0 size 600, 400 \n';
     GNU += '# set output \'errorbars.4.png\'\n';
     GNU += 'set style data lines\n';
@@ -1289,16 +1216,16 @@ function buildGNUfile(){
     GNU += 'gf1H=-0.02\n';
     GNU += 'gf1I=-0.003\n';
     GNU += 'gf1(x) = exp((gf1A*log(x*0.001)**0) + (gf1B*log(x*0.001)**1) + (gf1C*log(x*0.001)**2) + (gf1D*log(x*0.001)**3) + (gf1E*log(x*0.001)**4) + (gf1F*log(x*0.001)**5) + (gf1G*log(x*0.001)**6) + (gf1H*log(x*0.001)**7) + (gf1I*log(x*0.001)**8))\n';
-    GNU += 'fit gf1(x) \"GRIFFIN_efficiency_data.dat\" u 1:2:3 yerrors via gf1A, gf1B, gf1C, gf1D, gf1E, gf1F, gf1G, gf1H, gf1I\n\n';
+    GNU += 'fit gf1(x) \"GRIFFIN_'+dataStore.dataType+'_efficiency_data.dat\" u 1:2:3 yerrors via gf1A, gf1B, gf1C, gf1D, gf1E, gf1F, gf1G, gf1H, gf1I\n\n';
 
     GNU += '## Plot the data points\n';
-    GNU += 'plot [40:10000] \"GRIFFIN_efficiency_data.dat\" t \"Data from ';
+    GNU += 'plot [40:10000] \"GRIFFIN_'+dataStore.dataType+'_efficiency_data.dat\" t \"Data from ';
     for(i=0; i<keys.length; i++){
       if(i>0){ GNU += '+'; }
     GNU += keys[i];
     }
     GNU += '\" w yerr, \\\n';
-    GNU += 'gf1(x) t \"Efficiency fit\"\n';
+    GNU += 'gf1(x) t \"'+dataStore.dataType+' Efficiency fit\"\n';
 
     // Create a download link
     const textBlob = new Blob([GNU], {type: 'text/plain'});
@@ -1464,7 +1391,8 @@ function projectAllMatrices(){
 
 
 function processConfigFileForRuntime(payload){
-
+// The run duration is required for calculating the absolute efficiency.
+// The run start date and time is required for calculating the source activity at the time of the data collection.
 	// Unpack the response from the server into a local variable
 	console.log(payload);
     var thisConfig = JSON.parse(payload);

@@ -2019,3 +2019,24 @@ function HPGeEfficiency(param, logEn){
 
               return(params);
             };
+
+
+            // Legendre Polynomials
+            function P0(x){
+                return parseFloat(1);
+            }
+            // Legendre Polynomials
+            function P1(x){
+                return parseFloat(x);
+            }
+            // Legendre Polynomials
+            //The following is a general functoin that returns the value of the Legendre Polynomial for any given x and n=0,1,2,3,...
+            function Pn(x, n){
+                if(n==0){
+                    return P0(x);
+                }else if(n==1){
+                    return P1(x);
+                }else{
+                    return parseFloat((2*n-1)*x*Pn(x,n-1)-(n-1)*Pn(x,n-2))/n;
+                }
+            }

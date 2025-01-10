@@ -511,6 +511,7 @@ dataStore.plotStyle[0] = {                                              //dygrap
   colors: ["#AAE66A", "#EFB2F0", "#B2D1F0", "#F0DBB2"],
   labelsDiv: 'dataPlot0Legend',
   drawPoints: true,
+  underlayCallback: drawDygraphCanvasObjects,
 //  underlayCallback: drawDygraphCanvasObjects,
   pointSize: 5,
   highlightCircleSize: 7,
@@ -559,45 +560,42 @@ function onloadInitialSetup(){
 function drawDygraphCanvasObjects(ctx, area, layout) {
 
     // Identify which graph this is
-            if(layout.maindiv_.id.includes('Abs')){
               var thisPlotID = 0;
-            }else if(layout.maindiv_.id.includes('Rel')){
-              var thisPlotID = 1;
-            }else{ console.log('Unrecognized Div for dygraph drawEfficiencyLine'); return;}
 
   // Bail out if there is no data yet
   if (typeof(dataStore._dataplot[thisPlotID].dygraph) == 'undefined') return;  // won't be set on the initial draw.
-  if (dataStore.efficiencyPlotData.length<1) return;  // won't be set on the initial draw.
-  if (dataStore.efficiencyPlotData[thisPlotID].length<1) return;  // won't be set on the initial draw.
+  if (dataStore.dataplotDataY.length<1) return;  // won't be set on the initial draw.
+  if (dataStore.dataplotDataY[thisPlotID].length<1) return;  // won't be set on the initial draw.
 
-    drawDygraphEfficiencyLine(thisPlotID, ctx, area, layout);
-    drawDygraphErrorBars(thisPlotID, ctx, area, layout);
+    drawDygraphAngCorrLine(thisPlotID, ctx, area, layout);
+  //  drawDygraphErrorBars(thisPlotID, ctx, area, layout);
 }
 
-function drawDygraphEfficiencyLine(thisPlotID, ctx, area, layout) {
+function drawDygraphAngCorrLine(thisPlotID, ctx, area, layout) {
   console.log('drawLines');
 
-  var range = [0,5000];
-  var params = dataStore.efficiencyPlotEquationParameters[thisPlotID];
+  var range = [-1,1];
   var color = '#E67E22';
-  var step = 1;
+  var step = 0.01;
+  var c2 = 0.102, c4=0.008;
   //ctx.save();
   ctx.strokeStyle = color;
   ctx.lineWidth = 3.0;
 
-  var y1 = HPGeEfficiency(params, Math.log(parseFloat(range[0]/1000)));
+
+  var y1 = 1.0 + Pn(range[0],2) + Pn(range[0],4);
   var p1 = dataStore._dataplot[thisPlotID].dygraph.toDomCoords(range[0], y1);
   ctx.beginPath();
-  ctx.moveTo(0, -1);
-  ctx.lineTo(p1[0], p1[1]);
+  ctx.moveTo(p1[0], p1[1]);
   for(i=range[0]+step; i<=range[1]; i+=step){
-    // HPGeEfficiency() expects energy in MeV and the natural log.
-    y1 = HPGeEfficiency(params, Math.log(parseFloat(i/1000)));
+    y1 = 1.0 + Pn(i,2) + Pn(i,4);
+    console.log([i,y1]);
     var p1 = dataStore._dataplot[thisPlotID].dygraph.toDomCoords(i, y1);
     ctx.lineTo(p1[0], p1[1]);
   }
   ctx.stroke();
-  //ctx.restore();
+  console.log(p1);
+  console.log(y1);
 }
 
 function drawDygraphErrorBars(thisPlotID, ctx, area, layout) {

@@ -172,7 +172,7 @@
                }
                // Set up the CSV file button
                document.getElementById('saveCSV').onclick = function(){ buildCSVfile(); }
-               
+
                // Create the Detector/subsystem choice buttons
                for(var i=0; i<dataStore.detectorChoice.length; i++){
                  newButton = document.createElement('button');
@@ -205,6 +205,23 @@
           	           }.bind(newButton);
           	           document.getElementById('detectorChoiceBar').appendChild(newButton);
           	         }
+
+                       // Add a button for skipping to Dygraph development work
+                       newButton = document.createElement('button');
+                       newButton.setAttribute('id', 'PlotDevelopmentButton');
+                       newButton.setAttribute('class', 'btn btn-default');
+                       newButton.setAttribute('engaged', '0');
+                       newButton.value = 1;
+                       newButton.innerHTML = 'Dygraph Plot Development';
+                       newButton.onclick = function(){
+                         // Save this choice in the dataStore
+                         console.log("Plot Testing Button");
+dataStore.theseAngularBins = [0.0,45,90,135,180];
+dataStore.angularBinData = [1.1,1.0,0.9,1.0,1.1];
+
+                         populateDataPlot();
+                	           }.bind(newButton);
+                	           document.getElementById('detectorChoiceBar').appendChild(newButton);
 
             });
 
