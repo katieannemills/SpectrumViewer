@@ -464,7 +464,6 @@ console.log("Number of 1d tasks only = "+dataStore.progressBarNumberTasks);
     url = dataStore.spectrumServer + '/?cmd=viewConfig' + '&filename=' + filename;
     XHR(url, "Problem getting Config file for "+ filename +" from analyzer server", processConfigFileForRunDetails, function(error){ErrorConnectingToAnalyzerServer(error)});
 
-
     // change information message
     document.getElementById('welcomeMessage').classList.add('hidden');
     document.getElementById('fetchingMessage').classList.remove('hidden');
@@ -644,6 +643,16 @@ console.log("Number of 1d tasks only = "+dataStore.progressBarNumberTasks);
 
         // Set the dataStore.histoFileName to this source so that constructQueries requests the correct spectrum
         dataStore.currentHistoFileName = dataStore.histoFileName;
+
+        // Request the config file for this histogram file in order to get the details on runtime
+        // First format check for the data file directory path
+        var filename = dataStore.histoFileDirectoryPath;
+        if(filename[filename.length]!='/'){
+          filename += '/';
+        }
+        filename += dataStore.histoFileName;
+        url = dataStore.spectrumServer + '/?cmd=viewConfig' + '&filename=' + filename;
+        XHR(url, "Problem getting Config file for "+ filename +" from analyzer server", processConfigFileForRunDetails, function(error){ErrorConnectingToAnalyzerServer(error)});
 
         // Drop as much as possible to reduce overall memory usage
         //clearLocalMemory();
