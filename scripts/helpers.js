@@ -1165,7 +1165,10 @@ function construct2dQueries(queries,keys){
   // queries is assumed to be the queries array built by constructQueries() and we add to it.
 
   var i, queryString;
-  var j = ((queries.length-1)*16) + (queries[queries.length-1].match(/spectrum/g) || []).length;
+  var j=0;
+  if(queries.length>0){
+    j = ((queries.length-1)*16) + (queries[queries.length-1].match(/spectrum/g) || []).length;
+  }
   for(i=0; i<keys.length; i++){
     queryString = dataStore.spectrumServer + '?cmd=callspechandler';
     if(dataStore.histoFileName!=undefined){
@@ -1785,6 +1788,38 @@ function pokeURL(url){
   // Make the request
   req.send();
 }
+
+
+// Drop-area functions
+
+  function preventDropDefaults (e) {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
+  function highlightDrop(e) {
+    document.getElementById('drop-area').classList.add('highlight')
+  }
+
+  function unhighlightDrop(e) {
+    document.getElementById('drop-area').classList.remove('highlight')
+  }
+
+function handleDrop(e) {
+  let dt = e.dataTransfer
+  let files = dt.files
+
+  console.log(dt);
+  console.log(files);
+
+  handleDropFiles(files)
+}
+
+function handleDropFiles(files) {
+  ([...files]).forEach(processDropFile)
+}
+
+////////////////////////////
 
 function inverseMatrix(_A) {
   // Credit to https://gist.github.com/husa/5652439

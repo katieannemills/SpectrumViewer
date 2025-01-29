@@ -60,6 +60,11 @@ div.ui-subgroup{
     color: #FF6666;
 }
 
+.error-text{
+    color: #FF6666;
+   font-size: xx-large;
+}
+
 .btn-group {
   display: flex;
 }
@@ -78,4 +83,40 @@ input, button, select, li.toggle{
 
 div.no-pad{
     padding: 0px;
+}
+
+div.progress{
+   margin-top: 1em;
+   width: 100%;
+}
+
+.progress-bar {
+   -webkit-transition: none;
+   -moz-transition: none;
+   -ms-transition: none;
+   -o-transition: none;
+   transition: none;
+}
+
+#drop-area {
+  border: 4px dashed #ccc;
+  border-color: #FA8072; /* Salmon pink */
+  border-radius: 20px;
+  width: 480px;
+  font-family: sans-serif;
+  margin: 10px auto;
+  padding: 8px;
+}
+#drop-area.highlight {
+  border-color: #DAA520; /* goldenrod*/
+}
+#fileElem {
+  display: none;
+}
+
+textarea {
+border-color: #FA8072; /* Salmon pink */
+border-radius: 10px;
+    background-color: #333333;
+    margin: 4px auto;
 }

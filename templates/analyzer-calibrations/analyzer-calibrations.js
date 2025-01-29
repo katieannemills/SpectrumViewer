@@ -21,9 +21,6 @@ function setupCalibrationsContent(){
       dropArea.addEventListener(eventName, unhighlightDrop, false)
     });
 
-    //  dropArea.addEventListener('dragenter', handlerFunction, false)
-    //  dropArea.addEventListener('dragleave', handlerFunction, false)
-      //dropArea.addEventListener('dragover', handlerFunction, false)
       dropArea.addEventListener('drop', handleDrop, false)
 
       // Populate the Config table on initial load
@@ -52,33 +49,6 @@ document.getElementById('currentConfigCalibrationsTableDiv').innerHTML = outputS
 /////////////////
 // helpers
 /////////////////
-
-  function preventDropDefaults (e) {
-    e.preventDefault()
-    e.stopPropagation()
-  }
-
-  function highlightDrop(e) {
-    document.getElementById('drop-area').classList.add('highlight')
-  }
-
-  function unhighlightDrop(e) {
-    document.getElementById('drop-area').classList.remove('highlight')
-  }
-
-function handleDrop(e) {
-  let dt = e.dataTransfer
-  let files = dt.files
-
-  console.log(dt);
-  console.log(files);
-
-  handleDropFiles(files)
-}
-
-function handleDropFiles(files) {
-  ([...files]).forEach(processDropFile)
-}
 
 function sendCalibrationsToAnalyzer(){
 

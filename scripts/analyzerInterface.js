@@ -433,10 +433,10 @@ function processSortStatus(payload){
     }
 
     // Calculate quantities from the current Sort Status values
-    dataStore.SortStatusCurrentSortSpeed = parseFloat((dataStore.SortStatusCurrentMegaBytesSorted-dataStore.SortStatusPreviousMegaBytesSorted)/(dataStore.SortStatusCurrentTimestamp - dataStore.SortStatusPreviousTimestamp)).toFixed(1);
+    dataStore.SortStatusCurrentSortSpeed = parseFloat((dataStore.SortStatusCurrentMegaBytesSorted-dataStore.SortStatusPreviousMegaBytesSorted)/(dataStore.SortStatusCurrentTimestamp - dataStore.SortStatusPreviousTimestamp));
     calculateAverageSortSpeed();
     dataStore.SortStatusCurrentPercentageComplete = parseFloat((dataStore.SortStatusCurrentMegaBytesSorted/dataStore.SortStatusCurrentFileSize)*100.0).toFixed(1);
-    dataStore.SortStatusCurrentRemainingSortTime = parseFloat((dataStore.SortStatusCurrentFileSize-dataStore.SortStatusCurrentMegaBytesSorted)/dataStore.SortStatusCurrentSortSpeed).toFixed(1);
+    dataStore.SortStatusCurrentRemainingSortTime = parseFloat((dataStore.SortStatusCurrentFileSize-dataStore.SortStatusCurrentMegaBytesSorted)/dataStore.SortStatusAverageSortSpeed).toFixed(1);
 
     /*
     console.log('===================================');
@@ -453,19 +453,18 @@ function processSortStatus(payload){
     if(dataStore.SortStatusCurrentRemainingSortTime<0){ dataStore.SortStatusCurrentRemainingSortTime=0.1; }
 
     // Check the values in the console
-    /*
-    console.log('Dir: '+dataStore.midasFileDataDirectoryPath);
-    console.log('File: '+dataStore.SortStatusCurrentFileName);
-    console.log('Run: '+dataStore.SortStatusCurrentRunNumber);
-    console.log('Sub: '+dataStore.SortStatusCurrentSubRunNumber);
-    console.log('Size: '+dataStore.SortStatusCurrentFileSize+' MB');
-    console.log('Sorted: '+dataStore.SortStatusCurrentBytesSorted+' Bytes');
-    console.log('Sorted: '+dataStore.SortStatusCurrentMegaBytesSorted+' MB');
-    console.log('Percent: '+dataStore.SortStatusCurrentPercentageComplete);
-    console.log('Current Speed: '+dataStore.SortStatusCurrentSortSpeed);
-    console.log('Average Speed: '+dataStore.SortStatusAverageSortSpeed);
-    console.log('Remaining: '+dataStore.SortStatusCurrentRemainingSortTime);
-    */
+  //  console.log('Dir: '+dataStore.midasFileDataDirectoryPath);
+  //  console.log('File: '+dataStore.SortStatusCurrentFileName);
+  //  console.log('Run: '+dataStore.SortStatusCurrentRunNumber);
+  //  console.log('Sub: '+dataStore.SortStatusCurrentSubRunNumber);
+  //  console.log('Size: '+dataStore.SortStatusCurrentFileSize+' MB');
+  //  console.log('Sorted: '+dataStore.SortStatusCurrentBytesSorted+' Bytes');
+  //  console.log('Sorted: '+dataStore.SortStatusCurrentMegaBytesSorted+' MB');
+  //  console.log('Percent: '+dataStore.SortStatusCurrentPercentageComplete);
+  //  console.log('Current Speed: '+dataStore.SortStatusCurrentSortSpeed);
+  //  console.log('Average Speed: '+dataStore.SortStatusAverageSortSpeed);
+  //  console.log('Remaining: '+dataStore.SortStatusCurrentRemainingSortTime);
+
 
     // Update the printed Sort Status information on screen
     string = 'Run '+dataStore.SortStatusCurrentRunNumber+', subrun '+dataStore.SortStatusCurrentSubRunNumber+' at '+dataStore.SortStatusAverageSortSpeed+' MB/s. Sorted '+prettyFileSizeString(dataStore.SortStatusCurrentBytesSorted)+' of '+prettyFileSizeString(dataStore.SortStatusCurrentBytesFileSize)+'s ('+dataStore.SortStatusCurrentPercentageComplete+'% completed).<br>Estimated '+prettyTimeString(parseInt(dataStore.SortStatusCurrentRemainingSortTime))+' remaining.';

@@ -59,8 +59,8 @@ function setupDataStore(){
   dataStore.hm = {};                                                 //object for 2d matrix stuff
   dataStore.hm._raw = [0];                                                 //buffer for raw matrix data
   dataStore.createdSpectra = {};                                       //initialize empty object for created spectra
-	dataStore.createdBG1Spectra = {},                                    //initialize empty object for created background (BG1) spectra
-  dataStore.createdBG2Spectra = {},                                    //initialize empty object for created background (BG2) spectra
+	dataStore.createdBG1Spectra = {};                                    //initialize empty object for created background (BG1) spectra
+  dataStore.createdBG2Spectra = {};                                    //initialize empty object for created background (BG2) spectra
   dataStore.THESEdetectors = [];                                    //10-char codes of all possible griffin/paces detectors. Contents based on detectorChoice
   dataStore.angularMatrices = [];                                   // list of the names of the angular correlation matrices
   dataStore.angCorrProjections = [];                                // list of the names of the projections to be fitted
@@ -852,53 +852,61 @@ function fetchCallback(){
     console.log(dataStore);
 
         // Create the objects for each matrix in the local storage
-        createAllLocalMatrices();
+        // createAllLocalMatrices(listOfMatrices,progressBarKey,callback);
+        createAllLocalMatrices(dataStore.angularMatrices,'progressGGAngCorr',createAllLocalMatricesCallback);
 
 }
 
-async function createAllLocalMatrices(){
+function createAllLocalMatricesCallback(){
+
+    // Now change the DOM in preparation for peak inputs needed for projections
+    console.log("finished unpacking");
+    console.log(dataStore);
+
+    // Hide the progress bar
+    setTimeout(function(){document.getElementById('progressDiv').classList.add('hidden')},2000);
+
+    // change messages
+    deleteNode('downloadMessage');
+    document.getElementById('readyMessage').classList.remove('hidden');
+
+    // Enable the input buttons
+    document.getElementById('gamma1Input').disabled = false;
+    document.getElementById('gamma2Input').disabled = false;
+    document.getElementById('ggAngCorrProject').disabled = false;
+
+}
+
+// createAllLocalMatrices(listOfMatrices,progressBarKey,callback);
+async function createAllLocalMatrices(listOfMatrices,progressBarKey,callback){
 
   // Create the objects for each matrix in the local storage
-  for(let i=1; i<dataStore.angularMatrices.length; i++){
+  for(let i=0; i<listOfMatrices.length; i++){
 
     // Update the progress bar
     let status = 49+i;
     let message = "complete";
     dataStore.ProgressValue = parseInt(status);
-    document.getElementById('progressGGAngCorr').setAttribute('style', "width:" + status + "%" );
-    document.getElementById('progressGGAngCorr').innerHTML = status + "% " + message;
+    document.getElementById(progressBarKey).setAttribute('style', "width:" + status + "%" );
+    document.getElementById(progressBarKey).innerHTML = status + "% " + message;
     console.log("Progress value = " + dataStore.ProgressValue);
 
     // Process the next matrix before updating the progress bar again
-    await createLocalMatrices(i);
+    await createLocalMatrices(dataStore.angularMatrices[i]);
 
   } // End of for loop
 
-  // Now change the DOM in preparation for peak inputs needed for projections
-  console.log("finished unpacking");
-  console.log(dataStore);
-
-  // Hide the progress bar
-  setTimeout(function(){document.getElementById('progressDiv').classList.add('hidden')},2000);
-
-  // change messages
-  deleteNode('downloadMessage');
-  document.getElementById('readyMessage').classList.remove('hidden');
-
-  // Enable the input buttons
-  document.getElementById('gamma1Input').disabled = false;
-  document.getElementById('gamma2Input').disabled = false;
-  document.getElementById('ggAngCorrProject').disabled = false;
-
+  // Call the callback function
+  callback();
 }
 
-async function createLocalMatrices(i){
+async function createLocalMatrices(spectrumName){
 
   // Return a new promise.
   return new Promise(function(resolve) {
 
     // Create the new object for this matrix in the local storage
-    var thisKey = dataStore.histoFileName.split(".")[0] + ":" + dataStore.angularMatrices[i];
+    var thisKey = dataStore.histoFileName.split(".")[0] + ":" + spectrumName;
     console.log("Creating "+thisKey);
     var thisMatrix = {
       "name" : dataStore.rawData[thisKey].name,
@@ -927,7 +935,6 @@ async function createLocalMatrices(i){
 
     // Delete the raw version to reduce total memory usage
     delete dataStore.rawData[thisKey];
-    console.log(i);
 
     // resolve the promise
     setTimeout(function(){resolve('Success!')},5);
