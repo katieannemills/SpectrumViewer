@@ -685,6 +685,7 @@ console.log("Number of 1d tasks only = "+dataStore.progressBarNumberTasks);
     function buildCSVfile(){
       console.log('Download initiated');
       var keys = Object.keys(dataStore.fitResults);
+      var index = 1;
 
       // Write the table of results to a CSV file for download.
       var CSV = '';
@@ -693,6 +694,7 @@ console.log("Number of 1d tasks only = "+dataStore.progressBarNumberTasks);
 
       //fit results: 'plotname': [[amplitude, center, width, intercept, slope, area, FWHM], [amplitude, center, width, intercept, slope, area, FWHM]]
 
+      CSV += 'Fit Index,';
       CSV += 'Histogram File,';
       CSV += 'Run Title,Run StartTime,Run Duration,';
       CSV += 'Spectrum,';
@@ -706,6 +708,7 @@ console.log("Number of 1d tasks only = "+dataStore.progressBarNumberTasks);
       CSV += 'FWHM\n'; //
       for(var i=0; i<keys.length; i++){
         for(var j=0; j<dataStore.fitResults[keys[i]].length; j++){
+          CSV += index + ','; index++;
           CSV += keys[i].split(":")[0] + ',';
           CSV += dataStore.spectrumListHistoFileDetails[keys[i].split(":")[0]].Title + ',';
           CSV += dataStore.spectrumListHistoFileDetails[keys[i].split(":")[0]].StartTime + ',';
