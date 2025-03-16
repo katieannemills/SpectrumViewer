@@ -1,0 +1,58 @@
+<template id='paginationMenu'>
+  <div id='menu-wrap'> </div>
+</template>
+
+<script>
+
+  function menuButtonClick(thisID,thisIndex){
+
+    var buttonIDs = dataStore.buttonIDs;
+    var buttonPages = dataStore.buttonPages;
+
+    // set default state for all buttons
+    // Hide all pages
+    for(i=0; i<buttonIDs.length; i++){
+      document.getElementById(buttonIDs[i]).setAttribute('class', 'btn btn-default btn-lg');
+      document.getElementById(buttonPages[i]).classList.add('hidden');
+    }
+
+    //set selected button active state
+    document.getElementById(thisID).classList.add('btn-warning');
+
+    // Display the associated Page
+    document.getElementById(buttonPages[thisIndex]).classList.remove('hidden');
+
+  }
+
+  function injectMenuButtons(){
+
+    var i, newLink, current;
+    var wrap = document.getElementById('menu-wrap');
+
+    var buttonNames = dataStore.buttonNames;
+    var buttonIDs = dataStore.buttonIDs;
+
+    // Create menu buttons
+    for(i=0; i<buttonNames.length; i++){
+      newButton = document.createElement('button');
+      newButton.setAttribute('id', buttonIDs[i]);
+      newButton.setAttribute('value', i);
+      newButton.setAttribute('class', 'btn btn-default btn-lg');
+      newButton.innerHTML = buttonNames[i];
+      newButton.style.padding = '4px';
+      newButton.onclick = function(){
+        menuButtonClick(this.id,this.value);
+      }.bind(newButton);
+      wrap.appendChild(newButton);
+    }
+  }
+
+  function setupPaginationMenu(wrapperID){
+    document.getElementById(wrapperID).innerHTML = Mustache.to_html(dataStore.templates['paginationMenu'], {});
+    injectMenuButtons();
+
+    //set active state
+    document.getElementById(dataStore.buttonIDs[0]).classList.add('btn-warning');
+  }
+
+</script>

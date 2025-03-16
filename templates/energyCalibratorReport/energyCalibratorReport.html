@@ -206,26 +206,26 @@
     }
 
     // Setup the Coefficiencts Results subpage
-                //inject templates
-              this.wrap2.innerHTML = Mustache.to_html(
-                dataStore.templates.energyCalibratorCoefficienctsReport,
-                {
-                    'id': this.wrapID2,
-                }
-                );
-                // table has to be done as a separate template, since templates and tables don't play too nice together
-        // Build the list of rows for the table. Loop through each peak of each source
-              var detectors =[];
-              for(var i=0; i<dataStore.THESEdetectors.length; i++){
-                    detectors.push(dataStore.THESEdetectors[i]);
-            }
-            document.getElementById(this.wrapID2 + 'energyCalibratorCoefficienctsResults').innerHTML= Mustache.to_html(
-                dataStore.templates.energyCalibratorCoefficientsReportTable,
-                content = {
-                    'id': this.wrapID2,
-                    'detectors': detectors
-                }
-                );
+    //inject templates
+    this.wrap2.innerHTML = Mustache.to_html(
+    dataStore.templates.energyCalibratorCoefficienctsReport,
+    {
+      'id': this.wrapID2,
+    }
+    );
+    // table has to be done as a separate template, since templates and tables don't play too nice together
+    // Build the list of rows for the table. Loop through each peak of each source
+    var detectors =[];
+    for(var i=0; i<dataStore.THESEdetectors.length; i++){
+      detectors.push(dataStore.THESEdetectors[i]);
+    }
+    document.getElementById(this.wrapID2 + 'energyCalibratorCoefficienctsResults').innerHTML= Mustache.to_html(
+    dataStore.templates.energyCalibratorCoefficientsReportTable,
+    content = {
+      'id': this.wrapID2,
+      'detectors': detectors
+    }
+    );
 
 },
 

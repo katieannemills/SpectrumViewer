@@ -118,6 +118,7 @@ dataStore.peakFitterScript = {
   'spectrumListProjectionsPeaks' : []                      // List of all peak centroids to be fitted in the projected 1d spectra from the 2d spectra
 };
 
+
 //receiveScript(JSON.stringify(dataStore.peakFitterScript));
 
 console.log(dataStore);
@@ -761,7 +762,74 @@ console.log("Number of 1d tasks only = "+dataStore.progressBarNumberTasks);
     }
 
 
-function postProcessPU(){
+    function postProcessPUFirstHit(){
+      // Post processing for 2-Hit pileup, 1st Hit correction as function of k.
+    //
+    // Perform 6th order polynomial fit of correction factor as function of k.
+    // Result is function describing correction factor as function of k.
+    console.log("\n\n==============================\n  Post-processing for pile-up, k dependance correction...\n\n");
+
+    var keys = Object.keys(dataStore.fitResults);
+    if(typeof(dataStore.fitResults["run29578-no-2ndHit-Correction:single_hit"]) != "undefined"){
+    var singleHitEnergy = dataStore.fitResults["run29578-no-2ndHit-Correction:single_hit"][0][1]; // Get the single hit centroid energy of 1332keV peak
+    }else{
+    var singleHitEnergy = dataStore.fitResults["run29572:single_hit"][0][1]; // Get the single hit centroid energy of 1408keV peak
+    }
+
+
+    var thisGeindex = 1; // Eventually will be a loop here over all Ge
+    var GeNum = 1;
+    //var GeString = "Ge" + alwaysThisLong(GeNum, 2);
+    var GeString = "Ge" + GeNum;
+    var matrixString = "_E_vs_k_1st_of_2hitx";
+    var data = [];
+    for(var thisKvalue=5; thisKvalue<380; thisKvalue+=20){
+
+            // Spectrum names of the form: GeX_E_vs_k_1st_of_2hitx where X is Ge number.
+            // Kstring will be the projection values in this case.
+    var Kstring = "x-"+(parseInt(thisKvalue)-5)+"-"+(parseInt(thisKvalue)+5);
+
+        for(var j=0; j<keys.length; j++){
+
+          if(keys[j].includes(matrixString) && keys[j].includes(GeString) && keys[j].includes(Kstring)){
+            // xValue is k value.
+            var xValue = parseInt(thisKvalue);
+
+            // yValue is the necessary correction to the Energy centroid to match the centroid from the single Hit spectrum
+            var yValue = parseFloat(1.0-(dataStore.fitResults[keys[j]][0][1]/singleHitEnergy)+1.0);
+
+            data.push([xValue,yValue]);
+          }
+        }
+}
+
+// Add the single hit data point. This seems to be important.
+    data.push([379,1.0]);
+
+    console.log(data);
+    // Perform 6th order polynomial fit of the series of y=correction factor as a function of x=k.
+        // Hats off to Tom Alexander, https://github.com/Tom-Alexander/regression-js
+        const result = regression.polynomial(data, { order: 6, precision: 20 });
+
+        console.log(result.equation);
+        console.log(result.string);       //  A string representation of the equation
+
+    // Save the Cstring.
+    // An array of the parameters for this HPGe
+    var Cmstring = "{"
+    for(var i=result.equation.length-1; i>=0; i--){ Cmstring += result.equation[i]; if(i>0){ Cmstring += ","; } }
+    Cmstring += "},";
+
+    var Ccstring = "{"
+    for(var i=result.equation.length-1; i>=0; i--){ Ccstring += result.equation[i]; if(i>0){ Ccstring += ","; } }
+    Ccstring += "},";
+
+    console.log(Cmstring);
+    console.log(Ccstring);
+    }
+
+
+function postProcessPUSecondHit(){
   // Post processing for 2-Hit pileup, energy2 vs energy1 as function of k.
 //
 // Perform linear fit of each series of projections for each 2d spectrum.
@@ -775,12 +843,17 @@ var mData = [];
 var cData = [];
 
 var keys = Object.keys(dataStore.fitResults);
+if(typeof(dataStore.fitResults["run29578:single_hit"]) != "undefined"){
 var singleHitEnergy = dataStore.fitResults["run29578:single_hit"][1][1]; // Get the single hit centroid energy of 1332keV peak
-
+}else if(typeof(dataStore.fitResults["run29572:single_hit"]) != "undefined"){
+var singleHitEnergy = dataStore.fitResults["run29572:single_hit"][0][1]; // Get the single hit centroid energy of 1332keV peak
+}else{
+var singleHitEnergy = dataStore.fitResults["run29543-k-dependance-corrected:single_hit"][0][1]; // Get the single hit centroid energy of 1408keV peak
+}
 
 // Perform linear fit of each series of projections for each 2d spectrum.
 // Result y=mx+c where y = correction to E2, x=E1, m=gradient for this k value, c=intercept for this k value.
-var thisGeindex = 1;
+var thisGeindex = 1; // Eventually will be a loop here over all Ge
 var GeNum = 1;
 var GeString = "Ge" + alwaysThisLong(GeNum, 2);
 for(var thisKvalue=10; thisKvalue<380; thisKvalue+=20){
@@ -792,24 +865,29 @@ kData.push(thisKvalue);
     var data = [];
 
     for(var j=0; j<keys.length; j++){
+
       if(keys[j].includes(Kstring)){
-       // xValue is the E1 energy. Calculate from gate in the projection name
-       var tail = keys[j].split(Kstring)[1];
-       tail = tail.substr(1);
-       var xValue = parseInt(tail.split("-")[1]-tail.split("-")[0]/2);
 
-       // yValue is the correction required to E2
-       var yValue = parseFloat(1.0-(dataStore.fitResults[keys[j]][0][1]/singleHitEnergy)+1.0);
+        // Omit failed peak fit results. Test the centroid for NaN.
+        if(isNaN(dataStore.fitResults[keys[j]][0][1])){ continue; }
 
-      data.push([xValue,yValue]);
-    }
+        // xValue is the E1 energy. Calculate from gate in the projection name
+        var tail = keys[j].split(Kstring)[1];
+        tail = tail.substr(1);
+        var xValue = parseInt(tail.split("-")[1]-tail.split("-")[0]/2);
+
+        // yValue is the correction required to E2, derived from the centroid of this fit
+        var yValue = parseFloat(1.0-(dataStore.fitResults[keys[j]][0][1]/singleHitEnergy)+1.0);
+
+        data.push([xValue,yValue]);
+      }
     }
 
     // Hats off to Tom Alexander, https://github.com/Tom-Alexander/regression-js
     const result = regression.polynomial(data, { order: 1, precision: 20 });
 
     // Save the fit results into the object for this detector
-    mData.push(result.equation[0]);    // The coefficient of the slope term of the equation
+    mData.push(result.equation[0]);  // The coefficient of the slope term of the equation
     cData.push(result.equation[1]);  // The coefficient of the offset term of the equation
 }
 
@@ -817,8 +895,7 @@ console.log(kData);
 console.log(mData);
 console.log(cData);
 
-// Perform linear fit of each series of projections for each 2d spectrum.
-// Result y=mx+c where y = correction to E2, x=E1, m=gradient for this k value, c=intercept for this k value.
+// Perform 6th order polynomial fit of each series of m and c as a function of k.
 console.log("Now fit the m coefficient as a function of k");
 var data = [];
 for(var i=0; i<kData.length; i++){
@@ -856,6 +933,8 @@ Ccstring += "},";
 console.log(Cmstring);
 console.log(Ccstring);
 }
+
+
 
     ///////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////
@@ -940,439 +1019,3 @@ console.log(Ccstring);
     ///////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////
-
-    // Function to save the run details from the Config file received from the server
-    function processConfigFileForRunDetails(payload){
-      // The run duration is required for calculating the absolute efficiency.
-      // The run start date and time is required for calculating the source activity at the time of the data collection.
-      // Unpack the response from the server into a local variable
-      console.log(payload);
-      var thisConfig = JSON.parse(payload);
-      console.log(thisConfig.Analyzer[6].Midas);
-
-      // Unpack Midas content
-      var keyName = dataStore.histoFileName.split(".")[0];
-      dataStore.spectrumListHistoFileDetails[keyName] = {
-        'Title': thisConfig.Analyzer[6].Midas[0].Value,
-        'StartTime': thisConfig.Analyzer[6].Midas[1].Value,
-        'Duration': thisConfig.Analyzer[6].Midas[2].Value,
-      };
-
-    }
-
-    // Function to increment the progressBar by the states amount
-    function updateProgressBar(updateValue){
-
-      dataStore.progressBarTasksCompleted+=parseInt(updateValue);
-      dataStore.ProgressValue = (100*(dataStore.progressBarTasksCompleted/dataStore.progressBarNumberTasks)).toFixed(1);
-      document.getElementById(dataStore.progressBarKey).setAttribute('style', "width:" + dataStore.ProgressValue + "%" );
-      document.getElementById(dataStore.progressBarKey).innerHTML = dataStore.ProgressValue + "% complete";
-      console.log("Progress value: "+dataStore.progressBarTasksCompleted+"/"+dataStore.progressBarNumberTasks+" = " + dataStore.ProgressValue);
-
-    }
-
-    // createAllLocalMatrices(listOfMatrices,progressBarKey,callback);
-    // This function calls the function createLocalMatrices(spectrumName) and they are required together.
-    // This function should be called after 2d matrices are fetched from the server.
-    // Loops through the liftOfMatrices and unpacks the received content correctly.
-    // Fetched 2d spectra are initially placed in dataStore.rawData object.
-    // The function packZcompressed() is used to uncompress each 2d spectrum.
-    // The uncompressed 2d spectrum object is placed in dataStore.matrix array,
-    // and the dataStore.rawData version deleted to reduce total memory usage.
-    // Input: listOfMatrices is an array. A list of 2d spectrum names.
-    //        The "histoFileName:" must be added to the beginning of the name in this function for it to be used as a key for rawData.
-    // Input: callback is a function to be called one the work of this function is completed.
-    // Note: The progress bar will be incremented. The dataStore.progressBarKey variable must be set with the id of the div with class="progress-bar ..." and will be updated during execution of this function.
-    // Note: dataStore.histoFileName must be set correctly.
-    // Note: dataStore.matrix array must be declared.
-    async function createAllLocalMatrices(listOfMatrices,callback){
-
-      // Create the objects for each matrix in the local storage
-      for(let i=0; i<listOfMatrices.length; i++){
-
-        // Update the progress bar by one task
-        updateProgressBar(1);
-
-        // Process the next matrix before updating the progress bar again
-        await createLocalMatrices(listOfMatrices[i]);
-
-      } // End of for loop
-
-      // Call the callback function
-      callback();
-    }
-
-
-    // Works in partnership with createAllLocalMatrices(listOfMatrices,callback);
-    // See notes for that function.
-    async function createLocalMatrices(spectrumName){
-
-      // Return a new promise.
-      return new Promise(function(resolve) {
-
-        // Create the new object for this matrix in the local storage
-        var thisKey = dataStore.histoFileName.split(".")[0] + ":" + spectrumName;
-        console.log("Creating "+thisKey);
-        var thisMatrix = {
-          "name" : dataStore.rawData[thisKey].name,
-          "xlength" : dataStore.rawData[thisKey].XaxisLength,
-          "ylength" : dataStore.rawData[thisKey].YaxisLength,
-          "xmin" : dataStore.rawData[thisKey].XaxisMin,
-          "ymin" : dataStore.rawData[thisKey].YaxisMin,
-          "xmax" : dataStore.rawData[thisKey].XaxisMax,
-          "ymax" : dataStore.rawData[thisKey].YaxisMax,
-          "zmin" : dataStore.rawData[thisKey].ZaxisMin,
-          "zmax" : dataStore.rawData[thisKey].ZaxisMax,
-          "zminfull" : dataStore.rawData[thisKey].ZaxisMin,
-          "zmaxfull" : dataStore.rawData[thisKey].ZaxisMax,
-          "data" : []
-        };
-        dataStore.matrix[thisKey] = thisMatrix;
-
-        // Unpack the raw data to the local storage
-        // The last argument as false, suppresses the generation of a colorMap used for displaying as a heatmap
-        // Unpack the compressed matrix data received from the server
-        var thisMatrixData = packZcompressed(dataStore.rawData[thisKey].data2, dataStore.rawData[thisKey].XaxisLength, dataStore.rawData[thisKey].YaxisLength, dataStore.rawData[thisKey].ZaxisMax,dataStore.rawData[thisKey].symmetrized, false);
-
-        // Trim the matrix and save it in the object
-        //  dataStore.matrix[thisKey].data = trimMatrix(thisMatrixData,3);
-        dataStore.matrix[thisKey].data = thisMatrixData;
-
-        // Delete the raw version to reduce total memory usage
-        delete dataStore.rawData[thisKey];
-
-        // resolve the promise
-        // This 5ms pause is necessary so that the DOM update of the progressBar actually happens during the looping.
-        setTimeout(function(){resolve('Success!')},5);
-      });
-
-    }
-
-    // projectAllMatrices(projectionsList)
-    // This function calls the function createNewProjection() and they are required together.
-    // This function should be called after 2d matrices have been uncompressed to local storage.
-    // Loops through the projectionsList to make all requested projections from each 2d spectrum.
-    // Input: projectionsList is an array of objects.
-    // Each object contains the "matrixName" which is a valid key for the dataStore.matrix array.
-    // Each object also contains the "gateDetails" which is an array of gates specific to that 2d spectrum.
-    // Format for gates: 'matrixname': [[axis,gateMin,gateMax,BG1SF,BG1Min,BG1Max,BG2SF,BG2Min,BG2Max], [], ...]
-    // Where BG1SF is the Scaling Factor for a projection between bins BG1Min and BG1Max which will be subtracted from the main Gate projection between bins gateMin and gateMax onto the 'axis' axis.
-    // The axis,gateMin,gateMax members are required. All others are optional.
-    // Upgrade: The progressbar should be updated in this function.
-    // Note: Terminates with projectionsCallback().
-    function projectAllMatrices(projectionsList){
-      //make the projections for the matrix of each source based on the peaks defined.
-      console.log(dataStore);
-
-      // Get the list of keys for the matrices to be projected
-      matrixKeys = projectionsList;
-
-      releaser(
-        async function(i){
-
-          // Update the progress bar by one task
-         updateProgressBar(1);
-
-          // Change rawData to another list that is just the Sum_Energy_ spectrum
-          var matrixKeys = projectionsList;
-
-          // Set the details for this matrix needed by the projectXaxis function
-          var thisKey = matrixKeys[i].matrixName;
-          dataStore.activeMatrix = thisKey;
-          dataStore.hm._raw = dataStore.matrix[thisKey].data;
-
-          // Set limits for the projections in this matrix
-          var gateMin = matrixKeys[i].gateDetails[1];
-          var gateMax = matrixKeys[i].gateDetails[2];
-
-          // Set limits for the backgrounds to be subtracted from the projections
-          var BG1SF  = matrixKeys[i].gateDetails[3];
-          var BG1Min = matrixKeys[i].gateDetails[4];
-          var BG1Max = matrixKeys[i].gateDetails[5];
-          var BG2SF  = matrixKeys[i].gateDetails[6];
-          var BG2Min = matrixKeys[i].gateDetails[7];
-          var BG2Max = matrixKeys[i].gateDetails[8];
-
-          // Now make the projection around the gate energy
-          // and the associated background projections
-          if(matrixKeys[i].gateDetails[0] == "x"){
-            console.log("Request x axis projection of "+matrixKeys[i]);
-            await createNewProjection("x",gateMin,gateMax,BG1SF,BG1Min,BG1Max,BG2SF,BG2Min,BG2Max);
-          }else if(matrixKeys[i].gateDetails[0] == "y"){
-            console.log("Request y axis projection of "+matrixKeys[i]);
-            await createNewProjection("y",gateMin,gateMax,BG1SF,BG1Min,BG1Max,BG2SF,BG2Min,BG2Max);
-          }else{
-            console.log("Problem with defined axis for "+matrixKeys[i]);
-          }
-
-        }.bind(this),
-
-        function(){
-          // This code is executed only after the full list of matrixKeys has been processed by the previous function.
-          projectionsCallback();
-
-        }.bind(this),
-
-        matrixKeys.length-1
-      )
-    };
-
-    // Works in partnership with projectAllMatrices(projectionsList);
-    // See notes for that function.
-    // Format for inputs: axis,gateMin,gateMax,BG1SF,BG1Min,BG1Max,BG2SF,BG2Min,BG2Max
-    // The axis,gateMin,gateMax members are required. All others are optional and should be undefined if not requested.
-    // Where BG1SF is the Scaling Factor for a projection between bins BG1Min and BG1Max which will be subtracted from the main Gate projection between bins gateMin and gateMax onto the 'axis' axis.
-    async function createNewProjection(axis,min,max,BG1SF,BG1Min,BG1Max,BG2SF,BG2Min,BG2Max){
-      //create the projections for the gate energy and the BG1 and BG2 regions
-      var i, evt, plotName;
-
-      // Return a new promise.
-      return new Promise(function(resolve) {
-
-        // Make the gated spectrum
-        console.log("Make gate projection "+min+"-"+max);
-        if(axis === 'y'){
-          plotName = projectYaxis(min,max,'gate');
-        }else{
-          plotName = projectXaxis(min,max,'gate');
-        }
-
-        // Make the BG spectra if requested
-        if(typeof(BG1Min) != 'undefined'){
-          if(axis === 'y'){
-            plotNameBG1 = projectYaxis(BG1Min,BG1Max,'BG1',plotName);
-            plotNameBG2 = projectYaxis(BG2Min,BG2Max,'BG2',plotName);
-          }else{
-            plotNameBG1 = projectXaxis(BG1Min,BG1Max,'BG1',plotName);
-            plotNameBG2 = projectXaxis(BG2Min,BG2Max,'BG2',plotName);
-          }
-        }
-
-        // Save a local copy of the gated spectrum in order to perform background subtraction
-        var subtractedHistogram = dataStore.createdSpectra[plotName];
-
-        // Subtract the first background spectrum
-        if(typeof(BG1Min) != 'undefined'){
-          for(var j=0; j<dataStore.createdBG1Spectra[plotName].length; j++){
-            subtractedHistogram[i] -= Math.floor(dataStore.createdBG1Spectra[plotName][j]*BG1SF);
-          }
-        }
-
-        // Subtract the second background spectrum
-        if(typeof(BG2Min) != 'undefined'){
-          for(j=0; j<dataStore.createdBG2Spectra[plotName].length; j++){
-            subtractedHistogram[i] -= Math.floor(dataStore.createdBG2Spectra[plotName][j]*BG2SF);
-          }
-        }
-
-        // Add this background-subtracted projection to the rawData storage for plotting
-        dataStore.rawData[plotName] = subtractedHistogram;
-
-        // Remove these items from the BG1 and BG2 objects so they are not subtracted in gammaSpectrum
-        delete dataStore.createdBG1Spectra[plotName];
-        delete dataStore.createdBG2Spectra[plotName];
-
-        console.log("subtractBackground, adding "+plotName+" to rawData");
-
-        // resolve the promise
-        setTimeout(function(){resolve('Success!')},5);
-      });
-
-    };
-
-
-    function fitPeaksInSeriesOfHistograms(spectra,peaks){
-      //fit all spectra to the peaks defined.
-
-      console.log(dataStore);
-
-      // Return a new promise.
-      return new Promise(function(resolve, reject) {
-
-        // Get the list of keys
-        var i, keys = spectra,
-        buffer = dataStore.currentPlot //keep track of whatever was originally plotted so we can return to it
-
-        //dump data so there is one displayed at a time
-        dataStore.viewers[dataStore.plots[0]].removeData(dataStore.currentPlot);
-
-        //set up fit callbacks
-        dataStore.viewers[dataStore.plots[0]].fitCallback = fitCallback;
-
-        releaser(
-          function(i){
-            // Set up the next spectra and peaks to fit
-            var keys = spectra;
-            var thisKey = keys[i];
-
-            // Peak values must be integer as they represent bin/channel numbers
-            var thesePeaks = [];
-            for(var j=0; j<peaks[keys[i]].length; j++){
-              thesePeaks.push(parseInt(peaks[keys[i]][j]));
-            }
-
-            // Update the progress bar by one task
-            updateProgressBar(thesePeaks.length);
-
-            // Call the fitting routine
-            fitSpectra(thisKey,thesePeaks)
-          }.bind(this),
-
-          function(){
-            var evt;
-            //set up fit line re-drawing
-            dataStore.viewers[dataStore.plots[0]].drawCallback = addFitLines;
-
-            // Callback
-            fittingCallback();
-
-            // resolve the promise
-            //resolve('Success!');
-
-          }.bind(this),
-
-          keys.length-1
-        )
-
-      }); // end of promise definition
-
-    }
-
-
-    function fitSpectra(spectrum,peaks){
-      //redo the fits for the named spectrum.
-      //<spectrum>: string; name of spectrum, per names from analyzer
-
-      console.log("fitSpectra for "+spectrum);
-
-      var peakIndex = 0;
-      var viewerName = dataStore.plots[0];
-
-      //set up fitting for this spectrum/source
-      dataStore.currentPlot = spectrum;
-      dataStore.viewers[viewerName].plotData() //kludge to update limits, could be nicer
-      dataStore.viewers[viewerName].fitTarget = spectrum;
-      dataStore._plotListLite.exclusivePlot(spectrum, dataStore.viewers[dataStore.plots[0]]);
-
-      //locate the spectrum in the dataStore
-      if(spectrum in dataStore.createdSpectra){ // true if spectrum is a key of createdSpectra
-        //set up the spectrum data for fitting
-        dataStore.viewers[viewerName].addData(spectrum, JSON.parse(JSON.stringify(dataStore.createdSpectra[spectrum])) );
-      }else if(spectrum in dataStore.rawData){
-        //set up the spectrum data for fitting
-        dataStore.viewers[viewerName].addData(spectrum, JSON.parse(JSON.stringify(dataStore.rawData[spectrum])) );
-      }else{
-        console.log("Failed to locate spectrum data for \'"+spectrum+"\' in fitSpectra");
-        return;
-      }
-
-      // Loop through the peaks to fit for this projection
-      for(peakIndex=0; peakIndex<peaks.length; peakIndex++){
-
-        // Determine the peak width for the fit region
-        var thisPeakWidth = Math.ceil(typicalPeakWidth(peaks[peakIndex],"HPGe")*2);
-
-        //set up peak fit
-        console.log('fitting '+spectrum+', peak '+peakIndex);
-        dataStore.currentPeak = peakIndex;
-        if(!dataStore.ROI[dataStore.currentPlot]){ dataStore.ROI[dataStore.currentPlot] =[]; }
-        if(!dataStore.ROI[dataStore.currentPlot][dataStore.currentPeak]){ dataStore.ROI[dataStore.currentPlot][dataStore.currentPeak] = []; }
-        dataStore.ROI[dataStore.currentPlot][dataStore.currentPeak][0] = parseInt(peaks[peakIndex] - thisPeakWidth);
-        dataStore.ROI[dataStore.currentPlot][dataStore.currentPeak][1] = parseInt(peaks[peakIndex] + thisPeakWidth);
-        dataStore.viewers[viewerName].FitLimitLower = peaks[peakIndex] - thisPeakWidth;
-        dataStore.viewers[viewerName].FitLimitUpper = peaks[peakIndex] + thisPeakWidth;
-        dataStore.viewers[viewerName].fitData(spectrum, 0);
-      }
-
-      //dump data so it doesn't stack up
-      dataStore.viewers[viewerName].removeData(spectrum);
-    }
-
-
-    function fitCallback(center, width, amplitude, intercept, slope){
-      //after fitting, log the fit results, as well as any modification made to the ROI by the fitting algortihm
-      //also update table
-      //<center>: number; center of gaussian peak
-      //<width>: number; width of peak
-      //<amplitude>: number; amplitude of peak
-      //<intercept>: number; intercept of linear background beneath peak
-      //<slope>: number; slope of linear background
-      console.log("fitCallback");
-
-      var refitPeak = document.getElementById('refitPeakButton');
-      var viewerName = dataStore.plots[0];
-
-      // Calculate peak area here
-      var grossArea = 0,
-      netArea = 0,
-      integral = 0,
-      functionVals = [],
-      i, x, sigmas = 5, stepSize = 0.01;
-      //calculate peak area in excess of background, for <sigmas> up and down.
-      for(i=0; i<2*sigmas*width/stepSize; i++){
-        x = center - sigmas*width + i*stepSize
-        functionVals.push( gauss(amplitude, center, width, x)*stepSize )
-        integral = functionVals.integrate()
-      }
-      var area = parseInt(integral.toFixed(0));
-
-      // Calculate the Full Width at Half Maximum (FWHM) here
-      var fwhm = (width*2.35);
-
-      //keep track of fit results and peak area
-      console.log("Save fit results for "+dataStore.currentPlot+", "+dataStore.currentPeak);
-      if(!dataStore.fitResults[dataStore.currentPlot]) dataStore.fitResults[dataStore.currentPlot] = [];
-      dataStore.fitResults[dataStore.currentPlot][dataStore.currentPeak] = [amplitude, center, width, intercept, slope, area, fwhm];
-
-      // Update the ROI in case they were modified by the fitting routine
-      // DO WE NEED ROI ANY MORE? Yes, for addFitLines
-      dataStore.ROI[dataStore.currentPlot][dataStore.currentPeak][0] = dataStore.viewers[viewerName].FitLimitLower;
-      dataStore.ROI[dataStore.currentPlot][dataStore.currentPeak][1] = dataStore.viewers[viewerName].FitLimitUpper;
-
-      //disengage fit mode buttons
-      //if( parseInt(refitPeak.getAttribute('engaged'),10) == 1)
-      //refitPeak.onclick();
-    }
-
-
-
-    function addFitLines(){
-      //add current fits to the plot
-      console.log('addFitLines');
-
-      var fitLines = [];
-      var viewerName = dataStore.plots[0];
-
-      dataStore.viewers[viewerName].containerFit.removeAllChildren();
-
-      // fitting projections for summing corrections
-      console.log(dataStore);
-      console.log(dataStore.ROI);
-      console.log(dataStore.fitResults);
-      console.log(dataStore.currentPlot);
-
-      // Bail out of no fitResults yet
-      if(!dataStore.fitResults[dataStore.currentPlot]){
-        console.log('No fitResults yet for '+dataStore.currentPlot+' in addFitLines so bailing out');
-        return;
-      }
-
-      // Loop through the peaks for this spectrum
-      for(i=0; i<dataStore.ROI[dataStore.currentPlot].length; i++){
-        //add fit lines
-        console.log('Add fit lines for '+dataStore.currentPlot+', peak '+i);
-        fitLines[i] = dataStore.viewers[viewerName].addFitLine(
-          dataStore.ROI[dataStore.currentPlot][i][0],
-          dataStore.ROI[dataStore.currentPlot][i][1] - dataStore.ROI[dataStore.currentPlot][i][0],
-          dataStore.fitResults[dataStore.currentPlot][i][0],
-          dataStore.fitResults[dataStore.currentPlot][i][1],
-          dataStore.fitResults[dataStore.currentPlot][i][2],
-          dataStore.fitResults[dataStore.currentPlot][i][3],
-          dataStore.fitResults[dataStore.currentPlot][i][4]
-        );
-
-        dataStore.viewers[viewerName].containerFit.addChild(fitLines[i]);
-      }
-
-      dataStore.viewers[viewerName].stage.update();
-    }
