@@ -304,21 +304,34 @@ function XHR(url, errorMessage, callback, reject){
   req.onload = function() {
     // This is called even on 404 etc
     // so check the status
+      console.log("XHR on load");
+    console.log(req);
     if (req.status == 200) {
       callback(req.response);
     }
     else {
+      console.log("XHR onload with error");
+      console.log(req);
       reject(ErrorConnectingToAnalyzerServer(req.statusText));
     }
   };
 
   // Handle network errors
   req.onerror = function() {
+    console.log("XHR on error");
+    console.log(this);
+    temporary_error_handler(req);
     reject(ErrorConnectingToAnalyzerServer(errorMessage));
-  };
+  }.bind(req);
 
   // Make the request
   req.send();
+}
+
+function temporary_error_handler(req){
+console.log("temporary_error_handler:");
+console.log(req);
+
 }
 
 function RCS(data, theory, parameters){
