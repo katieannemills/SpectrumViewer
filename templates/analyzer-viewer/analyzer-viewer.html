@@ -10,9 +10,8 @@
         <div id="HistoFilesTableContainerDiv">
           <div class='container-fluid'>
             <div class='row'>
-              <div class='col-md-2'><h5>Histogram File Directory:</h5></div>
+              <div class='col-md-2'><h5 id="histoDirViewerDiv">Histogram File Directory:</h5></div>
               <div class='col-md-4' id='HistoDirectoryInputDivViewer'></div>
-              <div class='col-md-2' id='HistoDirectoryRefreshDivViewer'></div>
             </div>
             <div class='row'>
               <div class='col-md-2'><h5>Filename for Summed Histogram file:</h5></div>
@@ -142,16 +141,16 @@
     }.bind(newButton);
     document.getElementById('launchAppsDiv').appendChild(newButton);
 
-    // Create Refresh button for fetching histograms list
+    // Create refresh button for the histogram directory
     newButton = document.createElement('button');
-    newButton.setAttribute('id', 'refreshHistosListButton');
-    newButton.setAttribute('class', 'btn btn-default btn-lg');
-    newButton.innerHTML = "Refresh Histogram list";
+    newButton.setAttribute('id', 'refreshViewerHistoDir');
+    newButton.setAttribute('class', 'btn btn-default btn-sm');
+    newButton.innerHTML = "<span class=\"glyphicon glyphicon-refresh\"></span>";
     newButton.style.padding = '4px';
     newButton.onclick = function(){
-       getHistoFileListFromServer();
+    getHistoFileListFromServer();
     }.bind(newButton);
-    document.getElementById('HistoDirectoryRefreshDivViewer').appendChild(newButton);
+    document.getElementById('histoDirViewerDiv').appendChild(newButton);
 
     // set up event listeners
     listener(wrapperID, 'requestViewerRefresh', setupViewerContent);
