@@ -20,13 +20,13 @@
             <h2>Sort MIDAS files</h2>
 	<div id='JobSubmit'>
 	  <div class='container-fluid'>
-	      <div class='col-md-2'><h5>MIDAS Data File Directory:</h5></div>
+	      <div class='col-md-2'><h5 id="dataDirDiv">MIDAS Data File Directory:</h5></div>
 	      <div class='col-md-4' id='DataDirectoryInputDiv'></div>
 	      <div class='col-md-2'><h5>Configuration File Directory:</h5></div>
 	      <div class='col-md-4' id='ConfigDirectoryInputDiv'></div>
 	    </div>
 	  <div class='container-fluid'>
-	      <div class='col-md-2'><h5>Histogram File Directory:</h5></div>
+	      <div class='col-md-2'><h5 id="histoDirDiv">Histogram File Directory:</h5></div>
 	      <div class='col-md-4' id='HistoDirectoryInputDivSorting'></div>
 	      <div class='col-md-2'><h5>Source of calibration coefficients:</h5></div>
 	      <div class='col-md-4' id='CalibrationSourceInputDiv'></div>
@@ -106,27 +106,50 @@
     }.bind(newButton);
       document.getElementById('submitDivTable').appendChild(newButton);
 
-			    // Create Connect to Online button
-			    newButton = document.createElement('button');
-			    newButton.setAttribute('id', 'submitConnectOnlineButtonGrsmid00');
-			    newButton.setAttribute('class', 'btn btn-default btn-md');
-			    newButton.innerHTML = "Connect to online MIDAS grsmid00";
-			    newButton.style.padding = '4px';
-			    newButton.onclick = function(){
-			    SubmitConnectToOnline('grsmid00');
-			    }.bind(newButton);
-			      document.getElementById('submitDivOnline').appendChild(newButton);
+    // Create Connect to Online button
+    newButton = document.createElement('button');
+    newButton.setAttribute('id', 'submitConnectOnlineButtonGrsmid00');
+    newButton.setAttribute('class', 'btn btn-default btn-md');
+    newButton.innerHTML = "Connect to online MIDAS grsmid00";
+    newButton.style.padding = '4px';
+    newButton.onclick = function(){
+    SubmitConnectToOnline('grsmid00');
+    }.bind(newButton);
+      document.getElementById('submitDivOnline').appendChild(newButton);
 
-						    // Create Connect to Online button
-						    newButton = document.createElement('button');
-						    newButton.setAttribute('id', 'submitConnectOnlineButtonGrifstore1');
-						    newButton.setAttribute('class', 'btn btn-default btn-md');
-						    newButton.innerHTML = "Connect to online MIDAS grifstore1";
-						    newButton.style.padding = '4px';
-						    newButton.onclick = function(){
-						    SubmitConnectToOnline('grifstore1');
-						    }.bind(newButton);
-						      document.getElementById('submitDivOnline').appendChild(newButton);
+    // Create Connect to Online button
+    newButton = document.createElement('button');
+    newButton.setAttribute('id', 'submitConnectOnlineButtonGrifstore1');
+    newButton.setAttribute('class', 'btn btn-default btn-md');
+    newButton.innerHTML = "Connect to online MIDAS grifstore1";
+    newButton.style.padding = '4px';
+    newButton.onclick = function(){
+    SubmitConnectToOnline('grifstore1');
+    }.bind(newButton);
+      document.getElementById('submitDivOnline').appendChild(newButton);
+
+    // Create refresh button for the data directory
+    newButton = document.createElement('button');
+    newButton.setAttribute('id', 'refreshDataDir');
+    newButton.setAttribute('class', 'btn btn-default btn-sm');
+    newButton.innerHTML = "<span class=\"glyphicon glyphicon-refresh\"></span>";
+    newButton.style.padding = '4px';
+    newButton.onclick = function(){
+    getMidasFileListFromServer();
+    }.bind(newButton);
+    document.getElementById('dataDirDiv').appendChild(newButton);
+
+    // Create refresh button for the histogram directory
+    document.getElementById('dataDirDiv').appendChild(newButton);
+    newButton = document.createElement('button');
+    newButton.setAttribute('id', 'refreshDataDir');
+    newButton.setAttribute('class', 'btn btn-default btn-sm');
+    newButton.innerHTML = "<span class=\"glyphicon glyphicon-refresh\"></span>";
+    newButton.style.padding = '4px';
+    newButton.onclick = function(){
+    getHistoFileListFromServer();
+    }.bind(newButton);
+    document.getElementById('histoDirDiv').appendChild(newButton);
 
     // set up event listeners
     listener(wrapperID, 'requestSortingRefresh', setupSortingContent);
