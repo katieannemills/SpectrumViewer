@@ -40,7 +40,6 @@
     <div id='histo-list-directory-div' class='col-md-6'>Histogram Directory: </div>
     <div id='histo-list-menu-div' class='col-md-3'></div>
   </div>
-  <div id='messageDiv' class='col-md-12'></div>
   <div id='analyzerPlots'>
 
     <nav class="navbar navbar-default">
@@ -53,6 +52,10 @@
       </div><!-- /.container-fluid -->
     </nav>
 
+  </div>
+
+  <div id='messageDiv' class='col-md-12'>
+    <div id='messageDivText'></div><div id='messageDivButton'></div>
   </div>
 
   <!--Plotting-->
@@ -161,6 +164,17 @@
 
     _plotControl2d.setup();
     setupFooter('foot');
+
+          // Inject the dismiss button to the messageDiv
+          newButton = document.createElement('button');
+          newButton.setAttribute('id', 'messageDivDismissButton');
+          newButton.setAttribute('class', 'btn btn-default btn-lg');
+          newButton.innerHTML = "Dismiss";
+          //newButton.style.padding = '4px';
+          newButton.onclick = function(){
+            ClearErrorConnectingToAnalyzerServer();
+          }.bind(newButton);
+          document.getElementById('messageDivButton').appendChild(newButton);
 
     //start with Coincidence matrix menu displayed
     // document.getElementById(dataStore.backendHost).onclick();

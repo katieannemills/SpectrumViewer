@@ -79,6 +79,7 @@ function promiseJSONURL(url){
   return new Promise(function(resolve, reject) {
     // Do the usual XHR stuff
     var req = new XMLHttpRequest();
+    req.timeout = 5000; // time in milliseconds
     req.open('GET', url);
 
     req.onload = function() {
@@ -160,6 +161,7 @@ function promisePartial(name){
   return new Promise(function(resolve, reject) {
     // Do the usual XHR stuff
     var req = new XMLHttpRequest();
+    req.timeout = 5000; // time in milliseconds
     req.open('GET', url);
 
     req.onload = function() {
@@ -193,12 +195,17 @@ function promiseXHR(url, errorMessage, callback, reject){
   return new Promise(function(resolve, reject) {
     // Do the usual XHR stuff
     var req = new XMLHttpRequest();
+    req.timeout = 5000; // time in milliseconds
     req.open('GET', url);
 
     req.onload = function() {
       // This is called even on 404 etc
       // so check the status
       if (req.status == 200) {
+        // Clear any previosuly reported errors
+          if(req.responseURL.split("cmd=")[1] != "getSortStatus"){
+            ClearErrorConnectingToAnalyzerServer();
+          }
         // Call the callback function
         callback(req.response);
         // Resolve the promise with the response text
@@ -299,39 +306,40 @@ function XHR(url, errorMessage, callback, reject){
   //generic XHR request guts
 
   var req = new XMLHttpRequest();
+  req.timeout = 5000; // time in milliseconds
   req.open('GET', url);
 
   req.onload = function() {
     // This is called even on 404 etc
     // so check the status
-      console.log("XHR on load");
-    console.log(req);
     if (req.status == 200) {
+      if(req.responseURL.split("cmd=")[1] != "getSortStatus"){
+        ClearErrorConnectingToAnalyzerServer();
+      }
       callback(req.response);
     }
     else {
-      console.log("XHR onload with error");
-      console.log(req);
-      reject(ErrorConnectingToAnalyzerServer(req.statusText));
+      //reject(ErrorReceivedFromAnalyzerServer(req.response));
+      ErrorReceivedFromAnalyzerServer(req.response);
+      if(reject != undefined){ reject(req.response); }
     }
   };
 
-  // Handle network errors
+  // Handle server error responses
   req.onerror = function() {
-    console.log("XHR on error");
-    console.log(this);
-    temporary_error_handler(req);
-    reject(ErrorConnectingToAnalyzerServer(errorMessage));
-  }.bind(req);
+    //reject(ErrorReceivedFromAnalyzerServer(req.response));
+    ErrorReceivedFromAnalyzerServer(req.response);
+    if(reject != undefined){ reject(req.response); }
+  };
+
+  // Handle network errors
+  req.ontimeout = function(){
+    ErrorConnectingToAnalyzerServer("Server not responding");
+    reject(ErrorConnectingToAnalyzerServer("Server not responding"));
+  };
 
   // Make the request
   req.send();
-}
-
-function temporary_error_handler(req){
-console.log("temporary_error_handler:");
-console.log(req);
-
 }
 
 function RCS(data, theory, parameters){
@@ -538,7 +546,7 @@ function getMidasFileListFromServer(){
   var directoryPath = dataStore.midasFileDataDirectoryPath;
   if(directoryPath == undefined){ directoryPath = dataStore.midasFileDataDirectoryPath = dataStore.histoFileDirectoryPath; }
   var url = dataStore.spectrumServer + '/?cmd=getDatafileList&dir='+dataStore.midasFileDataDirectoryPath;
-  XHR(url, "Problem getting list of MIDAS files from analyzer server", processMidasFileList, function(error){ErrorConnectingToAnalyzerServer(error)});
+  XHR(url, "Problem getting list of MIDAS files from analyzer server", processMidasFileList, );
 
 }
 
@@ -600,9 +608,6 @@ function GetSpectrumListFromServer(ServerName, callback){
 function processConfigFile(payload){
   // callback after getting the Config file containing the Global conditions, Gates conditions and Histogram definitions from the server/ODB
   // finish initial setup
-
-  // A response was received from the server, so ensure the connection error is not displayed
-  ClearErrorConnectingToAnalyzerServer();
 
   // Unpack the response and place the response from the server into the dataStore
   // Protect against an empty response
@@ -693,9 +698,6 @@ function processConfigFile(payload){
 }
 
 function processMidasFileList(payload){
-
-  // A response was received from the server, so ensure the connection error is not displayed
-  ClearErrorConnectingToAnalyzerServer();
 
   // receive the payload and split into an array of strings
   var thisPayload = payload.split("]")[0].split("[ \n")[1];
@@ -796,9 +798,6 @@ function processMidasFileList(payload){
 
 function processMidasFileDetails(payload){
 
-  // A response was received from the server, so ensure the connection error is not displayed
-  ClearErrorConnectingToAnalyzerServer();
-
   // receive the payload and split into an array of strings
   var thisPayload = payload.split("]")[0].split("[ \n")[1];
 
@@ -850,9 +849,6 @@ function processMidasFileDetails(payload){
 }
 
 function processHistoFileList(payload){
-
-  // A response was received from the server, so ensure the connection error is not displayed
-  ClearErrorConnectingToAnalyzerServer();
 
   // receive the payload and split into an array of strings
   var thisPayload = payload.split(" ]")[0].split("[ \n")[1];
@@ -915,7 +911,7 @@ function setupHistoListSelect(){
 
 function ErrorConnectingToAnalyzerServer(error){
   var string = 'Problem connecting to analyzer server: '+dataStore.spectrumServer+'<br>'+error;
-  document.getElementById('messageDiv').innerHTML = string;
+  document.getElementById('messageDivText').innerHTML = string;
   document.getElementById('messageDiv').style.display= 'block';
 
   // Slow down the heartbeat if the server is not responding
@@ -930,10 +926,13 @@ function ClearErrorConnectingToAnalyzerServer(){
   dataStore.heartbeatTimer = dataStore.heartbeatIntervalDEFAULTvalue;
 }
 
-function processSpectrumList(payload,callback){
+function ErrorReceivedFromAnalyzerServer(errorText){
+  var string = 'Error returned from server ['+dataStore.spectrumServer+']:<br>'+errorText;
+  document.getElementById('messageDivText').innerHTML = string;
+  document.getElementById('messageDiv').style.display= 'block';
+}
 
-  // A response was received from the server, so ensure the connection error is not displayed
-  ClearErrorConnectingToAnalyzerServer();
+function processSpectrumList(payload,callback){
 
   // We have had problems with corruption in the spectrum list. So protect against errors here
   try{

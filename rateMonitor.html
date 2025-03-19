@@ -31,6 +31,9 @@
 
     <body>
         <div id='head'></div>
+          <div id='messageDiv' class='col-md-12'>
+            <div id='messageDivText'></div><div id='messageDivButton'></div>
+          </div>
 
 	<!--Controls-->
         <div class='sectionWrapper item expand' id='rateMonitorControl'>
@@ -116,6 +119,17 @@
                 dataStore._striptoolSliders.setup();
                 dataStore._rateControl.setup();
                 setupFooter('foot');
+
+                // Inject the dismiss button to the messageDiv
+                newButton = document.createElement('button');
+                newButton.setAttribute('id', 'messageDivDismissButton');
+                newButton.setAttribute('class', 'btn btn-default btn-lg');
+                newButton.innerHTML = "Dismiss";
+                //newButton.style.padding = '4px';
+                newButton.onclick = function(){
+                  ClearErrorConnectingToAnalyzerServer();
+                }.bind(newButton);
+                document.getElementById('messageDivButton').appendChild(newButton);
 
                 //declare our one and only plot
                 dataStore._plotGrid.manageCellCreation(null, dataStore.plots[0]);

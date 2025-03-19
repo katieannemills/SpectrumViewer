@@ -32,6 +32,9 @@
 
     <body>
         <div id='head'></div>
+          <div id='messageDiv' class='col-md-12'>
+            <div id='messageDivText'></div><div id='messageDivButton'></div>
+          </div>
 
         <!--helpful hints-->
         <div class='col-md-6'>
@@ -200,6 +203,17 @@
 
                 //don't want additional plots in this app
                 deleteNode('plottingGridnewPlotButton');
+
+                                    // Inject the dismiss button to the messageDiv
+                                    newButton = document.createElement('button');
+                                    newButton.setAttribute('id', 'messageDivDismissButton');
+                                    newButton.setAttribute('class', 'btn btn-default btn-lg');
+                                    newButton.innerHTML = "Dismiss";
+                                    //newButton.style.padding = '4px';
+                                    newButton.onclick = function(){
+                                      ClearErrorConnectingToAnalyzerServer();
+                                    }.bind(newButton);
+                                    document.getElementById('messageDivButton').appendChild(newButton);
 
 
 	         // Create Mode choice buttons

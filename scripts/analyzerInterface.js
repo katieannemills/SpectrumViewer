@@ -251,6 +251,17 @@ function setupEventListeners(){
 	    setupAnalyzerViewer('AnalyzerDisplayViewer');
 	    setupFooter('foot');
 
+      // Inject the dismiss button to the messageDiv
+      newButton = document.createElement('button');
+      newButton.setAttribute('id', 'messageDivDismissButton');
+      newButton.setAttribute('class', 'btn btn-default btn-lg');
+      newButton.innerHTML = "Dismiss";
+      //newButton.style.padding = '4px';
+      newButton.onclick = function(){
+        ClearErrorConnectingToAnalyzerServer();
+      }.bind(newButton);
+      document.getElementById('messageDivButton').appendChild(newButton);
+
 	    // Launch the current time counter which includes a timeout
 	    updateTime();
 
@@ -290,7 +301,12 @@ function updateTime(){
 function processSortStatus(payload){
 
     // A response was received from the server, so ensure the connection error is not displayed
-    ClearErrorConnectingToAnalyzerServer();
+    if(document.getElementById('messageDiv').style.display == 'block'){
+      if(document.getElementById('messageDiv').innerHTML.split(" ")[0] == "Problem"){
+        // Only hide the error message if it was because the server was not responding
+         ClearErrorConnectingToAnalyzerServer();
+       }
+    }
 
     /*
     // Clear the Sort Status request lock because a response has been received

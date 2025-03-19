@@ -120,3 +120,25 @@ border-radius: 10px;
     background-color: #333333;
     margin: 4px auto;
 }
+
+#messageDiv{
+    background-color: #FF0000;
+    display: none;
+}
+#messageDivText{
+    width: 60%;
+    text-align: center;
+    margin: auto;
+    background-color: #FF0000;
+    color: white;
+    font-weight: bold;
+    font-size: large;
+}
+#messageDivButton{
+    width: 5%;
+    background-color: #FF0000;
+    margin: auto;
+    position: absolute;
+    right: 5%;
+    top: 5%;
+}

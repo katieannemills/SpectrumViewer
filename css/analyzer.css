@@ -144,13 +144,25 @@ div.no-pad{
 }
 
 #messageDiv{
-    width: 100%;
+    background-color: red;
+    display: none;
+}
+#messageDivText{
+    width: 60%;
     text-align: center;
+    margin: auto;
     background-color: red;
     color: white;
     font-weight: bold;
     font-size: large;
-    display: none;
+}
+#messageDivButton{
+    width: 5%;
+    background-color: red;
+    margin: auto;
+    position: absolute;
+    right: 5%;
+    top: 5%;
 }
 
 div.globalContent{

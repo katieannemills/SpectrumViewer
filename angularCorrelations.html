@@ -31,6 +31,9 @@
 
     <body>
       <div id='head'></div>
+        <div id='messageDiv' class='col-md-12'>
+          <div id='messageDivText'></div><div id='messageDivButton'></div>
+        </div>
 
       <div id='histo-list-container' class='container-fluid'>
         <div id='histo-list-server-div' class='col-md-3'></div>
@@ -152,6 +155,17 @@
           $(function () {
                     $('[data-toggle="tooltip"]').tooltip()
                 });
+
+                                    // Inject the dismiss button to the messageDiv
+                                    newButton = document.createElement('button');
+                                    newButton.setAttribute('id', 'messageDivDismissButton');
+                                    newButton.setAttribute('class', 'btn btn-default btn-lg');
+                                    newButton.innerHTML = "Dismiss";
+                                    //newButton.style.padding = '4px';
+                                    newButton.onclick = function(){
+                                      ClearErrorConnectingToAnalyzerServer();
+                                    }.bind(newButton);
+                                    document.getElementById('messageDivButton').appendChild(newButton);
 
                 // Plug in the onchange functions
                 document.getElementById('gamma1Input').onchange = function(){
