@@ -2,43 +2,44 @@
 
 <template id='analyzer-sorting'>
 
-    <div class='section-wrapper'>
-      <div class='col-md-12 pan' id='Sorting-Online'>
-	      <h2>Connect to a MIDAS DAQ</h2>
+  <div class='section-wrapper'>
+    <div class='col-md-8'>
+      <div id='Sorting-Jobs-Queue'>
+        <h2>Current Job Queue</h2>
+        <div id='JobsQueue'>The queue is currently empty. Submit files from the list below to sort them.</div>
+      </div>
+    </div>
+
+      <div class='col-md-4' id='Sorting-Online'>
+        <h3>Connect to a MIDAS DAQ</h3>
         <div id='submitDivOnline'></div>
-    </div>
+      </div>
+  </div>
 
-    <div class='section-wrapper'>
-        <div class='col-md-12 pan' id='Sorting-Jobs-Queue'>
-            <h2>Current Job Queue</h2>
-            <div id='JobsQueue'>The queue is currently empty. Submit files from the list below to sort them.</div>
+  <div class='section-wrapper'>
+    <div class='col-md-12 pan' id='Sorting-Job-Submit'>
+      <h2>Sort MIDAS files</h2>
+      <div id='JobSubmit'>
+        <div class='container-fluid'>
+          <div class='col-md-2'><h5 id="dataDirDiv">MIDAS Data File Directory:</h5></div>
+          <div class='col-md-4' id='DataDirectoryInputDiv'></div>
+          <div class='col-md-2'><h5>Configuration File Directory:</h5></div>
+          <div class='col-md-4' id='ConfigDirectoryInputDiv'></div>
         </div>
-    </div>
-
-    <div class='section-wrapper'>
-        <div class='col-md-12 pan' id='Sorting-Job-Submit'>
-            <h2>Sort MIDAS files</h2>
-	<div id='JobSubmit'>
-	  <div class='container-fluid'>
-	      <div class='col-md-2'><h5 id="dataDirDiv">MIDAS Data File Directory:</h5></div>
-	      <div class='col-md-4' id='DataDirectoryInputDiv'></div>
-	      <div class='col-md-2'><h5>Configuration File Directory:</h5></div>
-	      <div class='col-md-4' id='ConfigDirectoryInputDiv'></div>
-	    </div>
-	  <div class='container-fluid'>
-	      <div class='col-md-2'><h5 id="histoDirDiv">Histogram File Directory:</h5></div>
-	      <div class='col-md-4' id='HistoDirectoryInputDivSorting'></div>
-	      <div class='col-md-2'><h5>Source of calibration coefficients:</h5></div>
-	      <div class='col-md-4' id='CalibrationSourceInputDiv'></div>
-	    </div>
-            <div id='submitDivTable'></div>
-	      <h4>Select the MIDAS files to sort (Shift-click to select multiple at once), then press the button to submit them to the sort queue:</h4>
-	    <div id="MidFilesTableContainerDiv">
-	      <table id="MidFilesTable" class='analyzer-table-selectable'></table>
-	    </div>
-	  </div>
+        <div class='container-fluid'>
+          <div class='col-md-2'><h5 id="histoDirDiv">Histogram File Directory:</h5></div>
+          <div class='col-md-4' id='HistoDirectoryInputDivSorting'></div>
+          <div class='col-md-2'><h5>Source of calibration coefficients:</h5></div>
+          <div class='col-md-4' id='CalibrationSourceInputDiv'></div>
         </div>
+        <div id='submitDivTable'></div>
+        <h4>Select the MIDAS files to sort (Shift-click to select multiple at once), then press the button to submit them to the sort queue:</h4>
+        <div id="MidFilesTableContainerDiv">
+          <table id="MidFilesTable" class='analyzer-table-selectable'></table>
+        </div>
+      </div>
     </div>
+  </div>
 
 </template>
 

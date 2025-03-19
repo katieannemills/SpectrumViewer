@@ -123,7 +123,7 @@
     document.getElementById('launchAppsDiv').style.textAlign = 'right';
     newButton.style.padding = '4px';
     newButton.onclick = function(){
-      var url = "https://griffincollaboration.github.io/SpectrumViewer/energyCalibrator.html?analyzerBackend="+dataStore.spectrumServerBackend+"&analyzerPort="+dataStore.spectrumServerPort+"&histoDir="+dataStore.midasFileDataDirectoryPath;
+      var url = "https://griffincollaboration.github.io/SpectrumViewer/energyCalibrator.html?analyzerBackend="+dataStore.spectrumServerBackend+"&analyzerPort="+dataStore.spectrumServerPort+"&histoDir="+dataStore.histoFileDirectoryPath;
       window.open(url);
     }.bind(newButton);
     document.getElementById('launchAppsDiv').appendChild(newButton);
@@ -136,7 +136,7 @@
     document.getElementById('launchAppsDiv').style.textAlign = 'right';
     newButton.style.padding = '4px';
     newButton.onclick = function(){
-      var url = "https://griffincollaboration.github.io/SpectrumViewer/efficiencyFitter.html?analyzerBackend="+dataStore.spectrumServerBackend+"&analyzerPort="+dataStore.spectrumServerPort+"&histoDir="+dataStore.midasFileDataDirectoryPath;
+      var url = "https://griffincollaboration.github.io/SpectrumViewer/efficiencyFitter.html?analyzerBackend="+dataStore.spectrumServerBackend+"&analyzerPort="+dataStore.spectrumServerPort+"&histoDir="+dataStore.histoFileDirectoryPath;
       window.open(url);
     }.bind(newButton);
     document.getElementById('launchAppsDiv').appendChild(newButton);

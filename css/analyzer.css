@@ -146,9 +146,11 @@ div.no-pad{
 #messageDiv{
     background-color: red;
     display: none;
+    min-height: 31px;
 }
 #messageDivText{
     width: 60%;
+    min-height: 31px;
     text-align: center;
     margin: auto;
     background-color: red;
@@ -158,6 +160,7 @@ div.no-pad{
 }
 #messageDivButton{
     width: 5%;
+    min-height: 31px;
     background-color: red;
     margin: auto;
     position: absolute;
