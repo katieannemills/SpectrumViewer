@@ -989,7 +989,7 @@ function saveHistogramChangeToAnalyzerODB(histogramNumber){
 	};
 
     // Check for special characters that are not allowed
-    var specials = ['&','=','{','}','?','!'];
+    var specials = ['&','=','{','}','?','!',':'];
     for(var i=0; i<specials.length; i++){
 	if(newContents.name.includes(specials[i])){
 	    // We have a problem character

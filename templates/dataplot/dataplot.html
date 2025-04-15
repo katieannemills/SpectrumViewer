@@ -12,7 +12,7 @@
         this.wrapID = wrapID;
     this.wrap = document.getElementById(wrapID);
     this.IDNum = IDNum;
-    
+
         this.setup = function(IDNum){
 
             // Set a value if this is undefined
@@ -20,20 +20,21 @@
                this.IDNum = 0;
             }else{
                this.IDNum = IDNum;
-            }   
-            
+            }
+
             //inject template
             this.wrap.innerHTML = Mustache.to_html(dataStore.templates.dataplot, {'id': this.wrapID});
 
             // custom event listeners
             listener(this.wrapID, 'updateDyData'+this.IDNum, this.updateData.bind(this))
             listener(
-                this.wrapID, 
-                'setDyVisible'+this.IDNum,                 
+                this.wrapID,
+                'setDyVisible'+this.IDNum,
                 function(event){
                     this.setVisible(event.detail.index, event.detail.isVisible)
                 }.bind(this)
             )
+            listener(this.wrapID, 'redrawDataplot'+this.IDNum, this.redraw.bind(this))
 
             this.initializePlot(dataStore.plotInitData[this.IDNum], dataStore.plotStyle[this.IDNum]);
         },
@@ -55,7 +56,7 @@
             //catch an event carrying new data, and update.
             //<event>: event; updateDyData custom event
             //this: dataplot object
-    
+
             var keys, i, annotations;
 
             // Add the new data to the plot
@@ -63,7 +64,7 @@
 
             // Fix the Y axis range with latest numbers from the datastore
             this.dygraph.updateOptions( { axes: { y : { valueRange: [dataStore.YAxisMinValue[this.IDNum][0],dataStore.YAxisMaxValue[this.IDNum][0]] } } } );
-            this.dygraph.updateOptions( { axes: { y2: { valueRange: [dataStore.YAxisMinValue[this.IDNum][1],dataStore.YAxisMaxValue[this.IDNum][1]] } } } ); 
+            this.dygraph.updateOptions( { axes: { y2: { valueRange: [dataStore.YAxisMinValue[this.IDNum][1],dataStore.YAxisMaxValue[this.IDNum][1]] } } } );
 
             //check for annotations to add
             //update annotations
@@ -92,6 +93,16 @@
             //this: dataplot object
 
             this.dygraph.setVisibility(index, isVisible);
+        },
+
+        this.redraw = function(){
+            // trigger a redraw
+            //this: dataplot object
+
+            // Fix the Y axis range with latest numbers from the datastore
+            this.dygraph.updateOptions( { axes: { y : { valueRange: [dataStore.YAxisMinValue[this.IDNum][0],dataStore.YAxisMaxValue[this.IDNum][0]] } } } );
+            this.dygraph.updateOptions( { axes: { y2: { valueRange: [dataStore.YAxisMinValue[this.IDNum][1],dataStore.YAxisMaxValue[this.IDNum][1]] } } } );
+
         }
 
     }

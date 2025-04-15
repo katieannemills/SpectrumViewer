@@ -94,9 +94,10 @@
                 <div class='col-md-8' id='plotCtrl'></div>
                 <div class='sectionWrapper refitButtons'>
                     <div class='col-md-12'>
-                        <button type="button" class="btn btn-default btn-lg" id='fitLow' engaged='0'>
-                            <span id='refitLoBadge' class="glyphicon glyphicon-equalizer" aria-hidden="true"></span>
-                            <span id='loText'>Refit a Peak</span>
+                        <select id="refitSelect"></select>
+                        <button type="button" class="btn btn-default btn-lg" id='refitButton' engaged='0'>
+                            <span id='refitButtonBadge' class="glyphicon glyphicon-equalizer" aria-hidden="true"></span>
+                            <span id='refitButtonText'>Refit this Peak</span>
                         </button>
                     </div>
                 </div>
@@ -122,63 +123,62 @@
         <div id='foot'></div>
 
         <script>
-            window.addEventListener('HTMLImportsLoaded', function(e) {
+        window.addEventListener('HTMLImportsLoaded', function(e) {
 
-                dataStore._plotGrid = new plotGrid('plottingGrid');
-                dataStore._plotControl = new plotControl('plotCtrl', 'horizontal');
+          dataStore._plotGrid = new plotGrid('plottingGrid');
+          dataStore._plotControl = new plotControl('plotCtrl', 'horizontal');
 
-                dataStore.templates = prepareTemplates(['header', 'paginationMenu', 'energyCalibratorDetectorReport', 'energyCalibratorCoefficienctsReport', 'energyCalibratorDetectorReportTable', 'energyCalibratorCoefficientsReportTable', 'plotGrid', 'plotControl', 'plotListLite', 'dataplot', 'footer']);
+          dataStore.templates = prepareTemplates(['header', 'paginationMenu', 'energyCalibratorDetectorReport', 'energyCalibratorCoefficienctsReport', 'energyCalibratorDetectorReportTable', 'energyCalibratorCoefficientsReportTable', 'plotGrid', 'plotControl', 'plotListLite', 'dataplot', 'footer']);
 
-                setupHeader('head', 'Energy Calibrator');
-          	    setupPaginationMenu('menu');
-                dataStore._plotGrid.setup();
-                dataStore._plotControl.setup();
-                //set up spectrum cell
-                dataStore._plotGrid.manageCellCreation(null, dataStore.plots[0]);
-                setupFooter('foot');
+          setupHeader('head', 'Energy Calibrator');
+          setupPaginationMenu('menu');
+          dataStore._plotGrid.setup();
+          dataStore._plotControl.setup();
+          //set up spectrum cell
+          dataStore._plotGrid.manageCellCreation(null, dataStore.plots[0]);
+          setupFooter('foot');
 
-                //don't want additional plots in this app
-	        deleteNode('plottingGridnewPlotButton');
+          //don't want additional plots in this app
+          deleteNode('plottingGridnewPlotButton');
 
-                    // Inject the dismiss button to the messageDiv
-                    newButton = document.createElement('button');
-                    newButton.setAttribute('id', 'messageDivDismissButton');
-                    newButton.setAttribute('class', 'btn btn-default btn-lg');
-                    newButton.innerHTML = "Dismiss";
-                    //newButton.style.padding = '4px';
-                    newButton.onclick = function(){
-                      ClearErrorConnectingToAnalyzerServer();
-                    }.bind(newButton);
-                    document.getElementById('messageDivButton').appendChild(newButton);
+          // Inject the dismiss button to the messageDiv
+          newButton = document.createElement('button');
+          newButton.setAttribute('id', 'messageDivDismissButton');
+          newButton.setAttribute('class', 'btn btn-default btn-lg');
+          newButton.innerHTML = "Dismiss";
+          newButton.onclick = function(){
+            ClearErrorConnectingToAnalyzerServer();
+          }.bind(newButton);
+          document.getElementById('messageDivButton').appendChild(newButton);
 
-	// Create the text input for the Histogram file directory and file inputs
-	var newLabel = document.createElement("label");
-	newLabel.for = 'HistoDirectoryInput';
-	newLabel.innerHTML = 'Directory of Histogram files: ';
-	document.getElementById('histoChoiceDir').appendChild(newLabel);
+          // Create the text input for the Histogram file directory and file inputs
+          var newLabel = document.createElement("label");
+          newLabel.for = 'HistoDirectoryInput';
+          newLabel.innerHTML = 'Directory of Histogram files: ';
+          document.getElementById('histoChoiceDir').appendChild(newLabel);
 
-	newInput = document.createElement('input');
-	newInput.id = 'HistoDirectoryInput';
-	newInput.type = 'text';
-	newInput.style.width = '400px';
-	newInput.value = dataStore.histoFileDirectoryPath;
-	newInput.onchange = function(){
-	dataStore.histoFileDirectoryPath = this.value;
-	getHistoFileListFromServer();
-	}.bind(newInput);
-	document.getElementById('histoChoiceDir').appendChild(newInput);
+          newInput = document.createElement('input');
+          newInput.id = 'HistoDirectoryInput';
+          newInput.type = 'text';
+          newInput.style.width = '400px';
+          newInput.value = dataStore.histoFileDirectoryPath;
+          newInput.onchange = function(){
+            dataStore.histoFileDirectoryPath = this.value;
+            getHistoFileListFromServer();
+          }.bind(newInput);
+          document.getElementById('histoChoiceDir').appendChild(newInput);
 
-	// Grab the histogram list for the default directory
-	getHistoFileListFromServer();
-  getMidasFileListFromServer(); // The request for details follows this
+          // Grab the histogram list for the default directory
+          getHistoFileListFromServer();
+          getMidasFileListFromServer(); // The request for details follows this
 
-	        $(function () {
-                    $('[data-toggle="tooltip"]').tooltip()
-                });
-            });
+          $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+          });
+        });
 
-            // Set up event listener
-            listener('histoChoiceBar', 'midasFileDetailsAvailable', addTitlesToHistoListSelect);
+        // Set up event listener
+        listener('histoChoiceBar', 'midasFileDetailsAvailable', addTitlesToHistoListSelect);
         </script>
-    </body>
-</html>
+      </body>
+      </html>

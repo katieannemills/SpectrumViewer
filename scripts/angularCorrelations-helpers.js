@@ -1,6 +1,143 @@
 // Most of these functions are originally taken getConfigFileFromServer
 // https://github.com/GRIFFINCollaboration/AngularCorrelationUtility
 // Credit to them
+
+/////////////////////////////////
+//recalculation functions related to the form inputs
+//////////////////////////////////
+
+function recalculate_L(transition){
+    // transition == 1 -> first transition; 2 -> second transition.
+
+    var jOrig = parseFloat(document.getElementById("j" + transition).value),
+        jFinal = parseFloat(document.getElementById("j" + (transition+1)).value),
+        lMin, lMax, lA, lB, i, j,
+        radio, label, chosenMomenta,
+        momenta = ['l'+transition+'a', 'l'+transition+'b'],
+        momenta_options = [document.getElementById('l'+transition+'a_value'), document.getElementById('l'+transition+'b_value')];
+
+    lMin = Math.abs(jFinal-jOrig);
+    lMax = Math.abs(jFinal+jOrig);
+    if (lMin==0){
+        lMin = 1;
+    }
+    lA = lMin;
+    lB = lA+1;
+    if (lMin==lMax){
+        lB = lA;
+    }
+    chosenMomenta = [lA, lB];
+
+    for(j=0; j<momenta.length; j++){
+        momenta_options[j].innerHTML = '';
+
+        label = document.createElement('label');
+        label.innerHTML = "L<sub>" + momenta[j].slice(1) + "</sub>";
+        momenta_options[j].appendChild(label);
+
+        for (i = lMin; i<=lMax; i++){
+            radio = document.createElement('input');
+            radio.setAttribute('type', 'radio');
+            radio.setAttribute('name', momenta[j]);
+            radio.setAttribute('value', i);
+            radio.setAttribute('id', momenta[j] + '_' + i);
+            radio.onchange = recalculate;
+            if(i == chosenMomenta[j])
+                radio.setAttribute('checked', true);
+            momenta_options[j].appendChild(radio);
+
+            label = document.createElement('label');
+            label.setAttribute('for', momenta[j] + '_' + i);
+            label.innerHTML = i;
+            momenta_options[j].appendChild(label);
+        }
+    }
+};
+
+function check_jvalues(){
+
+    var j1 = parseFloat(document.getElementById("j1").value);
+        j2 = parseFloat(document.getElementById("j2").value),
+        j3 = parseFloat(document.getElementById("j3").value),
+
+    document.getElementById("error1").innerHTML = "";
+
+    if (j2==0 && (j1==0 || j3==0)){
+        j2 = 1;
+        document.getElementById("j2").value = 1;
+        alert("No 0 to 0 transitions allowed. Setting J2 to 1");
+    }
+};
+
+function recalculate(){
+
+    var j1 = parseFloat(document.getElementById("j1").value),
+        j2 = parseFloat(document.getElementById("j2").value),
+        j3 = parseFloat(document.getElementById("j3").value),
+
+        l1a = parseFloat($('input[name="l1a"]:checked').val()),
+        l1b = parseFloat($('input[name="l1b"]:checked').val()),
+        l2a = parseFloat($('input[name="l2a"]:checked').val()),
+        l2b = parseFloat($('input[name="l2b"]:checked').val()),
+
+        d1 = parseFloat($('#mix1').val()),
+        d2 = parseFloat($('#mix2').val()),
+        i, j, row,
+        noL1mix = false,
+        noL2mix = false,
+        min = dataStore.minMix,
+        max = dataStore.maxMix;
+
+    if (l1a==l1b){
+        noL1mix = true;
+        if (d1!=0){
+            d1 = 0;
+            $('#mix1').val(d2);
+            $('#delta1-slider').val(d2);
+            alert("can't have mixing; only multipolarity selected is "+l1a);
+        }
+        $('#delta1-slider').attr('disabled', 'true');
+    } else {
+        $('#delta1-slider').removeAttr('disabled');
+    }
+    if (l2a==l2b){
+        noL2mix = true;
+		if (d2!=0){
+		    d2 = 0;
+		    $('#mix2').val(d2);
+            $('#delta2-slider').val(d2);
+		    alert("Can't have mixing; only multipolarity selected is "+l2a);
+		}
+		$('#delta2-slider').attr('disabled', 'true');
+    } else {
+		$('#delta2-slider').removeAttr('disabled');
+    }
+
+    //a2 and a4 plots
+    //generate data
+
+    dataStore.x = [];
+    dataStore.y = [];
+    dataStore.mixingRatioLabels = [];
+    for(i=0; i<=dataStore.steps; i++){
+        dataStore.x.push(min + (max-min)*i/dataStore.steps);
+        dataStore.y.push(min + (max-min)*i/dataStore.steps);
+        dataStore.mixingRatioLabels.push('Mixing: ' + dataStore.x[i].toFixed(6));
+    }
+
+    dataStore.a2 = [];
+    dataStore.a4 = [];
+    for(i=0; i<=dataStore.steps; i++){
+        dataStore.a2[i] = []
+        dataStore.a4[i] = []
+        for(j=0; j<=dataStore.steps; j++){
+            dataStore.a2[i][j] = dataStore.A2[i]*dataStore.B2[j];
+            dataStore.a4[i][j] = dataStore.A4[i]*dataStore.B4[j];
+        }
+    }
+
+};
+
 //////////////////
 // Physics
 //////////////////
@@ -19,20 +156,29 @@ function calculate_a4(j1, j2, j3, l1a, l1b, l2a, l2b, delta1, delta2){
 };
 
 function ClebschGordan(j1, m1, j2, m2, j, m){
-    var term, cg, term1, sum, k
+    var term, cg, term1, sum, k;
 
-    // Conditions check
-    if( 2*j1 != Math.floor(2*j1) ||
-        2*j2 !=   Math.floor(2*j2) ||
-        2*j !=   Math.floor(2*j) ||
-        2*m1 !=   Math.floor(2*m1) ||
-        2*m2 !=   Math.floor(2*m2) ||
-        2*m !=   Math.floor(2*m) ){
+        // Conditions check
+        if( 2*j1 != Math.floor(2*j1) ||
+            2*j2 !=   Math.floor(2*j2) ||
+            2*j !=   Math.floor(2*j) ||
+            2*m1 !=   Math.floor(2*m1) ||
+            2*m2 !=   Math.floor(2*m2) ||
+            2*m !=   Math.floor(2*m) ){
 
-        //G4cout << "All arguments must be integers or half-integers." << G4endl;
-        return 0;
-    }
+            //G4cout << "All arguments must be integers or half-integers." << G4endl;
+            return 0;
+        }
 
+var string = j1+"-"+m1+"-"+j2+"-"+m2+"-"+j+"-"+m;
+
+if(typeof dataStore.cache.ClebschGordan[string] !== 'undefined'){
+  return(dataStore.cache.ClebschGordan[string]);
+};
+
+if(typeof dataStore.cache.term1[string] !== 'undefined'){
+  term1 = dataStore.cache.term1[string];
+}else{
     if(m1 + m2 != m){
         //G4cout << "m1 + m2 must equal m." << G4endl;
         return 0;
@@ -74,6 +220,8 @@ function ClebschGordan(j1, m1, j2, m2, j, m){
     }
 
     term1 = Math.pow((((2*j+1)/Factorial(j1+j2+j+1))*Factorial(j2+j-j1)*Factorial(j+j1-j2)*Factorial(j1+j2-j)*Factorial(j1+m1)*Factorial(j1-m1)*Factorial(j2+m2)*Factorial(j2-m2)*Factorial(j+m)*Factorial(j-m)),(0.5));
+}
+
     sum = 0;
 
     for(k = 0 ; k <= 99 ; k++ ){
@@ -93,6 +241,7 @@ function ClebschGordan(j1, m1, j2, m2, j, m){
     }
 
     cg = term1*sum;
+    dataStore.cache.ClebschGordan[string] = cg; // Save to the cache for fast retrieval next time
     return cg;
     // Reference: An Effective Algorithm for Calculation of the C.G.
     // Coefficients Liang Zuo, et. al.
@@ -146,6 +295,13 @@ function Wigner3j(j1, j2, j3, m1, m2, m3){
 };
 
 function Wigner6j(J1, J2, J3, J4, J5, J6){
+
+// Retrieve from cache if it has already been calculated
+  var string = J1+"-"+J2+"-"+J3+"-"+J4+"-"+J5+"-"+J6;
+  if(typeof dataStore.cache.Wigner6j[string] !== 'undefined'){
+    return(dataStore.cache.Wigner6j[string]);
+  };
+
     var j1 = J1;
         j2 = J2,
         j12 = J3,
@@ -188,6 +344,7 @@ function Wigner6j(J1, J2, J3, J4, J5, J6){
             }
         }
     }
+    dataStore.cache.Wigner6j[string] = sum; // Save to the cache for fast retrieval next time
     return sum;
 };
 
@@ -331,4 +488,13 @@ function Factorial(value){
 
         return fac;
     }
+}
+
+function syncElements(source, dest){
+    //source: string; id of element to read value from
+    //dest: string; id of element to write value to
+    //onchange callback to set the value of another element to that of this one.
+
+    var val = document.getElementById(source).value;
+    document.getElementById(dest).value = val;
 }

@@ -31,6 +31,7 @@ function setupDataStore(){
   dataStore.spectrumServer = 'http://grsmid00.triumf.ca:9093/';           //host + port of analyzer server
   dataStore.ODBhost = 'http://grsmid00.triumf.ca:8081/';                  //MIDAS / ODB host + port
   dataStore.ODBrequests = [];                 //request strings for odb parameters (needed by plotcontrol)
+  dataStore.xmltimeout = 0; // zero is setting no timeout
 
   // Histogram directory and filename
   dataStore.histoFileDirectoryPath = '/Users/garns/Work/Data';

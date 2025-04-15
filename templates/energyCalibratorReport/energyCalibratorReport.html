@@ -179,6 +179,9 @@
             //set up fit callbacks
        dataStore.viewers[dataStore.plots[0]].fitCallback = this.fitCallback.bind(this);
 
+         //plug in special fit controls
+         document.getElementById('refitButton').onclick = this.toggleFitMode;
+
             //plug in the allow Analyzer write switch
        document.getElementById(this.wrapID + 'yesDefinitelyWriteAnalyzer').onchange = this.toggleAnalyzerwrite.bind(this);
 
@@ -354,6 +357,12 @@ this.fitAllSinglesPeaks = function(){
               // Set the current detector name (crystalIndex) for this spectrum
               dataStore.currentDetector = dataStore.THESEdetectors.indexOf(dataStore.currentPlot.split(':')[1].split('_')[0]);
 
+                // Set up the drop-down list of peaks available to refit
+                var thisSelect = document.getElementById('refitSelect');
+                thisSelect.removeAttribute('disabled');
+                // Remove all options from the select
+                thisSelect.innerHTML = "";
+
                 // Loop through all peaks for this source
                 for(var i=0; i<dataStore.sourceInfo[dataStore.currentSource].literaturePeaks.length; i++){
                   //add fit lines
@@ -367,7 +376,12 @@ this.fitAllSinglesPeaks = function(){
                   dataStore.fitResults[dataStore.currentPlot][i][4]
                   );
 
+                  // Add this fitline to the canvas
                   dataStore.viewers[viewerName].containerFit.addChild(fitLines[i]);
+
+                  //add this peak as an option to the refit select
+                  var newSelect = document.createElement("select");
+                  thisSelect.add( new Option("Peak "+i+", "+dataStore.sourceInfo[dataStore.currentSource].literaturePeaks[i]+"keV", i) );
                 }
 
               dataStore.viewers[viewerName].stage.update();
@@ -750,36 +764,18 @@ this.toggleFitMode = function(){
     if(parseInt(this.getAttribute('engaged'),10) == 0){
         dataStore.viewers[viewerName].setupFitMode();
         this.setAttribute('engaged', 1);
-        if(this.id == 'fitLow')
-            document.getElementById('refitLoBadge').classList.add('red-text')
-        if(this.id == 'fitMid')
-            document.getElementById('refitMidBadge').classList.add('red-text')
-        if(this.id == 'fitHigh')
-            document.getElementById('refitHiBadge').classList.add('red-text')
-        if(this.id == 'fitvHi')
-            document.getElementById('refitvHiBadge').classList.add('red-text')
+        if(this.id == 'refitButton')
+            document.getElementById('refitButtonBadge').classList.add('red-text')
     }
     else{
         dataStore.viewers[viewerName].leaveFitMode();
         this.setAttribute('engaged', 0);
-        if(this.id == 'fitLow')
-            document.getElementById('refitLoBadge').classList.remove('red-text')
-        if(this.id == 'fitMid')
-            document.getElementById('refitMidBadge').classList.remove('red-text')
-        if(this.id == 'fitHigh')
-            document.getElementById('refitHiBadge').classList.remove('red-text')
-        if(this.id == 'fitvHi')
-            document.getElementById('refitvHiBadge').classList.remove('red-text')
+        if(this.id == 'refitButton')
+            document.getElementById('refitButtonBadge').classList.remove('red-text')
     }
 
-    if(this.id == 'fitLow')
-        dataStore.currentPeak = 0
-    else if(this.id == 'fitMid')
-        dataStore.currentPeak = 1
-    else if(this.id == 'fitHigh')
-        dataStore.currentPeak = 2
-    else
-        dataStore.currentPeak = 3
+  // Set the peak index in the datastore
+  dataStore.currentPeak = document.getElementById('refitSelect').value;
 
 },
 

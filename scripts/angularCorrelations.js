@@ -28,11 +28,15 @@ function setupDataStore(){
 
   dataStore = {};
 
+  // Cache
+  dataStore.cache = { Wigner6j: [], ClebschGordan: [], term1: [], factorial: [] }    // a cache for ClebschGordan and factorial values that are calculated often
+
   //network and raw data
   dataStore.spectrumServer = "";           //host + port of analyzer server
   dataStore.spectrumServerBackend = "";           //host + port of analyzer server
   dataStore.spectrumServerPort = "";           //host + port of analyzer server
   dataStore.ODBhost = 'http://grsmid00.triumf.ca:8081/';                  //MIDAS / ODB host + port
+  dataStore.xmltimeout = 0; // zero is setting no timeout
 
   // Histogram directory and filename
   dataStore.histoFileDirectoryPath = '/data3/S5020/Histograms';
@@ -75,22 +79,34 @@ function setupDataStore(){
   dataStore.ROI = {};                                                     //regions of interest (singles) to look for peaks in: 'plotname': {'ROIupper':[low bin, high bin], 'ROIlower': [low bin, high bin]}
   dataStore.ROIprojections = {};                                        //regions of interest (projections) to look for peaks in: 'plotname': {'ROIupper':[low bin, high bin], 'ROIlower': [low bin, high bin]}
   dataStore.fitResults = {};                                            //fit results of singles: 'plotname': [[amplitude, center, width, intercept, slope], [amplitude, center, width, intercept, slope]]
+  dataStore.fitUncertainty = {};                                            //fit results of singles: 'plotname': [[amplitude, center, width, intercept, slope], [amplitude, center, width, intercept, slope]]
   dataStore.fitResultsProjections = {};                                 //fit results of Projections: 'plotname': [[amplitude, center, width, intercept, slope], [amplitude, center, width, intercept, slope]]
 
 // Custom settings for Angular Correlations
   dataStore.angularBinRawPeakArea = [];         // place to store the raw peak area for each angular bin
+  dataStore.angularBinRawPeakAreaUnc = [];         // place to store the uncertainty in the raw peak area for each angular bin
   dataStore.angularBinTRBGPeakArea = [];         // place to store the time-random background peak area for each angular bin
+  dataStore.angularBinTRBGPeakAreaUnc = [];         // place to store the uncertainty in the time-random background peak area for each angular bin
   dataStore.angularBinTRBGFactor = [];         // place to store the time-random background factor for each angular bin
+  dataStore.angularBinTRBGFactorUnc = [];         // place to store the time-random background factor for each angular bin
   dataStore.angularBinPeakArea = [];         // place to store the peak area for each angular bin
+  dataStore.angularBinPeakAreaUnc = [];         // place to store the uncertainty in the peak area for each angular bin
   dataStore.angularBinWeight = [];           // place to store the weighting factor for each angular bin
+  dataStore.angularBinWeightUnc = [];        // place to store the weighting factor uncertainty for each angular bin
   dataStore.normalizationFactor = [];        // place to store the Normalization Factor for the angular correlation
+  dataStore.normalizationFactorUnc = [];        // place to store the Normalization Factor for the angular correlation
   dataStore.angularBinData = [];             // place to store the data value for each angular bin. raw area * bin weight * Normalization
   dataStore.angularBinDataUnc = [];          // place to store the data value uncertainty for each angular bin. raw area * bin weight * Normalization
+  dataStore.angularBinDataResiduals = [];    // place to store the residuals of the data vs best fit
   dataStore.singlesPeakArea = [];            // place to store the peak areas from each angular bin
+  dataStore.singlesPeakAreaUnc = [];            // place to store the peak areas from each angular bin
   dataStore.numCrystalPairs = [];            // place to store the number of crystal pairs for each angular bin
   dataStore.iteration = 0;
+  dataStore.bestFitCoeffs = [null,null];              // place to store best fit c2,c4 values
+  dataStore.minimaDetails = {};            // place to store best fit result values for all series
 
   dataStore.theseAngularBins = [];   // At initalization the appropriate 110/145mm data will be copied into here
+  dataStore.theseAngularBinsRadians = []; // angular bins in radians rather than degrees
   dataStore.theseGeAngles = []; // At initalization the appropriate 110/145mm data will be copied into here
 
   // angular differences in degrees for the 110mm distance. There are
@@ -257,7 +273,14 @@ function setupDataStore(){
     [43,41,35,36,49,50,51,50,33,29,35,39,26,20,19,25,18,15,9,14,34,30,24,28,46,42,39,43,47,44,45,48,36,33,37,42,21,17,23,27,9,5,8,12,7,4,3,6,22,18,12,16,31,25,26,32,10,8,15,16,1,2,1,0]
     ];
 
-
+// 60Co gg ang corr from Run run29578.tar
+ dataStore.quickDataX = [0.000, 15.442, 21.905, 29.143, 33.143, 38.382, 44.57, 47.445, 48.741, 51.473,
+  55.170, 59.978, 60.102, 62.340, 62.492, 63.423, 68.957, 71.431, 73.358, 73.629,
+   75.774, 80.942, 81.546, 83.894, 86.868, 88.966, 91.034, 93.132, 96.106, 98.454,
+    99.058, 104.226, 106.371, 106.642, 108.569, 111.043, 116.577, 117.508, 117.660,
+    119.898, 120.022, 124.830, 128.527, 131.259, 132.555, 135.430, 141.618, 146.857,
+     150.857, 158.095, 164.558, 180.000];
+ dataStore.quickDataY = [1.2, 1.1649445679515484, 1.16404404173609, 1.1534194212971343, 1.1487646735942079, 1.1319730562416195, 1.0855024174242622, 1.0955483598820324, 1.0967150537881445, 1.07477819459717, 1.0670033719253225, 1.0350595775621638, 1.0632547565661457, 1.054290250774924, 1.0397650722247835, 1.0464194928300574, 1.0382793697970039, 1.0345761445428245, 1.0213096453001547, 1.033750779388556, 1.0526274019670399, 1.0135505676433754, 1.022872761287112, 1.0229782483214198, 1.024272823171905, 1.0127807217310842, 1.0259485750877826, 1.010741956012306, 1.014006851101479, 1.0337180827684103, 1.0085204602351001, 1.0315913337747054, 1.045413973136467, 1.0273662602169433, 1.0239243794524204, 1.0302119450801877, 1.045204729193273, 1.0494111870868919, 1.0468512616814172, 1.0468137786650362, 1.0688584627515472, 1.0621886640362925, 1.0848967001474858, 1.086446504807811, 1.0831054060283596, 1.1116666070843002, 1.1222843879096187, 1.1243680235895794, 1.1433331260031783, 1.1398908022870562, 1.189665641136618, 1.2];
 
 
   //custom element config
@@ -484,35 +507,41 @@ dataStore.cellIndex = dataStore.plots.length;
 
 //resolution plot
 dataStore._dataplot = [];                 // Place for all dataplot objects to be created as an array. This makes them indexable and iteratable
-dataStore.dataplotData = [[],[]];                                       // place for dataplot data
-dataStore.dataplotDataX = [[],[]];                                       // place for dataplot data
-dataStore.dataplotDataY = [[],[]];                                       // place for dataplot data
+dataStore.dataplotData = [[],[],[]];                                       // place for dataplot data
+dataStore.dataplotDataX = [[],[],[]];                                       // place for dataplot data
+dataStore.dataplotDataY = [[],[],[]];                                       // place for dataplot data
+dataStore.dataplotDataYUnc = [[],[],[]];                                    // place for dataplot data
 dataStore.efficiencyPlotDataKeyMap = ['Abs', 'Rel', '133Ba', '152Eu', '56Co', '60Co'];
 dataStore.efficiencyPlotEquationParameters = [[],[]];
-dataStore.efficiencyPlotData = [];
-dataStore.efficiencyPlotDataUnc = [[],[],[],[],[],[]]; // Y uncertainty values for drawing the error bars
+dataStore.angCorrPlotData = [];
+dataStore.angCorrPlotData[0] = [];
+dataStore.angCorrPlotDataUnc = [[],[],[],[],[],[]]; // Y uncertainty values for drawing the error bars
 dataStore.efficiencyPlotY2Data = [];
 dataStore.efficiencyPlotY2Data[0] = [];
 dataStore.efficiencyPlotY2Data[1] = [];
-dataStore.efficiencyPlotXData = [];
-dataStore.efficiencyPlotXData[0] = [];
-dataStore.efficiencyPlotXData[1] = [];
-dataStore.efficiencyPlotData[0] = [];    // Absolute efficiency
+dataStore.angCorrPlotXData = [];
+dataStore.angCorrPlotXData[0] = [];
+dataStore.angCorrPlotXData[1] = [];
 dataStore.plotInitData = [];
 dataStore.plotInitData[0] = [[0,0], [1,0], [2,0], [3,0], [4,0]];      //initial dummy data
-dataStore.YAxisMinValue = [[0,0], [0,0], [0,0], [0,0], [0,0], [0,0]];
-dataStore.YAxisMaxValue = [[0,0], [0,0], [0,0], [0,0], [0,0], [0,0]];
+dataStore.plotInitData[1] = [[0,0], [1,0], [2,0], [3,0], [4,0]];      //initial dummy data
+dataStore.plotInitData[2] = [[0,0,0,0,0,0], [1,0,0,0,0,0], [2,0,0,0,0,0], [3,0,0,0,0,0]];      //initial dummy data
+dataStore.YAxisMinValue = [[0,0], [0,0], [0,0], [0,0], [0,0]];
+dataStore.YAxisMaxValue = [[0,0], [0,0], [0,0], [0,0], [0,0]];
 dataStore.annotations = [0,0];
 dataStore.plotStyle = [];
 dataStore.plotStyle[0] = {                                              //dygraphs style object
-  labels: ["cos(theta)", "Normalized Counts"],
+  labels: ["cos(theta)", "Experimental data"],
   title: 'GRIFFIN Gamma-gamma angular correlation',
   axisLabelColor: '#FFFFFF',
   colors: ["#AAE66A", "#EFB2F0", "#B2D1F0", "#F0DBB2"],
   labelsDiv: 'dataPlot0Legend',
   drawPoints: true,
-  underlayCallback: drawDygraphCanvasObjects,
-//  underlayCallback: drawDygraphCanvasObjects,
+  //underlayCallback: drawDygraphCanvasObjects0,
+  drawCallback: drawDygraphCanvasObjects0,
+  //highlightCallback: drawDygraphCanvasObjects0,
+  //unhighlightCallback: drawDygraphCanvasObjects0,
+  //clickCallback: drawDygraphCanvasObjects0,
   pointSize: 5,
   highlightCircleSize: 7,
   strokeWidth: 0.0,
@@ -523,10 +552,63 @@ dataStore.plotStyle[0] = {                                              //dygrap
     },
 
     y : {
-      valueRange: [0,10]
+      valueRange: [0.5,2]
     }
   }
-}
+};
+dataStore.plotStyle[1] = {                                              //dygraphs style object
+  labels: ["cos(theta)", "Residuals"],
+  title: 'Residuals',
+  axisLabelColor: '#FFFFFF',
+  colors: ["#AAE66A", "#B2D1F0", "#F0DBB2", "#EFB2F0", "#8037D4"],
+  labelsDiv: 'dataPlot1Legend',
+  drawPoints: true,
+  drawCallback: drawDygraphCanvasObjects1,
+  pointSize: 5,
+  highlightCircleSize: 7,
+  strokeWidth: 0.0,
+  legend: 'always',
+  axes: {
+    x: {
+      valueRange: [0,5000]
+    },
+
+    y : {
+      valueRange: [0.001,10]
+    }
+  }
+};
+
+dataStore.plotStyle[2] = {                                              //dygraphs style object
+  labels: ["atan(delta)", "j=0", "j=1", "j=2", "j=3", "j=4"],
+  title: 'Chi-square plot',
+  axisLabelColor: '#FFFFFF',
+  colors: ["#FF3131", "#AAE66A", "#0096FF", "#CD7F32", "#FF00FF"],
+  labelsDiv: 'dataPlot2Legend',
+  drawPoints: true,
+  logscale: true,
+  pointSize: 0,
+  highlightCircleSize: 5,
+  strokeWidth: 2.0,
+  legend: 'always',
+  axes: {
+    x: {
+      valueRange: [-1.6,1.6]
+    },
+
+    y : {
+      valueRange: [0.001,10]
+    }
+  },
+  series:{
+    "j=0":{
+                    strokeWidth: 2.0,
+                    drawPoints: true,
+                    pointSize: 6,
+                    highlightCircleSize: 8
+    }
+  }
+};
 
 
     // resolve the promise
@@ -557,7 +639,7 @@ function onloadInitialSetup(){
 
 }
 
-function drawDygraphCanvasObjects(ctx, area, layout) {
+function drawDygraphCanvasObjects0(ctx, area, layout) {
 
     // Identify which graph this is
               var thisPlotID = 0;
@@ -567,67 +649,78 @@ function drawDygraphCanvasObjects(ctx, area, layout) {
   if (dataStore.dataplotDataY.length<1) return;  // won't be set on the initial draw.
   if (dataStore.dataplotDataY[thisPlotID].length<1) return;  // won't be set on the initial draw.
 
-    drawDygraphAngCorrLine(thisPlotID, ctx, area, layout);
-  //  drawDygraphErrorBars(thisPlotID, ctx, area, layout);
+    drawDygraphErrorBars(thisPlotID, ctx, area, layout);
+    if(dataStore.bestFitCoeffs[0] != null){
+      var color = '#0096FF';
+      drawDygraphAngCorrLine(thisPlotID,dataStore.bestFitCoeffs[0],dataStore.bestFitCoeffs[1],color);
+    }
 }
 
-function drawDygraphAngCorrLine(thisPlotID, ctx, area, layout) {
-  console.log('drawLines');
+function drawDygraphCanvasObjects1(ctx, area, layout) {
 
+    // Identify which graph this is
+              var thisPlotID = 1;
+
+  // Bail out if there is no data yet
+  if (typeof(dataStore._dataplot[thisPlotID].dygraph) == 'undefined') return;  // won't be set on the initial draw.
+  if (dataStore.dataplotDataY.length<1) return;  // won't be set on the initial draw.
+  if (dataStore.dataplotDataY[thisPlotID].length<1) return;  // won't be set on the initial draw.
+
+  //  drawDygraphAngCorrLine(thisPlotID, ctx, area, layout);
+    drawDygraphErrorBars(thisPlotID, ctx, area, layout);
+}
+
+function drawDygraphAngCorrLine(thisPlotID,c2,c4,color) {
+  //console.log('drawLines');
+
+  var ctx = dataStore._dataplot[thisPlotID].dygraph.canvas_ctx_;
   var range = [-1,1];
-  var color = '#E67E22';
   var step = 0.01;
-  var c2 = 0.102, c4=0.008;
-  //ctx.save();
+  var normalizationFactor = 1.0;
   ctx.strokeStyle = color;
   ctx.lineWidth = 3.0;
 
 
-  var y1 = 1.0 + Pn(range[0],2) + Pn(range[0],4);
+  var y1 = 1.0 + (c2*Pn(range[0],2)) + (c4*Pn(range[0],4));
   var p1 = dataStore._dataplot[thisPlotID].dygraph.toDomCoords(range[0], y1);
   ctx.beginPath();
   ctx.moveTo(p1[0], p1[1]);
+  if(dataStore.DygraphAngCorrLineNormalization != undefined){
+    normalizationFactor = dataStore.DygraphAngCorrLineNormalization;
+    console.log("Normalization Factor set to "+normalizationFactor);
+  }
   for(i=range[0]+step; i<=range[1]; i+=step){
-    y1 = 1.0 + Pn(i,2) + Pn(i,4);
-    console.log([i,y1]);
+    y1 = (1.0 + (c2*Pn(i,2)) + (c4*Pn(i,4)))*normalizationFactor;
+    //console.log([i,y1]);
     var p1 = dataStore._dataplot[thisPlotID].dygraph.toDomCoords(i, y1);
     ctx.lineTo(p1[0], p1[1]);
   }
   ctx.stroke();
-  console.log(p1);
-  console.log(y1);
 }
 
 function drawDygraphErrorBars(thisPlotID, ctx, area, layout) {
-  console.log('drawErrorBars');
-  console.log(dataStore.efficiencyPlotXData[thisPlotID]);
-  console.log(dataStore.efficiencyPlotData[thisPlotID]);
-  console.log(dataStore.efficiencyPlotDataUnc[thisPlotID]);
+  console.log('drawErrorBars'+thisPlotID);
 
+  ctx = dataStore._dataplot[thisPlotID].dygraph.canvas_ctx_;
   var range = [0,5000];
-  var params = dataStore.efficiencyPlotEquationParameters[thisPlotID];
   var color = '#AAE66A';
   var step = 1;
   ctx.strokeStyle = color;
   ctx.lineWidth = 2.5;
 
-  for(i=0; i<dataStore.efficiencyPlotXData[thisPlotID].length; i++){
-    x1 = dataStore.efficiencyPlotXData[thisPlotID][i];
-    y1 = dataStore.efficiencyPlotData[thisPlotID][i] - dataStore.efficiencyPlotDataUnc[thisPlotID][i];
-    y2 = dataStore.efficiencyPlotData[thisPlotID][i] + dataStore.efficiencyPlotDataUnc[thisPlotID][i];
-  //  y1 = dataStore.efficiencyPlotData[thisPlotID][i] * 0.8;
-//    y2 = dataStore.efficiencyPlotData[thisPlotID][i] *1.2;
+  for(i=0; i<dataStore.angCorrPlotXData[thisPlotID].length; i++){
+    if(isNaN(dataStore.angCorrPlotDataUnc[thisPlotID][i]) || dataStore.angCorrPlotDataUnc[thisPlotID][i] === null){ continue; }
+    x1 = dataStore.angCorrPlotXData[thisPlotID][i];
+    y1 = dataStore.angCorrPlotData[thisPlotID][i] - dataStore.angCorrPlotDataUnc[thisPlotID][i];
+    y2 = dataStore.angCorrPlotData[thisPlotID][i] + dataStore.angCorrPlotDataUnc[thisPlotID][i];
     var p1 = dataStore._dataplot[thisPlotID].dygraph.toDomCoords(x1, y1);
     var p2 = dataStore._dataplot[thisPlotID].dygraph.toDomCoords(x1, y2);
 
-    //ctx.save();
     ctx.beginPath();
     ctx.moveTo(p1[0], p1[1]);
     ctx.lineTo(p2[0], p2[1]);
     ctx.stroke();
-    //ctx.restore();
   }
-
 }
 
 function initializeAngularCorrelations(){
@@ -659,6 +752,11 @@ console.log("Detector choice is "+dataStore.detectorType)
       dataStore.theseGeAngles = dataStore.ge_angles_110mm;
       dataStore.HPGeDistance = 110;
       var matrixNameString = "Ge-Ge_110mm_angular_bin";
+    }
+
+    // Generate the angular bins in radians
+    for(var i=0; i<dataStore.theseAngularBins.length; i++){
+      dataStore.theseAngularBinsRadians.push(Math.cos(dataStore.theseAngularBins[i]*(Math.PI / 180.000)));
     }
 
     // Names of Angular correlation matrices that we need to fetch and use for GRG-GRG
@@ -969,7 +1067,7 @@ function projectAngularCorrelations(){
   // Fit the gate peak also and subtract it from the fit peak as a time-random background
   dataStore.gatePeakEnergy = gateE;
   dataStore.fitPeakEnergies = [fitE,gateE]; // Must be an array in order to fit N peaks per spectrum
-  dataStore.peakWidth = Math.ceil(typicalPeakWidth(fitE,"HPGe")*4);
+  dataStore.peakWidth = Math.ceil(typicalPeakWidth(fitE,"HPGe")*6);
 
   // Set the gate width
   var gateWidth = Math.ceil(typicalPeakWidth(gateE,"HPGe"));
@@ -1256,6 +1354,26 @@ function fitPeaksInSeriesOfHistograms(spectra){
           dataStore.ROI[dataStore.currentPlot][dataStore.currentPeak][0] = dataStore.viewers[viewerName].FitLimitLower;
           dataStore.ROI[dataStore.currentPlot][dataStore.currentPeak][1] = dataStore.viewers[viewerName].FitLimitUpper;
 
+        // Calculate uncertainty in this fit
+        // Calculate the chi-square of the fitline and data
+        // Multiply the sqrt(area) with sqrt(chi^2/nu)
+        var index=0, nu, dataSeries = [], uncertaintySeries = [], fitSeries = [];
+      //  for(i=dataStore.ROI[dataStore.currentPlot][dataStore.currentPeak][0]; i<dataStore.ROI[dataStore.currentPlot][dataStore.currentPeak][1]; i++){
+        for(i=Math.floor(center-(3*width)); i<Math.ceil(center+(3*width)); i++){
+          dataSeries[index] = dataStore.rawData[dataStore.currentPlot][i];
+          fitSeries[index] = intercept + slope*i + amplitude*Math.exp(-1*(((i-center)*(i-center))/(2*width*width)));
+          index++;
+        }
+        nu = (index+1) - 5; // 5 parameters in the peak fit; centroid, width, height, BG slope, BG offset
+        uncertaintySeries = dataSeries.map((x) => (Math.sqrt(x)*10) );
+
+        // Fit uncertainty is the reduced Chi square of the fit, multiplied by the sqrt of the number of counts (area)
+        if(typeof dataStore.fitUncertainty[dataStore.currentPlot] === 'undefined'){ dataStore.fitUncertainty[dataStore.currentPlot] = []; }
+        if(typeof dataStore.fitUncertainty[dataStore.currentPlot][dataStore.currentPeak] === 'undefined'){ dataStore.fitUncertainty[dataStore.currentPlot][dataStore.currentPeak] = []; }
+        dataStore.fitUncertainty[dataStore.currentPlot][dataStore.currentPeak] = Math.sqrt(calculateChiSquare(dataSeries,uncertaintySeries,fitSeries)/nu)*Math.sqrt(area);
+        console.log("fitUncertainty of "+dataStore.fitUncertainty[dataStore.currentPlot][dataStore.currentPeak]/area+" from "+dataStore.fitUncertainty[dataStore.currentPlot][dataStore.currentPeak]+" from chi-square of "+calculateChiSquare(dataSeries,uncertaintySeries,fitSeries)+" and reduced chi-square of "+calculateChiSquare(dataSeries,uncertaintySeries,fitSeries)/nu);
+        console.log(" and sqrt(area="+area+") of "+Math.sqrt(area)+" which is ratio of "+Math.sqrt(area)/area);
+
         //disengage fit mode buttons
         if( parseInt(refitPeak.getAttribute('engaged'),10) == 1)
         refitPeak.onclick();
@@ -1306,123 +1424,388 @@ function fitPeaksInSeriesOfHistograms(spectra){
         dataStore.viewers[viewerName].stage.update();
       }
 
-function processAngularCorrelationData(){
-  console.log("processAngularCorrelationData()");
-  console.log(dataStore);
+      function processAngularCorrelationData(){
+        console.log("processAngularCorrelationData()");
+        console.log(dataStore);
 
-  var sumAngularBinAreas = 0;
-  var sumSinglesAreas = [0,0];
-  //var sumSinglesAreas = [];
+        var sumAngularBinAreas = 0;
+        var sumSinglesAreas = [0,0];
+        var sumAngularBinAreasUnc = 0;
+        var sumSinglesAreasUnc = [0,0];
+        //var sumSinglesAreas = [];
 
-  // Collect the angular bin peak areas
-  // skip the zero bin - not needed in the sum
-  // This list contains both total projection and peak-gated projection
-  for(var i=2; i<dataStore.angCorrProjections.length; i+=2){
-    // Here we make the subtraction of the gateE peak from the fitE peak to account for time-random coincidences
-    // Peak index 0 is fitE, index 1 is gateE
-    var index = parseInt(i/2);
+        // Collect the angular bin peak areas
+        // skip the zero angular difference bin (which is last in the dataStore.angCorrProjections list) - not needed in the sum
+        // This list contains both total projection and peak-gated projection
+        for(var i=0; i<dataStore.angCorrProjections.length-2; i+=2){
+          // Here we make the subtraction of the gateE peak from the fitE peak to account for time-random coincidences
+          // Peak index 0 is fitE, index 1 is gateE
+          var index = parseInt(i/2);
 
-    // Determine the time-random background subtraction factor from the ratio of the two peaks in the total projection
-    dataStore.angularBinTRBGFactor[index] = dataStore.fitResults[dataStore.angCorrProjections[i]][0][5] / dataStore.fitResults[dataStore.angCorrProjections[i]][1][5];
+          // Determine the time-random background subtraction factor from the ratio of the two peaks in the total projection
+          // The [i] index is the total projection of each matrix, [i+1] is the projection of gateE.
+          dataStore.angularBinTRBGFactor[index] = dataStore.fitResults[dataStore.angCorrProjections[i]][0][5] / dataStore.fitResults[dataStore.angCorrProjections[i]][1][5];
+          dataStore.angularBinTRBGFactorUnc[index] = Math.sqrt( Math.pow(dataStore.fitUncertainty[dataStore.angCorrProjections[i]][0]/dataStore.fitResults[dataStore.angCorrProjections[i]][0][5],2)
+        + Math.pow(dataStore.fitUncertainty[dataStore.angCorrProjections[i]][1]/dataStore.fitResults[dataStore.angCorrProjections[i]][1][5],2) );
 
-    // Save the raw area for the peak and time-random coincidence peak
-    dataStore.angularBinRawPeakArea[index] = dataStore.fitResults[dataStore.angCorrProjections[i+1]][0][5];
-    dataStore.angularBinTRBGPeakArea[index] = dataStore.fitResults[dataStore.angCorrProjections[i+1]][1][5];
+          // Save the raw area and uncertainties for the peak and time-random coincidence peak
+          // The [i] index is the total projection of each matrix, [i+1] is the projection of gateE.
+          dataStore.angularBinRawPeakArea[index] = dataStore.fitResults[dataStore.angCorrProjections[i+1]][0][5];
+          dataStore.angularBinTRBGPeakArea[index] = dataStore.fitResults[dataStore.angCorrProjections[i+1]][1][5];
+          dataStore.angularBinRawPeakAreaUnc[index] = dataStore.fitUncertainty[dataStore.angCorrProjections[i+1]][0];
+          dataStore.angularBinTRBGPeakAreaUnc[index] = dataStore.fitUncertainty[dataStore.angCorrProjections[i+1]][1];
 
-     dataStore.angularBinPeakArea[index] = dataStore.angularBinRawPeakArea[index] -
-                                          (dataStore.angularBinTRBGPeakArea[index] * dataStore.angularBinTRBGFactor[index]);
-     sumAngularBinAreas += dataStore.angularBinPeakArea[index];
-     dataStore.angularBinWeight[index] = 0; // zero the weighting factors here
-     dataStore.numCrystalPairs[index] = 0;  // zero the number of crystal pairs here
-  }
-  dataStore.normalizationFactor = sumAngularBinAreas;
-  console.log("dataStore.normalizationFactor = "+dataStore.normalizationFactor);
+          // Subtract time-random coincidence from the raw peak area
+          dataStore.angularBinPeakArea[index] = dataStore.angularBinRawPeakArea[index] - (dataStore.angularBinTRBGPeakArea[index] * dataStore.angularBinTRBGFactor[index]);
+          var secondTerm = ( Math.pow(dataStore.angularBinTRBGPeakAreaUnc[index]/dataStore.angularBinTRBGPeakArea[index],2)
+                                    + Math.pow(dataStore.angularBinTRBGFactorUnc[index]/dataStore.angularBinTRBGFactor[index],2) );
+          dataStore.angularBinPeakAreaUnc[index] = Math.sqrt( dataStore.angularBinRawPeakAreaUnc[index]*dataStore.angularBinRawPeakAreaUnc[index] + secondTerm );
+          console.log(index+" Ang bin Peak Area Unc "+dataStore.angularBinPeakAreaUnc[index]+" from: "+dataStore.angularBinRawPeakAreaUnc[index]+"/"+dataStore.angularBinRawPeakArea[index]+"="+dataStore.angularBinRawPeakAreaUnc[index]/dataStore.angularBinRawPeakArea[index]);
+          console.log(index+" and "+" from: "+dataStore.angularBinTRBGPeakAreaUnc[index]+"/"+dataStore.angularBinTRBGPeakArea[index]+"="+dataStore.angularBinTRBGPeakAreaUnc[index]/dataStore.angularBinTRBGPeakArea[index]);
+          console.log(index+" and "+" from: "+dataStore.angularBinTRBGFactorUnc[index]+"/"+dataStore.angularBinTRBGFactor[index]+"="+dataStore.angularBinTRBGFactorUnc[index]/dataStore.angularBinTRBGFactor[index]);
+          sumAngularBinAreas += dataStore.angularBinPeakArea[index];
+          sumAngularBinAreasUnc += (dataStore.angularBinPeakAreaUnc[index]*dataStore.angularBinPeakAreaUnc[index]);
+          dataStore.angularBinWeight[index] = 0;    // zero the weighting factors here
+          dataStore.angularBinWeightUnc[index] = 0; // zero the uncertainty in the weighting factors here
+          dataStore.numCrystalPairs[index] = 0;     // zero the number of crystal pairs here
+        }
+        sumAngularBinAreasUnc = Math.sqrt(sumAngularBinAreasUnc); // Squares of the uncertainties were summed in the loop, now find sqrt
 
-  // Collect the singles peak areas
-  for(i=0; i<dataStore.singlesSpectra.length; i++){
-     dataStore.singlesPeakArea[i] = [0,0]; // initialize this element
-     dataStore.singlesPeakArea[i][0] = dataStore.fitResults[dataStore.singlesSpectra[i]][0][5]; // the fit energy peak
-     dataStore.singlesPeakArea[i][1] = dataStore.fitResults[dataStore.singlesSpectra[i]][1][5]; // the gate energy peak
-     sumSinglesAreas[0] += dataStore.fitResults[dataStore.singlesSpectra[i]][0][5]; // the fit energy peak
-     sumSinglesAreas[1] += dataStore.fitResults[dataStore.singlesSpectra[i]][1][5]; // the gate energy peak
-  }
+        // The normalization factor is the sum of all angular bin peak areas
+        dataStore.normalizationFactor = sumAngularBinAreas;
+        dataStore.normalizationFactorUnc = sumAngularBinAreasUnc;
+        var normalizationFactorUncFraction = Math.pow(Math.sqrt(dataStore.normalizationFactorUnc)/dataStore.normalizationFactor,2);
+        console.log("dataStore.normalizationFactor = "+dataStore.normalizationFactor);
 
-  console.log(sumAngularBinAreas);
-  console.log(sumSinglesAreas);
+        // Collect the singles peak areas from the fitResults object
+        for(i=0; i<dataStore.singlesSpectra.length; i++){
+          dataStore.singlesPeakArea[i] = [0,0]; // initialize this element
+          dataStore.singlesPeakAreaUnc[i] = [0,0]; // initialize this element
+          dataStore.singlesPeakArea[i][0] = dataStore.fitResults[dataStore.singlesSpectra[i]][0][5]; // the fit energy peak
+          dataStore.singlesPeakArea[i][1] = dataStore.fitResults[dataStore.singlesSpectra[i]][1][5]; // the gate energy peak
+          dataStore.singlesPeakAreaUnc[i][0] = dataStore.fitUncertainty[dataStore.singlesSpectra[i]][0]; // the fit energy peak
+          dataStore.singlesPeakAreaUnc[i][1] = dataStore.fitUncertainty[dataStore.singlesSpectra[i]][1]; // the gate energy peak
+          sumSinglesAreas[0] += dataStore.fitResults[dataStore.singlesSpectra[i]][0][5]; // the fit energy peak
+          sumSinglesAreas[1] += dataStore.fitResults[dataStore.singlesSpectra[i]][1][5]; // the gate energy peak
+          sumSinglesAreasUnc[0] += (dataStore.fitUncertainty[dataStore.singlesSpectra[i]][0]*dataStore.fitUncertainty[dataStore.singlesSpectra[i]][0]); // the fit energy peak
+          sumSinglesAreasUnc[1] += (dataStore.fitUncertainty[dataStore.singlesSpectra[i]][1]*dataStore.fitUncertainty[dataStore.singlesSpectra[i]][1]); // the gate energy peak
+        }
+        sumSinglesAreasUnc[0] = Math.sqrt(sumSinglesAreasUnc[0]); // sqrt after the sum of squares in the loop
+        sumSinglesAreasUnc[1] = Math.sqrt(sumSinglesAreasUnc[1]); // sqrt after the sum of squares in the loop
 
-console.log(dataStore);
+        console.log(sumAngularBinAreas);
+                console.log(sumAngularBinAreasUnc);
+        console.log(sumSinglesAreas);
+                console.log(sumSinglesAreasUnc);
 
-  // Calculate the weighting factors
-  for(i=0; i<64; i++){
-  for(var j=0; j<64; j++){
-    var angleIndex = dataStore.theseGeAngles[i][j];
-    dataStore.angularBinWeight[angleIndex] += (dataStore.singlesPeakArea[i][0]/sumSinglesAreas[0])*(dataStore.singlesPeakArea[j][1]/sumSinglesAreas[1]) * 0.5;
-    dataStore.angularBinWeight[angleIndex] += (dataStore.singlesPeakArea[j][0]/sumSinglesAreas[0])*(dataStore.singlesPeakArea[i][1]/sumSinglesAreas[1]) * 0.5;
-    dataStore.numCrystalPairs[angleIndex]++;
- }
-}
+        console.log(dataStore);
+
+        // Calculate the weighting factors from singles peak areas of all crystals involved in each angular bin
+        for(i=0; i<64; i++){
+          for(var j=0; j<64; j++){
+            var angleIndex = dataStore.theseGeAngles[i][j];
+            dataStore.angularBinWeight[angleIndex] += (dataStore.singlesPeakArea[i][0]/sumSinglesAreas[0])*(dataStore.singlesPeakArea[j][1]/sumSinglesAreas[1]) * 0.5;
+            dataStore.angularBinWeight[angleIndex] += (dataStore.singlesPeakArea[j][0]/sumSinglesAreas[0])*(dataStore.singlesPeakArea[i][1]/sumSinglesAreas[1]) * 0.5;
+            var uncert1 = (dataStore.singlesPeakAreaUnc[i][0]/dataStore.singlesPeakArea[i][0]) * (dataStore.singlesPeakAreaUnc[i][0]/dataStore.singlesPeakArea[i][0]);
+            var uncert2 = (dataStore.singlesPeakAreaUnc[j][0]/dataStore.singlesPeakArea[j][0]) * (dataStore.singlesPeakAreaUnc[j][0]/dataStore.singlesPeakArea[j][0]);
+            var uncert3 = (dataStore.singlesPeakAreaUnc[i][1]/dataStore.singlesPeakArea[i][1]) * (dataStore.singlesPeakAreaUnc[i][1]/dataStore.singlesPeakArea[i][1]);
+            var uncert4 = (dataStore.singlesPeakAreaUnc[j][1]/dataStore.singlesPeakArea[j][1]) * (dataStore.singlesPeakAreaUnc[j][1]/dataStore.singlesPeakArea[j][1]);
+            var uncert5 = (sumSinglesAreasUnc[0]/sumSinglesAreas[0]) * (sumSinglesAreasUnc[0]/sumSinglesAreas[0]);
+            var uncert6 = (sumSinglesAreasUnc[1]/sumSinglesAreas[1]) * (sumSinglesAreasUnc[1]/sumSinglesAreas[1]);
+            dataStore.angularBinWeightUnc[angleIndex] +=  Math.sqrt( uncert1 + uncert2 + uncert3 + uncert4 + uncert5 + uncert6 )
+                                                          * ( ((dataStore.singlesPeakArea[i][0]/sumSinglesAreas[0])*(dataStore.singlesPeakArea[j][1]/sumSinglesAreas[1]) * 0.5)
+                                                              +((dataStore.singlesPeakArea[j][0]/sumSinglesAreas[0])*(dataStore.singlesPeakArea[i][1]/sumSinglesAreas[1]) * 0.5));
+            dataStore.numCrystalPairs[angleIndex]++;
+          }
+        }
 
 console.log("Angular Correlation Data:");
 // Calculate the angular correlation data points
+// Also find the min and max values
+var min=10000; var max=0;
 for(i=0; i<dataStore.angularBinPeakArea.length; i++){
+
+ // The uncertainty in the weighting factor of the angular bins is the uncertainties in the peak areas added in quadrature. So we we sqrt the sum of these.
+ dataStore.angularBinWeightUnc[i] =  Math.sqrt(dataStore.angularBinWeightUnc[i]) * dataStore.angularBinWeight[i];
+
 dataStore.angularBinData[i] = dataStore.angularBinPeakArea[i] / (dataStore.angularBinWeight[i] * dataStore.normalizationFactor);
-console.log(dataStore.theseAngularBins[i]+","+dataStore.angularBinData[i]);
+dataStore.angularBinDataUnc[i] = Math.sqrt(  ((dataStore.angularBinPeakAreaUnc[i]/dataStore.angularBinPeakArea[i]) * (dataStore.angularBinPeakAreaUnc[i]/dataStore.angularBinPeakArea[i]))
+                                          // + ((dataStore.angularBinWeightUnc[i]/dataStore.angularBinWeight[i]) * (dataStore.angularBinWeightUnc[i]/dataStore.angularBinWeight[i]))
+                                          // + ((dataStore.normalizationFactorUnc/dataStore.normalizationFactor) * (dataStore.normalizationFactorUnc/dataStore.normalizationFactor))
+                                          )
+                                           * dataStore.angularBinData[i];
+console.log(dataStore.theseAngularBins[i]+","+dataStore.angularBinData[i]+","+dataStore.angularBinDataUnc[i]);
+console.log("Error from "+dataStore.angularBinPeakAreaUnc[i]+"/"+dataStore.angularBinPeakArea[i]+"="+(dataStore.angularBinPeakAreaUnc[i]/dataStore.angularBinPeakArea[i])+", "+dataStore.angularBinWeightUnc[i]+"/"+dataStore.angularBinWeight[i]+"="+(dataStore.angularBinWeightUnc[i]/dataStore.angularBinWeight[i])+", "+dataStore.normalizationFactorUnc+"/"+dataStore.normalizationFactor+"="+(dataStore.normalizationFactorUnc/dataStore.normalizationFactor) );
+if(dataStore.angularBinData[i]<min){ min=dataStore.angularBinData[i]; }
+if(dataStore.angularBinData[i]>max){ max=dataStore.angularBinData[i]; }
 }
 
-// Plot the data
+console.log(dataStore.angularBinData);
+console.log(dataStore.angularBinDataUnc);
+
+// Report the statistics of this correlation
+document.getElementById('dataPlotMessage').innerHTML = "Total gamma-gamma coincidences = "+sumAngularBinAreas.toFixed(0)+", mean peak area in an individual angular bin = "+(sumAngularBinAreas/51).toFixed(0);
+
+// Trigger the Chi square plot generation and obtain the best fit
+var bestFitCoeffs = generateChiSquareData();
+console.log(bestFitCoeffs);
+dataStore.bestFitCoeffs = bestFitCoeffs;  // Save these here in order to Draw best-fit theory curve on data plot in the callback
+//drawDygraphAngCorrLine(0,bestFitCoeffs[0],bestFitCoeffs[1], '#0096FF'); // Draw best-fit theory curve on data plot
+
+
+// Plot the experimental data
 populateDataPlot();
+
+// Plot the residuals plot
+generateResidualsData(bestFitCoeffs[0],bestFitCoeffs[1]);
+
+ var thisTimeout = setTimeout(populateResidualsPlot,50);
+
+// Write the results to the Table
+updateChiSquareResultsTable();
 
 // Show the download button
 document.getElementById('downloadDiv').classList.remove('hidden');
 }
 
-    function populateDataPlot(){
-      // First determine the residuals by applying the calibration coefficients to the fitted centroid, then comparing it to the literature energy.
-      // Save the residuals data to the dataStore, then
-      //arrange the latest residual info for representation in the dygraph.
+function generateResidualsData(c2,c4){
 
+  var theorySeries = theoreticalAngularCorrelation(c2,c4, dataStore.theseAngularBinsRadians);
+
+   for(var i=0; i<dataStore.angularBinData.length; i++){
+      dataStore.angularBinDataResiduals[i] = dataStore.angularBinData[i] - theorySeries[i];
+   }
+}
+
+function generateChiSquareData(){
+  console.log("generateChiSquareData");
+  dataStore.theseAngularBinsRadians = [];
+  for(var i=0; i<dataStore.theseAngularBins.length; i++){
+    dataStore.theseAngularBinsRadians.push(Math.cos(dataStore.theseAngularBins[i]*(Math.PI / 180.000)));
+  }
+
+  var thisTheory = [];
+  // Declare the variables
+  var j1, j2, j3, l1a, l1b, l2a, l2b, delta1, delta2;
+  var bestFit = [], pure=0;
+
+  // Grab the user input for the cascade
+  var nu=(dataStore.quickDataY.length - 2);
+  j1=parseFloat(document.getElementById('j1').value);
+  j2=parseFloat(document.getElementById('j2').value);
+  j3=parseFloat(document.getElementById('j3').value);
+  delta1 = parseFloat(document.getElementById('mix1').value);
+  delta2 = parseFloat(document.getElementById('mix2').value);
+
+  // Calculate the l2 momenta
+  l2a = l2b = Math.abs(j2-j3);
+  if(l2a<1){ l2a = l2b = 1; } // E0 is not permitted
+  if((j2+j3)>l2b){ l2b++; }
+
+  var chiSquareSeries = [];
+  var minChiSquareSeries = [];
+  var thisChiSquare, minChiSquare = 100000;
+  var index=0;
+  for(j1=0; j1<5; j1++){
+    l1a = l1b = Math.abs(j1-j2);
+    if(l1a<1){ l1a = l1b = 1; } // E0 is not permitted
+    if((j1+j2)>l1b){ l1b++; }
+    if(l1a == l1b && l1a == l2a && l1a == l2b){ pure=1; }else{ pure=0; }
+    console.log("j1,j2,j3,l1a,l1b,l2a,l2b: "+j1+","+j2+","+j3+","+l1a+","+l1b+","+l2a+","+l2b);
+    delta1Series = [];
+    chiSquareSeries[index] = [];
+    minChiSquareSeries[index] = 100000;
+    for(var atanDelta1=-1.5; atanDelta1<=1.5; atanDelta1+=0.01){
+      if(atanDelta1>-0.01 && atanDelta1<0.01){ atanDelta1=0.0; }
+      delta1Series.push(atanDelta1.toFixed(2));
+      if(pure && atanDelta1 != 0){
+        chiSquareSeries[index].push(null);
+        continue;
+      }
+      newCoEffs = calculateTheoreticalAngularCorrelationCoefficients(j1, j2, j3, l1a, l1b, l2a, l2b, Math.tan(atanDelta1), delta2);
+      //console.log(newCoEffs);
+      thisTheory = theoreticalAngularCorrelation(newCoEffs[0],newCoEffs[1], dataStore.theseAngularBinsRadians);
+      thisChiSquare = calculateChiSquare(dataStore.angularBinData,dataStore.angularBinDataUnc,thisTheory)/nu;
+      chiSquareSeries[index].push(thisChiSquare);
+      if(thisChiSquare<minChiSquareSeries[index]){
+        minChiSquareSeries[index] = thisChiSquare;
+      dataStore.minimaDetails[dataStore.plotStyle[2].labels[index+1]] = {
+        'series': dataStore.plotStyle[2].labels[index+1],
+        'atanDelta1': atanDelta1.toFixed(4),
+        'Delta1': Math.tan(atanDelta1).toFixed(4),
+        'chiSquare': thisChiSquare.toFixed(4),
+        'bestFitCoeffs': newCoEffs,
+       };
+      if(thisChiSquare<minChiSquare){ minChiSquare = thisChiSquare; bestFit = newCoEffs; }
+    }
+    }
+    index++;
+  }
+
+  console.log([delta1Series,chiSquareSeries]);
+  populateChiSquarePlot(delta1Series,chiSquareSeries);
+
+  console.log(dataStore);
+
+  return(bestFit);
+}
+
+function updateChiSquareResultsTable(){
+  //$("chiSquareReportTable tbody tr").remove();
+  //  chiSquareReportTable
+  var string = "";
+  var results = dataStore.minimaDetails;
+  var keys = Object.keys(results);
+
+  string = "<h3>Results of chi-square analysis:</h3>";
+  for(var i=0; i<keys.length; i++){
+    string += "<p>"+results[keys[i]].series+", "+results[keys[i]].chiSquare+", "+results[keys[i]].atanDelta1+", "+results[keys[i]].Delta1+", c2="+results[keys[i]].bestFitCoeffs[0].toFixed(4)+", c4="+results[keys[i]].bestFitCoeffs[1].toFixed(4)+"</p><br>";
+  }
+  document.getElementById('chiSquareReportTableDiv').innerHTML = string;
+}
+
+function populateDataPlot(){
+  // First determine the residuals by applying the calibration coefficients to the fitted centroid, then comparing it to the literature energy.
+  // Save the residuals data to the dataStore, then
+  //arrange the latest residual info for representation in the dygraph.
+
+  // Find the plot id for this source
+  var thisPlotID = 0;
+  console.log('Data for plot'+thisPlotID);
+
+  // The peak energies over all sources are not sequential. So build an
+  // object of the peak energies and efficienicies so we can
+  // then sort them into energy order before displaying the plot.
+  // x value should be the literature energy value
+  // y value is raw efficiency normalized to 152Eu
+
+  // Fill the arrays with the data
+  for(var i=0; i<dataStore.angularBinData.length; i++){
+    dataStore.dataplotDataX[thisPlotID].push( Math.cos(dataStore.theseAngularBins[i]*(Math.PI / 180.000)) );
+    dataStore.dataplotDataY[thisPlotID].push( dataStore.angularBinData[i] );
+    //dataStore.dataplotDataYUnc[thisPlotID].push( (dataStore.angularBinData[i]+dataStore.angularBinDataUnc[i]),(dataStore.angularBinData[i]-dataStore.angularBinDataUnc[i]) );
+    dataStore.dataplotDataYUnc[thisPlotID].push( dataStore.angularBinDataUnc[i] );
+  }
+  console.log(dataStore.theseAngularBins);
+  console.log(dataStore.dataplotDataX[thisPlotID]);
+  console.log(dataStore.dataplotDataY[thisPlotID]);
+  console.log(dataStore.dataplotDataYUnc[thisPlotID]);
+
+  // Fill the flags array
+  var flags = [];
+  flags.fillN(0, dataStore.dataplotDataX[thisPlotID].length);
+
+  // Update the Y axis range
+  var min = 10000;
+  var max = 0.001;
+  for(i=0; i<dataStore.dataplotDataY[thisPlotID].length; i++){
+    if(dataStore.dataplotDataY[thisPlotID][i]-dataStore.dataplotDataYUnc[thisPlotID][i]<min){  min = dataStore.dataplotDataY[thisPlotID][i]-dataStore.dataplotDataYUnc[thisPlotID][i]; }
+    if(dataStore.dataplotDataY[thisPlotID][i]+dataStore.dataplotDataYUnc[thisPlotID][i]>max){  max = dataStore.dataplotDataY[thisPlotID][i]+dataStore.dataplotDataYUnc[thisPlotID][i]; }
+  }
+  min -= 0.04; if(min<0.001){ min=0.001; }
+  max += 0.04; if(max<1){ max=1; }
+  dataStore.YAxisMinValue[thisPlotID][0] = min;
+  dataStore.YAxisMaxValue[thisPlotID][0] = max;
+
+  // Save the uncertainty data to these arrays for plotting the errorBars
+  // The error bars are drawn by the callback function, underlayCallback
+  dataStore.angCorrPlotXData[thisPlotID] = dataStore.dataplotDataX[thisPlotID];
+  dataStore.angCorrPlotData[thisPlotID] = dataStore.dataplotDataY[thisPlotID];
+  dataStore.angCorrPlotDataUnc[thisPlotID] = dataStore.dataplotDataYUnc[thisPlotID];
+
+  // Send the main series data to the plot
+  dataStore.dataplotData[thisPlotID] = arrangePoints(dataStore.dataplotDataX[thisPlotID], [dataStore.dataplotDataY[thisPlotID]], flags );
+  var eventString = 'updateDyData'+thisPlotID;
+  console.log(eventString);
+  dispatcher({ 'data': dataStore.dataplotData[thisPlotID] }, eventString);
+
+}
+
+function populateResidualsPlot(){
+
+  // Find the plot id for this source
+  var thisPlotID = 1;
+  console.log('Data for plot'+thisPlotID);
+
+  // Fill the arrays with the data
+  for(var i=0; i<dataStore.angularBinData.length; i++){
+    dataStore.dataplotDataX[thisPlotID].push( Math.cos(dataStore.theseAngularBins[i]*(Math.PI / 180.000)) );
+    dataStore.dataplotDataY[thisPlotID].push( dataStore.angularBinDataResiduals[i] );
+    //dataStore.dataplotDataYUnc[thisPlotID].push( (dataStore.angularBinData[i]+dataStore.angularBinDataUnc[i]),(dataStore.angularBinData[i]-dataStore.angularBinDataUnc[i]) );
+    dataStore.dataplotDataYUnc[thisPlotID].push( dataStore.angularBinDataUnc[i] );
+  }
+
+  // Fill the flags array
+  var flags = [];
+  flags.fillN(0, dataStore.dataplotDataX[thisPlotID].length);
+
+  // Update the Y axis range
+  var min = 10;
+  var max = -10;
+  for(i=0; i<dataStore.dataplotDataY[thisPlotID].length; i++){
+    if(dataStore.dataplotDataY[thisPlotID][i]-dataStore.dataplotDataYUnc[thisPlotID][i]<min){  min = dataStore.dataplotDataY[thisPlotID][i]-dataStore.dataplotDataYUnc[thisPlotID][i]; }
+    if(dataStore.dataplotDataY[thisPlotID][i]+dataStore.dataplotDataYUnc[thisPlotID][i]>max){  max = dataStore.dataplotDataY[thisPlotID][i]+dataStore.dataplotDataYUnc[thisPlotID][i]; }
+  }
+  min -= 0.04; if(min<-2){ min=-2; }
+  max += 0.04;
+  // Now make the Y axis limits symmetric about zero
+  if(Math.abs(min)>max){
+    max = Math.abs(min);
+  }else{
+    min = max * -1;
+  }
+  dataStore.YAxisMinValue[thisPlotID][0] = min;
+  dataStore.YAxisMaxValue[thisPlotID][0] = max;
+
+    // Save the uncertainty data to these arrays for plotting the errorBars
+    // The error bars are drawn by the callback function, underlayCallback
+    dataStore.angCorrPlotXData[thisPlotID] = dataStore.dataplotDataX[thisPlotID];
+    dataStore.angCorrPlotData[thisPlotID] = dataStore.dataplotDataY[thisPlotID];
+    dataStore.angCorrPlotDataUnc[thisPlotID] = dataStore.dataplotDataYUnc[thisPlotID];
+
+  // Send the main series data to the plot
+  dataStore.dataplotData[thisPlotID] = arrangePoints(dataStore.dataplotDataX[thisPlotID], [dataStore.dataplotDataY[thisPlotID]], flags );
+  var eventString = 'updateDyData'+thisPlotID;
+  console.log(eventString);
+  dispatcher({ 'data': dataStore.dataplotData[thisPlotID] }, eventString);
+
+}
+
+    function populateChiSquarePlot(xSeries,ySeries){
+      return;
       // Find the plot id for this source
-      var thisPlotID = 0;
-      console.log('Data for plot'+thisPlotID);
-
-      // The peak energies over all sources are not sequential. So build an
-      // object of the peak energies and efficienicies so we can
-      // then sort them into energy order before displaying the plot.
-      // x value should be the literature energy value
-      // y value is raw efficiency normalized to 152Eu
+      var thisPlotID = 2;
+      console.log('Data for chi-squared plot'+thisPlotID);
 
       // Fill the arrays with the data
-      for(var i=0; i<dataStore.angularBinData.length; i++){
-        dataStore.dataplotDataX[thisPlotID].push( Math.cos(dataStore.theseAngularBins[i]*(Math.PI / 180.000)) );
-        dataStore.dataplotDataY[thisPlotID].push( dataStore.angularBinData[i] );
-      //  dataStore.efficiencyPlotDataUnc[thisPlotID].push( data[i].YUnc );
+      for(var i=0; i<xSeries.length; i++){
+        dataStore.dataplotDataX[thisPlotID].push( xSeries[i] );
+        //  var string = ySeries[0][i]+","+ySeries[1][i]+","+ySeries[2][i]+","+ySeries[3][i];
+        dataStore.dataplotDataY[thisPlotID].push( ySeries[0][i],ySeries[1][i],ySeries[2][i],ySeries[3][i],ySeries[4][i] );
       }
-console.log(dataStore.dataplotDataX[thisPlotID]);
-console.log(dataStore.dataplotDataY[thisPlotID]);
 
       // Fill the flags array
       var flags = [];
       flags.fillN(0, dataStore.dataplotDataX[thisPlotID].length);
 
       // Update the Y axis scale if needed
-      var max = 0;
-      for(i=0; i<dataStore.dataplotDataY[thisPlotID].length; i++){
-        if(Math.abs(dataStore.dataplotDataY[thisPlotID][i])>max){
-          max = dataStore.dataplotDataY[thisPlotID][i];
-        }
+      var min=100000, max=0.001;
+      for(i=1; i<5; i++){
+        if(Math.min(...ySeries[i]) < min){ min = Math.min(...ySeries[i]); }
+        if(Math.max(...ySeries[i]) > max){ max = Math.max(...ySeries[i]); }
+        if(min<0.01){ min=0.01; }
+        if(max<10){ max=10; }
       }
-      max *= 1.2;
-      dataStore.YAxisMinValue[thisPlotID][0] = parseFloat(1)-max;
-      dataStore.YAxisMaxValue[thisPlotID][0] = parseFloat(1)+max;
+      dataStore.YAxisMinValue[thisPlotID][0] = min*0.65;
+      dataStore.YAxisMaxValue[thisPlotID][0] = max*1.7;
 
       // Send the data to the plot
-      dataStore.dataplotData[thisPlotID] = arrangePoints(dataStore.dataplotDataX[thisPlotID], [dataStore.dataplotDataY[thisPlotID]], flags );
+    //  dataStore.dataplotData[thisPlotID] = arrangePoints(dataStore.dataplotDataX[thisPlotID], [dataStore.dataplotDataY[thisPlotID]], flags );
+      dataStore.dataplotData[thisPlotID] = arrangePoints(xSeries,ySeries, flags );
       var eventString = 'updateDyData'+thisPlotID;
       console.log(eventString);
       dispatcher({ 'data': dataStore.dataplotData[thisPlotID] }, eventString);
-
     }
-
 
 function buildCSVfile(){
     console.log('Download initiated');
@@ -1471,7 +1854,7 @@ if(i<dataStore.angularBinData.length){
         CSV += dataStore.angularBinTRBGPeakArea[i] + ',';
         CSV += dataStore.angularBinTRBGFactor[i] + ',';
         CSV += dataStore.angularBinPeakArea[i] + ',';
-        CSV += '-' + ',';
+        CSV += Math.sqrt(dataStore.angularBinPeakArea[i]) + ',';
         CSV += dataStore.angularBinWeight[i] + ',';
         CSV += dataStore.normalizationFactor + ',';
         CSV += dataStore.angularBinData[i] + ',';
@@ -1479,19 +1862,19 @@ if(i<dataStore.angularBinData.length){
         CSV += i + ',';
         CSV += dataStore.gatePeakEnergy + ',';
         CSV += dataStore.singlesPeakArea[i-1][1] + ',';
-        CSV += '-' + ',';
+        CSV += Math.sqrt(dataStore.singlesPeakArea[i-1][1]) + ',';
         CSV += dataStore.fitPeakEnergies[0] + ',';
         CSV += dataStore.singlesPeakArea[i-1][0] + ',';
-        CSV += '-' + '\n';
+        CSV += Math.sqrt(dataStore.singlesPeakArea[i-1][0]) + '\n';
       }else{
       CSV += ' , , , , , , , , , , , , , , ,';
       CSV += i + ',';
       CSV += dataStore.gatePeakEnergy + ',';
       CSV += dataStore.singlesPeakArea[i-1][1] + ',';
-      CSV += '-' + ',';
+      CSV += Math.sqrt(dataStore.singlesPeakArea[i-1][1]) + ',';
       CSV += dataStore.fitPeakEnergies[0] + ',';
       CSV += dataStore.singlesPeakArea[i-1][0] + ',';
-      CSV += '-' + '\n';
+      CSV += Math.sqrt(dataStore.singlesPeakArea[i-1][0]) + '\n';
       }
 
      }

@@ -79,7 +79,11 @@ function promiseJSONURL(url){
   return new Promise(function(resolve, reject) {
     // Do the usual XHR stuff
     var req = new XMLHttpRequest();
-    req.timeout = 5000; // time in milliseconds
+    if(dataStore.xmltimeout != undefined){
+      req.timeout = dataStore.xmltimeout;
+    }else{
+      req.timeout = 5000; // time in milliseconds
+    }
     req.open('GET', url);
 
     req.onload = function() {
@@ -161,7 +165,11 @@ function promisePartial(name){
   return new Promise(function(resolve, reject) {
     // Do the usual XHR stuff
     var req = new XMLHttpRequest();
-    req.timeout = 5000; // time in milliseconds
+    if(dataStore.xmltimeout != undefined){
+      req.timeout = dataStore.xmltimeout;
+    }else{
+      req.timeout = 5000; // time in milliseconds
+    }
     req.open('GET', url);
 
     req.onload = function() {
@@ -195,7 +203,11 @@ function promiseXHR(url, errorMessage, callback, reject){
   return new Promise(function(resolve, reject) {
     // Do the usual XHR stuff
     var req = new XMLHttpRequest();
-    req.timeout = 5000; // time in milliseconds
+    if(dataStore.xmltimeout != undefined){
+      req.timeout = dataStore.xmltimeout;
+    }else{
+      req.timeout = 5000; // time in milliseconds
+    }
     req.open('GET', url);
 
     req.onload = function() {
@@ -306,7 +318,11 @@ function XHR(url, errorMessage, callback, reject){
   //generic XHR request guts
 
   var req = new XMLHttpRequest();
-  req.timeout = 5000; // time in milliseconds
+  if(dataStore.xmltimeout != undefined){
+    req.timeout = dataStore.xmltimeout;
+  }else{
+    req.timeout = 5000; // time in milliseconds
+  }
   req.open('GET', url);
 
   req.onload = function() {
@@ -1992,98 +2008,172 @@ function HPGeEfficiency(param, logEn){
 }
 
 // Perform a polynomial regression with a least squares estimator
-  function efficiencyRegression(dataX,dataY) {
+function efficiencyRegression(dataX,dataY) {
 
-    console.log('efficiencyRegression');
-    console.log(dataX);
-    console.log(dataY);
-    var params = [];
+  console.log('efficiencyRegression');
+  console.log(dataX);
+  console.log(dataY);
+  var params = [];
 
-// Set everything to zero to begin
-        var sum_xy = 0.0, sum_x = 0.0, sum_y = 0.0, sum_x2 = 0.0, num = 0;
+  // Set everything to zero to begin
+  var sum_xy = 0.0, sum_x = 0.0, sum_y = 0.0, sum_x2 = 0.0, num = 0;
 
-        // Loop over all data
-        for (var i = 0; i < dataX.length; i++) {
-          var x = dataX[i];
-          var y = dataY[i];
-          if (y === null || y === undefined) continue;
+  // Loop over all data
+  for (var i = 0; i < dataX.length; i++) {
+    var x = dataX[i];
+    var y = dataY[i];
+    if (isNaN(y) || y === null || y === undefined) continue;
 
-          // calculate the least squares
-          num++;
-          sum_x += x;
-          sum_y += y;
-          sum_xy += x * y;
-          sum_x2 += x * x;
-        }
+    // calculate the least squares
+    num++;
+    sum_x += x;
+    sum_y += y;
+    sum_xy += x * y;
+    sum_x2 += x * x;
+  }
 
-        // calculate the parameters
-        var a = (sum_xy - sum_x * sum_y / num) / (sum_x2 - sum_x * sum_x / num);
-        var b = (sum_y - a * sum_x) / num;
+  // calculate the parameters
+  var a = (sum_xy - sum_x * sum_y / num) / (sum_x2 - sum_x * sum_x / num);
+  var b = (sum_y - a * sum_x) / num;
 
-        params = [b, a];
-        if (typeof(console) != 'undefined') {
-          console.log("params: [" + b + ", " + a + "]");
-        }
+  params = [b, a];
+  if (typeof(console) != 'undefined') {
+    console.log("params: [" + b + ", " + a + "]");
+  }
 
-        return(params);
-      };
+  return(params);
+};
 
-      // Perform a polynomial regression with a weighted least squares estimator
-        function efficiencyWeightedRegression(dataX,dataY,thisYerror) {
+// Perform a regression with a least squares estimator for a Normalization factor
+function angularCorrelationRegression(dataX,dataY) {
+  // dataY series will be normalized to dataX series
+  var params = [];
 
-          console.log('efficiencyRegression');
-          console.log(dataX);
-          console.log(dataY);
-          console.log(dataYerror);
-          var params = [];
+  // Set everything to zero to begin
+  var sum_xy = 0.0, sum_x = 0.0, sum_y = 0.0, sum_x2 = 0.0, num = 0;
+  var max = 0, min=1000000;
 
-      // Set everything to zero to begin
-              var sum_xy = 0.0, sum_x = 0.0, sum_y = 0.0, sum_x2 = 0.0, num = 0;
+// clense the arrays of NaN and find min and max values
+for(var i=0; i<dataX.length; i++){
+  if(isNaN(dataX[i]) || dataX[i]<0 || isNaN(dataY[i])){
+    dataX.splice(i, 1);
+    dataY.splice(i, 1);
+  }
+  if(dataX[i]<min){ min = dataX[i]; }
+  if(dataX[i]>max){ max = dataX[i]; }
+}
 
-              // Loop over all data
-              for (var i = 0; i < dataX.length; i++) {
-                var x = dataX[i];
-                var y = dataY[i];
-                var w = 1.0/dataYerror[i];
-                if (y === null || y === undefined) continue;
-
-                // calculate the sums, residuals and squared residuals
-                num++;
-                sum_x += x;
-                sum_y += y;
-                sum_xy += x * y;
-                sum_x2 += x * x;
-              }
-
-              // calculate the parameters
-              var a = (sum_xy - sum_x * sum_y / num) / (sum_x2 - sum_x * sum_x / num);
-              var b = (sum_y - a * sum_x) / num;
-
-              params = [b, a];
-              if (typeof(console) != 'undefined') {
-                console.log("params: [" + b + ", " + a + "]");
-              }
-
-              return(params);
-            };
+  //  var min = Math.min(dataX);
+  //  var max = Math.max(dataX);
+    var range = max-min;
 
 
-            // Legendre Polynomials
-            function P0(x){
-                return parseFloat(1);
-            }
-            // Legendre Polynomials
-            function P1(x){
-                return parseFloat(x);
-            }
-            // Legendre Polynomials
-            //The following is a general functoin that returns the value of the Legendre Polynomial for any given x and n=0,1,2,3,...
-            function Pn(x, n){
-                if(n==0){
-                    return P0(x);
-                }else if(n==1){
-                    return P1(x);
-                }else{
-                    return parseFloat((2*n-1)*x*Pn(x,n-1)-(n-1)*Pn(x,n-2))/n;
-                }
-            }
+  // Loop over all data
+  for (var i = 0; i < dataX.length; i++) {
+    var x = dataX[i];
+    var y = dataY[i];
+    if (isNaN(x) || x === null || x === undefined) continue;
+    if (isNaN(y) || y === null || y === undefined) continue;
+
+    // calculate the least squares
+    num++;
+    sum_x += x;
+    sum_y += y;
+    sum_xy += x * y;
+    sum_x2 += x * x;
+
+    // Find the min and Max values
+  }
+
+  // calculate the parameters
+  var b = (sum_y / sum_x);
+
+      return(b);
+};
+
+// Calculate the reduced chi-squared between two series. First series is data, second series is model.
+function calculateChiSquare(dataExp,uncertExp,dataModel) {
+  var chiSquare = 0;
+
+  for(var i=0; i<dataExp.length; i++){
+    if(isNaN(dataExp[i]) || dataExp[i]<0 || isNaN(dataModel[i])|| isNaN(uncertExp[i])){ continue; } // ignore NaN
+    chiSquare += ((dataExp[i]-dataModel[i]) * (dataExp[i]-dataModel[i])) / (uncertExp[i] * uncertExp[i]);
+  }
+
+  return(chiSquare);
+};
+
+// Perform a polynomial regression with a weighted least squares estimator
+function efficiencyWeightedRegression(dataX,dataY,thisYerror) {
+
+  console.log('efficiencyRegression');
+  console.log(dataX);
+  console.log(dataY);
+  console.log(dataYerror);
+  var params = [];
+
+  // Set everything to zero to begin
+  var sum_xy = 0.0, sum_x = 0.0, sum_y = 0.0, sum_x2 = 0.0, num = 0;
+
+  // Loop over all data
+  for (var i = 0; i < dataX.length; i++) {
+    var x = dataX[i];
+    var y = dataY[i];
+    var w = 1.0/dataYerror[i];
+    if (isNaN(y) || y === null || y === undefined) continue;
+
+    // calculate the sums, residuals and squared residuals
+    num++;
+    sum_x += x;
+    sum_y += y;
+    sum_xy += x * y;
+    sum_x2 += x * x;
+  }
+
+  // calculate the parameters
+  var a = (sum_xy - sum_x * sum_y / num) / (sum_x2 - sum_x * sum_x / num);
+  var b = (sum_y - a * sum_x) / num;
+
+  params = [b, a];
+  if (typeof(console) != 'undefined') {
+    console.log("params: [" + b + ", " + a + "]");
+  }
+
+  return(params);
+};
+
+
+// Legendre Polynomials
+function P0(x){
+  return parseFloat(1);
+}
+// Legendre Polynomials
+function P1(x){
+  return parseFloat(x);
+}
+// Legendre Polynomials
+//The following is a general function that returns the value of the Legendre Polynomial for any given x and n=0,1,2,3,...
+function Pn(x, n){
+  if(n==0){
+    return P0(x);
+  }else if(n==1){
+    return P1(x);
+  }else{
+    return parseFloat((2*n-1)*x*Pn(x,n-1)-(n-1)*Pn(x,n-2))/n;
+  }
+}
+
+function theoreticalAngularCorrelation(c2,c4, xValues) {
+// Given the c2 and c4 coefficients, return the series of y values of the angular correlation for the given x series.
+// x values expected in radians between -1 and 1
+if(xValues.Min<-1 || xValues.Max>1){
+  console.log("Function theoreticalAngularCorrelation() expects the x values to be in radians between -1 and 1.");
+  return;
+}
+
+  var series = [];
+  for(i=0; i<xValues.length; i++){
+    series.push((1.0 + (c2*Pn(xValues[i],2)) + (c4*Pn(xValues[i],4))));
+  }
+  return(series);
+}

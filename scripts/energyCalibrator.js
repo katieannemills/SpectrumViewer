@@ -631,14 +631,6 @@ function submitHistoFilenameChoices(){
   // Draw the search region
   dataStore.viewers[dataStore.plots[0]].plotData();
 
-/*
-  //plug in special fit controls
-  document.getElementById('fitLow').onclick = dataStore._efficiencyFitterReport.toggleFitMode;
-  document.getElementById('fitMid').onclick = dataStore._efficiencyFitterReport.toggleFitMode;
-  document.getElementById('fitHigh').onclick = dataStore._efficiencyFitterReport.toggleFitMode;
-  document.getElementById('fitvHi').onclick = dataStore._efficiencyFitterReport.toggleFitMode;
-*/
-
   // Plug in the active spectra names
   // Here we just need the names of the spectra that will be fetched for each run file.
   for(i=0; i<dataStore.THESEdetectors.length; i++){
@@ -710,6 +702,24 @@ function submitHistoFilenameChoices(){
 
   // Request spectra from the server. This launches a series of promises. Once complete we end with fetchCallback.
   dataStore._plotControl.refreshAll();
+}
+
+function setOptionsForPeakRefitSelect(){
+
+  // Set the current Source for this spectrum
+  dataStore.currentSource = Object.keys(dataStore.sourceInfo).find(key => dataStore.sourceInfo[key].histoFileName.split('.')[0] === dataStore.currentPlot.split(':')[0]);
+
+  // Set up the drop-down list of peaks available to refit
+  thisSelect = document.getElementById('refitSelect');
+  // Remove all options from the select
+  thisSelect.removeAllChildren();
+
+  // Loop through all peaks for this source
+  for(var i=0; i<dataStore.sourceInfo[dataStore.currentSource].literaturePeaks.length; i++){
+    //add this peak as an option to the refit select
+    var newSelect = document.createElement("select");
+        thisSelect.add( new Option("Peak "+i+", "+dataStore.sourceInfo[dataStore.currentSource].literaturePeaks[i]+"keV", i) );
+  }
 }
 
 function updateAnalyzer(){

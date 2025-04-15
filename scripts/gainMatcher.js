@@ -27,6 +27,7 @@ function setupDataStore(){
   //network and raw data
   dataStore.spectrumServer = 'http://grsmid00.triumf.ca:9093/';           //host + port of analyzer server
   dataStore.ODBhost = 'http://grsmid00.triumf.ca:8081/';                  //MIDAS / ODB host + port
+  dataStore.xmltimeout = 0; // zero is setting no timeout
 
   // Histogram directory and filename
   dataStore.histoFileDirectoryPath = '/tig/grifstore0b/griffin/schedule140/Histograms';
@@ -39,6 +40,7 @@ function setupDataStore(){
   dataStore.numberOfClovers = 16;                                     // Default number of clovers is all of the array
   dataStore.numberOfRCMP = 6;                                     // Default number of RCMP DSSD is all of the array
   dataStore.numberOfRCMPStrips = 32;                                     // Default number of RCMP strips per DSSD side
+  dataStore.numberOfARIES = 76;                                  // Default number of ARIES tiles
   // shouldn't need to change anything below this line -----------------------------------------------------------------------
 
   dataStore.pageTitle = 'Gain Matcher';                                   //header title
@@ -97,13 +99,14 @@ function setupDataStore(){
   ];
 
   dataStore.detectorType = 'HPGe';                                       //Detector choice that has been selected; HPGe or PACES or LaBr3 or RCMP
-  dataStore.detectorChoice = [{"name": "HPGe"},{"name": "PACES"},{"name": "LaBr3"},{"name": "RCMP"}];       // Detector choice information to generate buttons
+  dataStore.detectorChoice = [{"name": "HPGe"},{"name": "PACES"},{"name": "LaBr3"},{"name": "RCMP"},{"name": "ARIES"}];       // Detector choice information to generate buttons
 
   dataStore.LimitFactors = {                                          // Upper and Lower limits for the search regions for each peak. The rough gain of this detector type, keV -> channels
     'HPGe': { 'Lower': 0.644, 'Upper': 0.966},
     'PACES':{ 'Lower':  1.02, 'Upper':   1.3},
     'LaBr3':{ 'Lower':  0.41, 'Upper':  0.75},
-    'RCMP': { 'Lower':  0.15, 'Upper':   0.95}
+    'RCMP': { 'Lower':  0.15, 'Upper':   0.95},
+    'ARIES': { 'Lower':  0.1, 'Upper':   0.95}
   };
   dataStore.sourceType = '';                                          // Source type that has been selected
   dataStore.sourceInfo = {                                            // Source information and settings
@@ -137,7 +140,12 @@ function setupDataStore(){
             'RCMP':
               [
                 {"name": "RCSalpha", "title":  "Triple", "lowEnergy": 5156.59, "midEnergy": 5485.56, "highEnergy": 5804.77, "vhiEnergy": null, "energies": [5156.59,5485.56,5804.77], "maxXValue":6500 }
+              ],
+            'ARIES':
+              [
+                {"name": "ARTspec", "title":  "ARIES Energy", "lowEnergy": 1, "midEnergy": 2, "highEnergy": 3, "vhiEnergy": null, "energies": [1,2,3], "maxXValue":1000 }
               ]
+
 
   };
   /*
@@ -822,6 +830,25 @@ function setupMenusFromDetectorChoice(detectorType){
         "plots": RCSPlots[i-1]
       })
     }
+  }else if(detectorType == 'ARIES'){
+    // Set up ARIES detectors
+
+    var ARIESPlots = [];
+    for(i=1; i<(dataStore.numberOfARIES+1); i++){
+      dataStore.THESEdetectors[num] = 'ART'+alwaysThisLong(i, 2)+'XS00X';
+      ARIESPlots.push({
+        "plotID": histoName+dataStore.THESEdetectors[num]+'_Pulse_Height',
+        "title": dataStore.THESEdetectors[num]
+      });
+      num++;
+    }
+
+    //generate the groups for plot selector
+    groups.push({
+      "groupID": 'ARIES',
+      "groupTitle": 'ARIES',
+      "plots": ARIESPlots
+    })
   }
 
   dataStore.plotGroups = groups;     //groups to arrange detectors into for dropdowns
