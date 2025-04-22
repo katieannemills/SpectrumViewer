@@ -3,46 +3,46 @@
 ////////////////////////////
 
 function setupCalibrationsContent(){
-    // function to refresh the content of the Calibrations subpage
-    // Called when there is new content available
-    //console.log('setupCalibrationsContent');
+  // function to refresh the content of the Calibrations subpage
+  // Called when there is new content available
+  //console.log('setupCalibrationsContent');
 
-    // Set up event listeners for the drop area
-    let dropArea = document.getElementById('drop-area');
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-      dropArea.addEventListener(eventName, preventDropDefaults, false)
-    });
+  // Set up event listeners for the drop area
+  let dropArea = document.getElementById('drop-area');
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropArea.addEventListener(eventName, preventDropDefaults, false)
+  });
 
-    ['dragenter', 'dragover'].forEach(eventName => {
-      dropArea.addEventListener(eventName, highlightDrop, false)
-    });
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropArea.addEventListener(eventName, highlightDrop, false)
+  });
 
-    ['dragleave', 'drop'].forEach(eventName => {
-      dropArea.addEventListener(eventName, unhighlightDrop, false)
-    });
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropArea.addEventListener(eventName, unhighlightDrop, false)
+  });
 
-      dropArea.addEventListener('drop', handleDrop, false)
+  dropArea.addEventListener('drop', handleDrop, false)
 
-      // Populate the Config table on initial load
-      refreshConfigCalibrationsContent();
+  // Populate the Config table on initial load
+  refreshConfigCalibrationsContent();
 }
 
 function refreshConfigCalibrationsContent(){
-//console.log(dataStore.currentCalibrations);
+  //console.log(dataStore.currentCalibrations);
 
-// Set the title for the current config
-thisTimestamp = new Date(dataStore.configFileTimestamp * 1000);
-document.getElementById('currentConfigCalibrationsTitleDiv').innerHTML = "<h3>Current Config file</h3>"+
-    "<br>Fetched "+thisTimestamp.toString();
+  // Set the title for the current config
+  thisTimestamp = new Date(dataStore.configFileTimestamp * 1000);
+  document.getElementById('currentConfigCalibrationsTitleDiv').innerHTML = "<h3>Current Config file</h3>"+
+  "<br>Fetched "+thisTimestamp.toString();
   // Clear the report Div
-document.getElementById('currentConfigCalibrationsTableDiv').innerHTML = "";
+  document.getElementById('currentConfigCalibrationsTableDiv').innerHTML = "";
 
-let outputString = "";
-for(let i=0; i<dataStore.currentCalibrations.length; i++)
-outputString += dataStore.currentCalibrations[i].name+': '+ dataStore.currentCalibrations[i].quad+','
-                + dataStore.currentCalibrations[i].gain+','+ dataStore.currentCalibrations[i].offset + "<br>";
+  let outputString = "";
+  for(let i=0; i<dataStore.currentCalibrations.length; i++)
+  outputString += dataStore.currentCalibrations[i].name+': '+ dataStore.currentCalibrations[i].quad+','
+  + dataStore.currentCalibrations[i].gain+','+ dataStore.currentCalibrations[i].offset + "<br>";
 
-document.getElementById('currentConfigCalibrationsTableDiv').innerHTML = outputString;
+  document.getElementById('currentConfigCalibrationsTableDiv').innerHTML = outputString;
 }
 
 
@@ -52,23 +52,23 @@ document.getElementById('currentConfigCalibrationsTableDiv').innerHTML = outputS
 
 function sendCalibrationsToAnalyzer(){
 
-    //send requests
-    for(let i=0; i<dataStore.CalibrationURLs.length; i++){
-      XHR(dataStore.CalibrationURLs[i], 'An error occured.',
-      function(){ document.getElementById('submitDivCalReport').innerHTML = "This calibration has been uploaded to the Analyzer. It is now the Current Config file."; return 0},
-      function(error){console.log(error); document.getElementById('submitDivCalReport').innerHTML = "An error occured.";} );
-    }
+  //send requests
+  for(let i=0; i<dataStore.CalibrationURLs.length; i++){
+    XHR(dataStore.CalibrationURLs[i], 'An error occured.',
+    function(){ document.getElementById('submitDivCalReport').innerHTML = "This calibration has been uploaded to the Analyzer. It is now the Current Config file."; return 0},
+    function(error){console.log(error); document.getElementById('submitDivCalReport').innerHTML = "An error occured.";} );
+  }
 
 }
 
 function processDropFile(file){
 
-// Clear the report Div
-document.getElementById('submitDivCalReport').innerHTML = "";
+  // Clear the report Div
+  document.getElementById('submitDivCalReport').innerHTML = "";
 
-// Set the title
-document.getElementById('calFileContentsTitleDiv').innerHTML = "<h3>Contents of Cal file</h3><br>\""+file.name+"\"";
-          //    +"", "+(file.size/1000).toFixed(1)+" kB,<br>last modified "+file.lastModifiedDate+"<br>";
+  // Set the title
+  document.getElementById('calFileContentsTitleDiv').innerHTML = "<h3>Contents of Cal file</h3><br>\""+file.name+"\"";
+  //    +"", "+(file.size/1000).toFixed(1)+" kB,<br>last modified "+file.lastModifiedDate+"<br>";
 
   let fr = new FileReader();
 
@@ -92,12 +92,14 @@ document.getElementById('calFileContentsTitleDiv').innerHTML = "<h3>Contents of 
     }
     //console.log(arrStr);
 
-// Build URLs for sending to the Analyzer
+    // Build URLs for sending to the Analyzer
     var num=0, ctr=0;
     var spectrumServer = dataStore.spectrumServer;
     dataStore.CalibrationURLs = []; // Reset the URLs
+    globalsURLs = [];
     dataStore.CalibrationURLs[num] = spectrumServer + '?cmd=setCalibration';
     let outputString = "";
+    // First build all Calibrations from the usual cal file entries
     for(var i=0; i<arrStr.length; i++){
       // Split one entry into its parts
       thisArrStr = arrStr[i].split('\n');
@@ -107,14 +109,23 @@ document.getElementById('calFileContentsTitleDiv').innerHTML = "<h3>Contents of 
         }
         if(thisArrStr[j].includes("EngCoeff")){
           thisArray = thisArrStr[j].split(/\t| /);
-            thisArray = thisArray.filter(String);
-            thisOffset = parseFloat(thisArray[1]);
-            thisGain = parseFloat(thisArray[2]);
-            thisQuad = parseFloat(thisArray[3]);
+          thisArray = thisArray.filter(String);
+          thisOffset = parseFloat(thisArray[1]);
+          thisGain = parseFloat(thisArray[2]);
+          thisQuad = parseFloat(thisArray[3]);
           //  console.log("Using thisArray: "+thisName+': '+ thisQuad+','+ thisGain+','+ thisOffset);
         }
       }
-    //  console.log(thisName+': '+ thisQuad+','+ thisGain+','+ thisOffset);
+      if(thisName.includes("TAC_")){
+        // This is a TAC Offset which will be added as a Global not a Calibration
+        // http://localhost:9093/?cmd=addGlobal&globalname=TAC-Offset-01-04&globalmin=-100&globalmax=-731
+        var thisGlobalName = "TAC-Offset-" + alwaysThisLong(parseInt(thisGain),2) + "-" + alwaysThisLong(parseInt(thisQuad),2);
+        var thisURLString = spectrumServer + '?cmd=addGlobal&globalname=' + thisGlobalName + "&globalmin=0&globalmax=" + thisOffset;
+        globalsURLs.push(thisURLString);
+        outputString += thisName+': '+ thisGlobalName+','+ thisOffset + "<br>";
+        continue;
+      }
+      //  console.log(thisName+': '+ thisQuad+','+ thisGain+','+ thisOffset);
       outputString += thisName+': '+ thisQuad+','+ thisGain+','+ thisOffset + "<br>";
       // Build URL here
       // Dont allow NaN to be sent to the server
@@ -129,7 +140,12 @@ document.getElementById('calFileContentsTitleDiv').innerHTML = "<h3>Contents of 
       }
     }
 
-  //  console.log(dataStore.CalibrationURLs);
+    // Add any Globals to the end of the dataStore.CalibrationURLs list
+    for(i=0; i<globalsURLs.length; i++){
+      dataStore.CalibrationURLs.push(globalsURLs[i]);
+    }
+
+    //  console.log(dataStore.CalibrationURLs);
 
     // Reveal the button for sending these calibrations to the Analyzer
     document.getElementById('submitCalibrationsButton').classList.remove('hidden');

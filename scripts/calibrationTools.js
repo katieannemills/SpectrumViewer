@@ -7,7 +7,7 @@ function GetURLArguments(){
 	var elts = {};
 	var queryString = window.location.search.substring(1)
 	var value, i;
-        var urlData = [];
+	var urlData = [];
 
 
 	queryString = queryString.split('&');
@@ -16,33 +16,32 @@ function GetURLArguments(){
 		urlData[value[0]] = value[1];
 	}
 
-    // Save the information to the dataStore
-    // Save the hostname and port number for getting spectrum data and writing to the config file
-	  if(urlData.analyzerBackend == "localhost"){
-	    dataStore.spectrumServer = 'http://'+urlData.analyzerBackend+":"+urlData.analyzerPort;
-	  }else{
-	    dataStore.spectrumServer = 'http://'+urlData.analyzerBackend+'.triumf.ca:'+urlData.analyzerPort;
-	  }
+	// Save the information to the dataStore
+	// Save the hostname and port number for getting spectrum data and writing to the config file
+	if(urlData.analyzerBackend == "localhost"){
+		dataStore.spectrumServer = 'http://'+urlData.analyzerBackend+":"+urlData.analyzerPort;
+	}else{
+		dataStore.spectrumServer = 'http://'+urlData.analyzerBackend+'.triumf.ca:'+urlData.analyzerPort;
+	}
 
-    // Save the information to the dataStore
-    // Save the hostname and port number for writing the ODB parameters
-	  if(urlData.analyzerBackend == "localhost"){
-	    dataStore.ODBhost = 'http://'+urlData.ODBHostBackend+":"+urlData.ODBHostPort;
-	  }else{
-	    dataStore.ODBhost = 'http://'+urlData.ODBHostBackend+'.triumf.ca:'+urlData.ODBHostPort;
-	  }
+	// Save the information to the dataStore
+	// Save the hostname and port number for writing the ODB parameters
+	if(urlData.ODBHostBackend == "localhost"){
+		dataStore.ODBhost = 'http://'+urlData.ODBHostBackend+":"+urlData.ODBHostPort;
+	}else{
+		dataStore.ODBhost = 'http://'+urlData.ODBHostBackend+'.triumf.ca:'+urlData.ODBHostPort;
+	}
 
-    // Copy the histogram URL arguments to the dataStore
-    dataStore.histoFileDirectoryPath = urlData.histoDir;
-    if(dataStore.histoFileDirectoryPath==undefined){
-	// No directory for the histogram files has been provided in the URL, so we provide a default one
-	dataStore.histoFileDirectoryPath = '/tig/grifstore0b/griffin/schedule140/Histograms';
-    }
-    if(urlData.histoFile){
-	dataStore.histoFileName = urlData.histoFile;
-	dataStore.histoAutoLoad = true;
-    }
-
+	// Copy the histogram URL arguments to the dataStore
+	dataStore.histoFileDirectoryPath = urlData.histoDir;
+	if(dataStore.histoFileDirectoryPath==undefined){
+		// No directory for the histogram files has been provided in the URL, so we provide a default one
+		dataStore.histoFileDirectoryPath = '/tig/grifstore0b/griffin/schedule140/Histograms';
+	}
+	if(urlData.histoFile){
+		dataStore.histoFileName = urlData.histoFile;
+		dataStore.histoAutoLoad = true;
+	}
 }
 
 function processHistoFileList(payload){

@@ -34,8 +34,8 @@ var dataStore = {};     // Global object to pass variables around
 
 function setupDataStore(){
 
-    // Return a new promise.
-    return new Promise(function(resolve, reject) {
+  // Return a new promise.
+  return new Promise(function(resolve, reject) {
     // The dataStore object is declared as a global variable.
     // Here we fill the dataStore object with most values
     // Some initial values are filled elsewhere, like getURLArguments() and getConfigFileFromServer()
@@ -49,7 +49,7 @@ function setupDataStore(){
 
     // Sorting Status variables
     dataStore.midasFileDataDirectoryPath = '';                // [added in processConfigFile()] initial data directory path
-  //  dataStore.midasFileDataDirectoryPath = "/tig/grifstore1/grifalt/schedule146/Calibrations_June2024";                // [added in processConfigFile()] initial data directory path
+    //  dataStore.midasFileDataDirectoryPath = "/tig/grifstore1/grifalt/schedule146/Calibrations_June2024";                // [added in processConfigFile()] initial data directory path
 
     dataStore.midasFileList = { "Names" : [], "Sizes" : [], "Titles" : []};  // place to store the list of midas files available to sort which is provided by the server
     dataStore.midasRunList = {};                               // place to store the list of midas runs available to sort which is provided by the server
@@ -81,24 +81,24 @@ function setupDataStore(){
 
 
     // Gating and Histogram variables
-  //  dataStore.configFileDataDirectoryPath = "/home/grifstor/daq/analyzer/grif-replay";                                 // [added in processConfigFile()] initial config file directory path
+    //  dataStore.configFileDataDirectoryPath = "/home/grifstor/daq/analyzer/grif-replay";                                 // [added in processConfigFile()] initial config file directory path
     dataStore.configFileDataDirectoryPath = '';                                 // [added in processConfigFile()] initial config file directory path
     dataStore.configFileTimestamp = 0;               // Timestamp recorded at the most recent request for the config file (viewConfig)
     dataStore.Configs = {};                          // place to park Config file information
     dataStore.globalCondition = {                   // place to park Global condition info on the dataStore
-        "globalIndex" : 0,               // monotonically increasing counter to create unique IDs for new Glabal condition blocks
-	"contents" : []             // array of structures holding the variables and values for each Global condition
+      "globalIndex" : 0,               // monotonically increasing counter to create unique IDs for new Glabal condition blocks
+      "contents" : []             // array of structures holding the variables and values for each Global condition
     };
 
     dataStore.gateCondition = {                  // place to park Gate condition info on the dataStore
-        "gateIndex" : 0,                 // monotonically increasing counter to create unique IDs for new Gate condition blocks
-        "nRows" : [],                 // array of monotonic counters for number of rows inserted into Gate condition block; Gate block # == array index.
-	"contents" : []             // array of structures holding the variables and values for each Gate condition
-	};
+      "gateIndex" : 0,                 // monotonically increasing counter to create unique IDs for new Gate condition blocks
+      "nRows" : [],                 // array of monotonic counters for number of rows inserted into Gate condition block; Gate block # == array index.
+      "contents" : []             // array of structures holding the variables and values for each Gate condition
+    };
     dataStore.histogramDefinition = {             // place to park Histogram definition info on the dataStore
-        "histogramIndex" : 0,            // monotonically increasing counter to create unique IDs for new Histogram condition blocks
-        "nRows" : [],            // array of monotonic counters for number of rows inserted into Histogram condition block; Histogram block # == array index.
-        "contents" : []            // place to save Histogram definition parameters
+      "histogramIndex" : 0,            // monotonically increasing counter to create unique IDs for new Histogram condition blocks
+      "nRows" : [],            // array of monotonic counters for number of rows inserted into Histogram condition block; Histogram block # == array index.
+      "contents" : []            // place to save Histogram definition parameters
     };
     dataStore.currentCalibrations = [];     // place to save the current Calibrations from the Config file
     dataStore.uniqueGlobalName = '';        // place to save the unique global name entered in the modal
@@ -108,38 +108,38 @@ function setupDataStore(){
     dataStore.sortCodeVariables = [];          // place to store the sort Code Variables available for histograms, gates and conditions
 
     dataStore.logicOptions = [                       // List of logic options used for building Gating conditions
-	{
-            "short": 'EQ',
-            "description": 'Equal to'
-	},
-	{
-            "short": 'LT',
-            "description": 'Less than'
-	},
-	{
-            "short": 'LTE',
-            "description": 'Less than or equal to'
-	},
-	{
-            "short": 'GT',
-            "description": 'Greater than'
-	},
-	{
-            "short": 'GTE',
-            "description": 'Greater than or equal to'
-	},
-	{
-            "short": 'NE',
-            "description": 'Not equal to'
-	},
-	{
-            "short": 'RA',
-            "description": 'Range[Min-Max]'
-	}
+      {
+        "short": 'EQ',
+        "description": 'Equal to'
+      },
+      {
+        "short": 'LT',
+        "description": 'Less than'
+      },
+      {
+        "short": 'LTE',
+        "description": 'Less than or equal to'
+      },
+      {
+        "short": 'GT',
+        "description": 'Greater than'
+      },
+      {
+        "short": 'GTE',
+        "description": 'Greater than or equal to'
+      },
+      {
+        "short": 'NE',
+        "description": 'Not equal to'
+      },
+      {
+        "short": 'RA',
+        "description": 'Range[Min-Max]'
+      }
     ];
 
     // Spectrum viewer variables
-  //  dataStore.histoFileDirectoryPath = "/tig/grifstore1/grifalt/schedule146/Calibrations_June2024";    // [added in processConfigFile()] initial histogram file directory path
+    //  dataStore.histoFileDirectoryPath = "/tig/grifstore1/grifalt/schedule146/Calibrations_June2024";    // [added in processConfigFile()] initial histogram file directory path
     dataStore.histoFileDirectoryPath = '';    // [added in processConfigFile()] initial histogram file directory path
     dataStore.histoFileList = [];                                                            // place to store the list of histogram files available to be opened
     dataStore.histoFileName = "run21850_000.tar";                        // place to store the name of the histogram file to be opened
@@ -156,10 +156,10 @@ function setupDataStore(){
 
     // Heartbeat variables
     dataStore.heartbeat = {                               // queries and callbacks for the periodic data poll
-        "URLqueries": [],                        // elements == ['url string', 'response type string', callback]; response type can be 'arraybuffer' or 'json'
-        "scriptQueries": [],
-        "ADCrequest": [],                         // same format as URL queries.
-	"errorMessage": ''
+      "URLqueries": [],                        // elements == ['url string', 'response type string', callback]; response type can be 'arraybuffer' or 'json'
+      "scriptQueries": [],
+      "ADCrequest": [],                         // same format as URL queries.
+      "errorMessage": ''
     };
     dataStore.heartbeatInterval = 1000;                   // ms between data updates
     dataStore.heartbeatIntervalDEFAULTvalue = 1000;          // default interval
@@ -171,35 +171,35 @@ function setupDataStore(){
 
     // resolve the promise
     resolve('Success!');
-    });
+  });
 
 }
 
 // Control the initial load workflow
 function onloadInitialSetup(){
 
-    // Return a new promise.
-    return new Promise(function(resolve, reject) {
+  // Return a new promise.
+  return new Promise(function(resolve, reject) {
 
-// Set up the data store. Once that is done then the event listeners can be added.
+    // Set up the data store. Once that is done then the event listeners can be added.
     Promise.all([
-	setupDataStore(),
-	promiseURLArguments()
+      setupDataStore(),
+      promiseURLArguments()
     ]
-	       ).then(
-		   function(){
-             // setupEventListeners is usually the callback of GetURLArguments. Here we used a promise, so trigger that callback now.
-             setupEventListeners();
+  ).then(
+    function(){
+      // setupEventListeners is usually the callback of GetURLArguments. Here we used a promise, so trigger that callback now.
+      setupEventListeners();
 
-               // Do the work of getConfigFileFromServer() but with a resolved promise
-               // get the Global conditions, Gates conditions and Histogram definitions from the server/ODB
-               let url = dataStore.spectrumServer + '/?cmd=viewConfig';
-               resolve(promiseXHR(url, "Problem getting Config file from analyzer server", processConfigFile, function(error){ErrorConnectingToAnalyzerServer(error)}));
+      // Do the work of getConfigFileFromServer() but with a resolved promise
+      // get the Global conditions, Gates conditions and Histogram definitions from the server/ODB
+      let url = dataStore.spectrumServer + '/?cmd=viewConfig';
+      resolve(promiseXHR(url, "Problem getting Config file from analyzer server", processConfigFile, function(error){ErrorConnectingToAnalyzerServer(error)}));
 
-       		   }
-	       )
+    }
+  )
 
-    });
+});
 
 }
 
@@ -219,129 +219,129 @@ Promise.all([
 /////////////////
 
 function fetchCallback(){
-    //fires after all data has been updated
+  //fires after all data has been updated
 
-    var i,
-        keys = Object.keys(dataStore.viewers);
+  var i,
+  keys = Object.keys(dataStore.viewers);
 
-    for(i=0; i<keys.length; i++){
-        dataStore.viewers[keys[i]].plotData(null, true);
-    }
+  for(i=0; i<keys.length; i++){
+    dataStore.viewers[keys[i]].plotData(null, true);
+  }
 }
 
 function setupEventListeners(){
 
-	window.addEventListener('HTMLImportsLoaded', function(e) {
+  window.addEventListener('HTMLImportsLoaded', function(e) {
 
-	///////////////
-	// initial setup
-	///////////////
+    ///////////////
+    // initial setup
+    ///////////////
 
 
-	///////////////////////////
-	//handle templates
-	///////////////////////////
-	    dataStore.templates = prepareTemplates(['header', 'analyzer-menu', 'analyzer-sorting', 'analyzer-histograms', 'analyzer-calibrations', 'analyzer-viewer', 'globalBlock', 'gateBlock', 'histogramBlock', 'histogramConditionRow', 'gateConditionRow', 'plotList', 'plotGrid', 'plotControl', 'auxPlotControl', 'auxPlotControlTable', 'fitRow', 'footer']);
+    ///////////////////////////
+    //handle templates
+    ///////////////////////////
+    dataStore.templates = prepareTemplates(['header', 'analyzer-menu', 'analyzer-sorting', 'analyzer-histograms', 'analyzer-calibrations', 'analyzer-viewer', 'globalBlock', 'gateBlock', 'histogramBlock', 'histogramConditionRow', 'gateConditionRow', 'plotList', 'plotGrid', 'plotControl', 'auxPlotControl', 'auxPlotControlTable', 'fitRow', 'footer']);
 
-      setupHeader('head', 'Analyzer Interface');
-	    setupAnalyzerMenu('menu');
-	    setupAnalyzerSorting('AnalyzerDisplaySorting');
-	    setupAnalyzerHistograms('AnalyzerDisplayHistograms');
-	    setupAnalyzerCalibrations('AnalyzerDisplayCalibrations');
-	    setupAnalyzerViewer('AnalyzerDisplayViewer');
-	    setupFooter('foot');
+    setupHeader('head', 'Analyzer Interface');
+    setupAnalyzerMenu('menu');
+    setupAnalyzerSorting('AnalyzerDisplaySorting');
+    setupAnalyzerHistograms('AnalyzerDisplayHistograms');
+    setupAnalyzerCalibrations('AnalyzerDisplayCalibrations');
+    setupAnalyzerViewer('AnalyzerDisplayViewer');
+    setupFooter('foot');
 
-      // Inject the dismiss button to the messageDiv
-      newButton = document.createElement('button');
-      newButton.setAttribute('id', 'messageDivDismissButton');
-      newButton.setAttribute('class', 'btn btn-default btn-lg');
-      newButton.innerHTML = "Dismiss";
-      //newButton.style.padding = '4px';
-      newButton.onclick = function(){
-        ClearErrorConnectingToAnalyzerServer();
-      }.bind(newButton);
-      document.getElementById('messageDivButton').appendChild(newButton);
+    // Inject the dismiss button to the messageDiv
+    newButton = document.createElement('button');
+    newButton.setAttribute('id', 'messageDivDismissButton');
+    newButton.setAttribute('class', 'btn btn-default btn-lg');
+    newButton.innerHTML = "Dismiss";
+    //newButton.style.padding = '4px';
+    newButton.onclick = function(){
+      ClearErrorConnectingToAnalyzerServer();
+    }.bind(newButton);
+    document.getElementById('messageDivButton').appendChild(newButton);
 
-	    // Launch the current time counter which includes a timeout
-	    updateTime();
+    // Launch the current time counter which includes a timeout
+    updateTime();
 
-	    // Launch the heartbeat for regularly grabbing the sort status
-	    //console.log('initiateSortStatusHeartbeat');
-	    initiateSortStatusHeartbeat();
+    // Launch the heartbeat for regularly grabbing the sort status
+    //console.log('initiateSortStatusHeartbeat');
+    initiateSortStatusHeartbeat();
 
-	});
+  });
 }
 
 /*
 // This function has been moved to helpers.js
 function ErrorConnectingToAnalyzerServer(error){
-    var string = 'Problem connecting to analyzer server: '+dataStore.spectrumServer+'<br>'+error;
-    document.getElementById('messageDiv').innerHTML = string;
-    document.getElementById('messageDiv').style.display= 'block';
+var string = 'Problem connecting to analyzer server: '+dataStore.spectrumServer+'<br>'+error;
+document.getElementById('messageDiv').innerHTML = string;
+document.getElementById('messageDiv').style.display= 'block';
 
-    // Stop the heartbeat if the server is not responding
-    clearTimeout(dataStore.heartbeatTimer);
+// Stop the heartbeat if the server is not responding
+clearTimeout(dataStore.heartbeatTimer);
 }
 */
 
 function updateTime(){
 
-   // var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  // var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-    var today = new Date();
+  var today = new Date();
   //  var dateNow = today.getFullYear() + '-' + months[today.getMonth()] + '-' + today.getDate();
   //  var timeNow = today.getHours() + ':' + today.getMinutes().toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + ':' + today.getSeconds().toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
-    document.getElementById('currentDateTimeDisplay').innerHTML = today.toString();
-    // console.log(timeNow);
+  document.getElementById('currentDateTimeDisplay').innerHTML = today.toString();
+  // console.log(timeNow);
 
-    window.clearTimeout(currentTime)
-    currentTime = window.setTimeout(updateTime, 1000);
+  window.clearTimeout(currentTime)
+  currentTime = window.setTimeout(updateTime, 1000);
 }
 
 function processSortStatus(payload){
 
-    // A response was received from the server, so ensure the connection error is not displayed
-    if(document.getElementById('messageDiv').style.display == 'block'){
-      if(document.getElementById('messageDiv').innerHTML.split(" ")[0] == "Problem"){
-        // Only hide the error message if it was because the server was not responding
-         ClearErrorConnectingToAnalyzerServer();
-       }
+  // A response was received from the server, so ensure the connection error is not displayed
+  if(document.getElementById('messageDiv').style.display == 'block'){
+    if(document.getElementById('messageDiv').innerHTML.split(" ")[0] == "Problem"){
+      // Only hide the error message if it was because the server was not responding
+      ClearErrorConnectingToAnalyzerServer();
     }
+  }
 
-    /*
-    // Clear the Sort Status request lock because a response has been received
-    dataStore.SortStatusRequestLock = false;
-    dataStore.sortStatusRequestBlockCount=0;
-    console.log('sort status request lock reset. Lock='+dataStore.SortStatusRequestLock+', count='+dataStore.sortStatusRequestBlockCount);
-    */
+  /*
+  // Clear the Sort Status request lock because a response has been received
+  dataStore.SortStatusRequestLock = false;
+  dataStore.sortStatusRequestBlockCount=0;
+  console.log('sort status request lock reset. Lock='+dataStore.SortStatusRequestLock+', count='+dataStore.sortStatusRequestBlockCount);
+  */
 
-    //
-    // The function in the analyzer server (c syntax)
-    //int send_sort_status(int fd)
-    //{
-    //   char tmp[256];
-    //   sprintf(tmp,"%d %d %ld %ld", current_run, current_subrun, current_filesize, midas_bytes);
-    //   put_line(fd, tmp, strlen(tmp) );
-    //   return(0);
-    // }
-    //
-    // dataStore.SortStatusHistory.push(payload);
-    // console.log(dataStore.SortStatusHistory);
-    // Handle the Analyzer IDLE response
-    // Set the progress bar to orange and write a status message
-    if(strncmp(payload,'ONLINE',6)){
+  //
+  // The function in the analyzer server (c syntax)
+  //int send_sort_status(int fd)
+  //{
+  //   char tmp[256];
+  //   sprintf(tmp,"%d %d %ld %ld", current_run, current_subrun, current_filesize, midas_bytes);
+  //   put_line(fd, tmp, strlen(tmp) );
+  //   return(0);
+  // }
+  //
+  // dataStore.SortStatusHistory.push(payload);
+  // console.log(dataStore.SortStatusHistory);
+  // Handle the Analyzer IDLE response
+  // Set the progress bar to orange and write a status message
+  if(strncmp(payload,'ONLINE',6)){
 
     // Save the timestamp of the most recent config file saved on the server
     dataStore.configServerTimestamp = payload.split(' ')[2];
 
-	// Check the timestamp of the most recent config file saved on the server
-	checkConfigTimestamps(dataStore.configServerTimestamp);
+    // Check the timestamp of the most recent config file saved on the server
+    checkConfigTimestamps(dataStore.configServerTimestamp);
 
-	// Set the heartbeat frequency
-	dataStore.heartbeatInterval = dataStore.heartbeatIntervalIDLEvalue;
+    // Set the heartbeat frequency
+    dataStore.heartbeatInterval = dataStore.heartbeatIntervalIDLEvalue;
 
-	if(payload.split(' ')[1] == 'Stopped'){
-	    var string = 'Analyzer is connected to MIDAS but the run is stopped.';
+    if(payload.split(' ')[1] == 'Stopped'){
+      var string = 'Analyzer is connected to MIDAS but the run is stopped.';
 
       // If the run has just stopped then refresh the midas file and histogram lists
       if(dataStore.previousSortStatus != 'ONLINE-IDLE'){
@@ -351,124 +351,124 @@ function processSortStatus(payload){
       }
       // Remember this status
       dataStore.previousSortStatus = 'ONLINE-IDLE';
-	}else{
-      // Status is Sorting online
-    	var string = 'Analyzer is connected to MIDAS and is sorting online data.';
-
-      	// Remember this status
-      	dataStore.previousSortStatus = 'ONLINE-BUSY';
-  }
-
-	// Update the progress bar
-	document.getElementById('progress').className = 'progress-bar bg-info';
-	document.getElementById('progress').setAttribute('style', 'width:' + 100 + '%' );
-	document.getElementById('progress').innerHTML = string;
-	document.getElementById("sortStatusDisplay").innerHTML = string;
-	//console.log('End of processSortStatus: Lock='+dataStore.SortStatusRequestLock+', count='+dataStore.sortStatusRequestBlockCount);
-	return;
-    }else if(strncmp(payload,'IDLE',4)){
-
-	// Check the timestamp of the most recent config file saved on the server
-	checkConfigTimestamps(payload.split(' ')[1]);
-
-	// Check if a file just finished sorting and if so, grab the latest list of midas and histogram files
-	// Need to add somewhere a way to detect that one file in the queue has completed, while others are still sorting - done below after the payload is unpacked
-	if(dataStore.previousSortStatus != 'IDLE'){
-    console.log("SortStatus now IDLE, previously "+dataStore.previousSortStatus);
-    getMidasFileListFromServer();
-    getHistoFileListFromServer();
-	}
-	dataStore.previousSortStatus = 'IDLE';
-
-	// Set the heartbeat frequency
-	dataStore.heartbeatInterval = dataStore.heartbeatIntervalIDLEvalue;
-
-	// Update the progress bar
-	document.getElementById('progress').className = 'progress-bar progress-bar-warning progress-bar-striped';
-	document.getElementById('progress').setAttribute('style', 'width:' + 100 + '%' );
-	document.getElementById('progress').innerHTML = 'Analyzer is idle, ready for files to be submitted.';
-	document.getElementById("sortStatusDisplay").innerHTML = 'Analyzer is idle, ready for files to be submitted.';
-	//console.log('End of processSortStatus: Lock='+dataStore.SortStatusRequestLock+', count='+dataStore.sortStatusRequestBlockCount);
-	return;
     }else{
-	// Set the heartbeat frequency
-	dataStore.heartbeatInterval = dataStore.heartbeatIntervalBUSYvalue;
+      // Status is Sorting online
+      var string = 'Analyzer is connected to MIDAS and is sorting online data.';
 
-	// Remember the sorting state
-	dataStore.previousSortStatus = 'BUSY';
+      // Remember this status
+      dataStore.previousSortStatus = 'ONLINE-BUSY';
     }
 
-    // Handle the Analyzer running response
-    // [Data Directory] [Filename] [Run number] [Subrun number] [File size in bytes] [bytes sorted]
-    // The above line repeats for all files in the current queue
+    // Update the progress bar
+    document.getElementById('progress').className = 'progress-bar bg-info';
+    document.getElementById('progress').setAttribute('style', 'width:' + 100 + '%' );
+    document.getElementById('progress').innerHTML = string;
+    document.getElementById("sortStatusDisplay").innerHTML = string;
+    //console.log('End of processSortStatus: Lock='+dataStore.SortStatusRequestLock+', count='+dataStore.sortStatusRequestBlockCount);
+    return;
+  }else if(strncmp(payload,'IDLE',4)){
 
-    // Timestamp this Sort Status (in seconds)
-    dataStore.SortStatusCurrentTimestamp = Math.floor(Date.now() / 1000);
+    // Check the timestamp of the most recent config file saved on the server
+    checkConfigTimestamps(payload.split(' ')[1]);
 
-    // Unpack the Sort Status response from the server
-    var thisPayload = payload.split(" ");
-  //  console.log(thisPayload);
-    dataStore.midasFileDataDirectoryPath = thisPayload[0];
-    dataStore.SortStatusCurrentFileName = thisPayload[1];
-    dataStore.SortStatusCurrentRunNumber = parseInt(thisPayload[2]);
-    dataStore.SortStatusCurrentSubRunNumber = parseInt(thisPayload[3]);
-    dataStore.SortStatusCurrentBytesFileSize = parseInt(thisPayload[4]);
-    dataStore.SortStatusCurrentFileSize = parseInt(thisPayload[4] / 1000000);
-    dataStore.SortStatusCurrentBytesSorted = parseInt(thisPayload[5]);
-    dataStore.SortStatusCurrentMegaBytesSorted = parseInt(thisPayload[5] / 1000000);
-
-    /*
-    console.log('===================================');
-    console.log('Dir, File, Run, Subrun:');
-    console.log(dataStore.midasFileDataDirectoryPath);
-    console.log(dataStore.SortStatusCurrentFileName);
-    console.log(dataStore.SortStatusCurrentRunNumber);
-    console.log(dataStore.SortStatusCurrentSubRunNumber);
-    console.log('Filesize, bytes sorted, Config timestamp:');
-    console.log(dataStore.SortStatusCurrentBytesFileSize);
-    console.log(dataStore.SortStatusCurrentBytesSorted);
-    console.log(thisPayload[6]);
-    */
-
-    // one file in the queue has completed, while others are still sorting. Update the midas file and histogram lists
-    // Skip the update for the first instance following initialization of the dataStore.SortStatusPreviousRunNumber
-    if(dataStore.SortStatusCurrentRunNumber != dataStore.SortStatusPreviousRunNumber && dataStore.SortStatusPreviousRunNumber>10){
-      console.log("SortStatus now BUSY, with run number "+dataStore.SortStatusCurrentRunNumber+", previously "+dataStore.SortStatusPreviousRunNumber);
+    // Check if a file just finished sorting and if so, grab the latest list of midas and histogram files
+    // Need to add somewhere a way to detect that one file in the queue has completed, while others are still sorting - done below after the payload is unpacked
+    if(dataStore.previousSortStatus != 'IDLE'){
+      console.log("SortStatus now IDLE, previously "+dataStore.previousSortStatus);
       getMidasFileListFromServer();
       getHistoFileListFromServer();
     }
+    dataStore.previousSortStatus = 'IDLE';
 
-    // Check the timestamp of the most recent config file saved on the server
-    checkConfigTimestamps(thisPayload[6].split(',')[0]);
+    // Set the heartbeat frequency
+    dataStore.heartbeatInterval = dataStore.heartbeatIntervalIDLEvalue;
 
-    // Skip the first update so that we can have valid sort speed values
-    if(dataStore.SortStatusPreviousTimestamp<100){
-	dataStore.SortStatusPreviousTimestamp = dataStore.SortStatusCurrentTimestamp;
-	dataStore.SortStatusPreviousBytesSorted = dataStore.SortStatusCurrentBytesSorted;
-	dataStore.SortStatusPreviousMegaBytesSorted = dataStore.SortStatusCurrentMegaBytesSorted;
-    }
+    // Update the progress bar
+    document.getElementById('progress').className = 'progress-bar progress-bar-warning progress-bar-striped';
+    document.getElementById('progress').setAttribute('style', 'width:' + 100 + '%' );
+    document.getElementById('progress').innerHTML = 'Analyzer is idle, ready for files to be submitted.';
+    document.getElementById("sortStatusDisplay").innerHTML = 'Analyzer is idle, ready for files to be submitted.';
+    //console.log('End of processSortStatus: Lock='+dataStore.SortStatusRequestLock+', count='+dataStore.sortStatusRequestBlockCount);
+    return;
+  }else{
+    // Set the heartbeat frequency
+    dataStore.heartbeatInterval = dataStore.heartbeatIntervalBUSYvalue;
 
-    // Calculate quantities from the current Sort Status values
-    dataStore.SortStatusCurrentSortSpeed = parseFloat((dataStore.SortStatusCurrentMegaBytesSorted-dataStore.SortStatusPreviousMegaBytesSorted)/(dataStore.SortStatusCurrentTimestamp - dataStore.SortStatusPreviousTimestamp));
-    calculateAverageSortSpeed();
-    dataStore.SortStatusCurrentPercentageComplete = parseFloat((dataStore.SortStatusCurrentMegaBytesSorted/dataStore.SortStatusCurrentFileSize)*100.0).toFixed(1);
-    dataStore.SortStatusCurrentRemainingSortTime = parseFloat((dataStore.SortStatusCurrentFileSize-dataStore.SortStatusCurrentMegaBytesSorted)/dataStore.SortStatusAverageSortSpeed).toFixed(1);
+    // Remember the sorting state
+    dataStore.previousSortStatus = 'BUSY';
+  }
 
-    /*
-    console.log('===================================');
-    console.log(dataStore.SortStatusCurrentTimestamp);
-    console.log(dataStore.SortStatusSortSpeedHistory);
-    console.log(dataStore.SortStatusCurrentSortSpeed);
-    console.log(dataStore.SortStatusAverageSortSpeed);
-    */
+  // Handle the Analyzer running response
+  // [Data Directory] [Filename] [Run number] [Subrun number] [File size in bytes] [bytes sorted]
+  // The above line repeats for all files in the current queue
 
-    // Protect against nonsense values, but also against divide by zero errors
-    if(dataStore.SortStatusCurrentSortSpeed<0){ dataStore.SortStatusCurrentSortSpeed=0.1; }
-    if(!dataStore.SortStatusCurrentSortSpeed){ dataStore.SortStatusCurrentSortSpeed=0.1; }
-    if(dataStore.SortStatusCurrentPercentageComplete<0){ dataStore.SortStatusCurrentPercentageComplete=0.1; }
-    if(dataStore.SortStatusCurrentRemainingSortTime<0){ dataStore.SortStatusCurrentRemainingSortTime=0.1; }
+  // Timestamp this Sort Status (in seconds)
+  dataStore.SortStatusCurrentTimestamp = Math.floor(Date.now() / 1000);
 
-    // Check the values in the console
+  // Unpack the Sort Status response from the server
+  var thisPayload = payload.split(" ");
+  //  console.log(thisPayload);
+  dataStore.midasFileDataDirectoryPath = thisPayload[0];
+  dataStore.SortStatusCurrentFileName = thisPayload[1];
+  dataStore.SortStatusCurrentRunNumber = parseInt(thisPayload[2]);
+  dataStore.SortStatusCurrentSubRunNumber = parseInt(thisPayload[3]);
+  dataStore.SortStatusCurrentBytesFileSize = parseInt(thisPayload[4]);
+  dataStore.SortStatusCurrentFileSize = parseInt(thisPayload[4] / 1000000);
+  dataStore.SortStatusCurrentBytesSorted = parseInt(thisPayload[5]);
+  dataStore.SortStatusCurrentMegaBytesSorted = parseInt(thisPayload[5] / 1000000);
+
+  /*
+  console.log('===================================');
+  console.log('Dir, File, Run, Subrun:');
+  console.log(dataStore.midasFileDataDirectoryPath);
+  console.log(dataStore.SortStatusCurrentFileName);
+  console.log(dataStore.SortStatusCurrentRunNumber);
+  console.log(dataStore.SortStatusCurrentSubRunNumber);
+  console.log('Filesize, bytes sorted, Config timestamp:');
+  console.log(dataStore.SortStatusCurrentBytesFileSize);
+  console.log(dataStore.SortStatusCurrentBytesSorted);
+  console.log(thisPayload[6]);
+  */
+
+  // one file in the queue has completed, while others are still sorting. Update the midas file and histogram lists
+  // Skip the update for the first instance following initialization of the dataStore.SortStatusPreviousRunNumber
+  if(dataStore.SortStatusCurrentRunNumber != dataStore.SortStatusPreviousRunNumber && dataStore.SortStatusPreviousRunNumber>10){
+    console.log("SortStatus now BUSY, with run number "+dataStore.SortStatusCurrentRunNumber+", previously "+dataStore.SortStatusPreviousRunNumber);
+    getMidasFileListFromServer();
+    getHistoFileListFromServer();
+  }
+
+  // Check the timestamp of the most recent config file saved on the server
+  checkConfigTimestamps(thisPayload[6].split(',')[0]);
+
+  // Skip the first update so that we can have valid sort speed values
+  if(dataStore.SortStatusPreviousTimestamp<100){
+    dataStore.SortStatusPreviousTimestamp = dataStore.SortStatusCurrentTimestamp;
+    dataStore.SortStatusPreviousBytesSorted = dataStore.SortStatusCurrentBytesSorted;
+    dataStore.SortStatusPreviousMegaBytesSorted = dataStore.SortStatusCurrentMegaBytesSorted;
+  }
+
+  // Calculate quantities from the current Sort Status values
+  dataStore.SortStatusCurrentSortSpeed = parseFloat((dataStore.SortStatusCurrentMegaBytesSorted-dataStore.SortStatusPreviousMegaBytesSorted)/(dataStore.SortStatusCurrentTimestamp - dataStore.SortStatusPreviousTimestamp));
+  calculateAverageSortSpeed();
+  dataStore.SortStatusCurrentPercentageComplete = parseFloat((dataStore.SortStatusCurrentMegaBytesSorted/dataStore.SortStatusCurrentFileSize)*100.0).toFixed(1);
+  dataStore.SortStatusCurrentRemainingSortTime = parseFloat((dataStore.SortStatusCurrentFileSize-dataStore.SortStatusCurrentMegaBytesSorted)/dataStore.SortStatusAverageSortSpeed).toFixed(1);
+
+  /*
+  console.log('===================================');
+  console.log(dataStore.SortStatusCurrentTimestamp);
+  console.log(dataStore.SortStatusSortSpeedHistory);
+  console.log(dataStore.SortStatusCurrentSortSpeed);
+  console.log(dataStore.SortStatusAverageSortSpeed);
+  */
+
+  // Protect against nonsense values, but also against divide by zero errors
+  if(dataStore.SortStatusCurrentSortSpeed<0){ dataStore.SortStatusCurrentSortSpeed=0.1; }
+  if(!dataStore.SortStatusCurrentSortSpeed){ dataStore.SortStatusCurrentSortSpeed=0.1; }
+  if(dataStore.SortStatusCurrentPercentageComplete<0){ dataStore.SortStatusCurrentPercentageComplete=0.1; }
+  if(dataStore.SortStatusCurrentRemainingSortTime<0){ dataStore.SortStatusCurrentRemainingSortTime=0.1; }
+
+  // Check the values in the console
   //  console.log('Dir: '+dataStore.midasFileDataDirectoryPath);
   //  console.log('File: '+dataStore.SortStatusCurrentFileName);
   //  console.log('Run: '+dataStore.SortStatusCurrentRunNumber);
@@ -482,52 +482,52 @@ function processSortStatus(payload){
   //  console.log('Remaining: '+dataStore.SortStatusCurrentRemainingSortTime);
 
 
-    // Update the printed Sort Status information on screen
-    string = 'Run '+dataStore.SortStatusCurrentRunNumber+', subrun '+dataStore.SortStatusCurrentSubRunNumber+' at '+dataStore.SortStatusAverageSortSpeed+' MB/s. Sorted '+prettyFileSizeString(dataStore.SortStatusCurrentBytesSorted)+' of '+prettyFileSizeString(dataStore.SortStatusCurrentBytesFileSize)+'s ('+dataStore.SortStatusCurrentPercentageComplete+'% completed).<br>Estimated '+prettyTimeString(parseInt(dataStore.SortStatusCurrentRemainingSortTime))+' remaining.';
-  	document.getElementById("sortStatusDisplay").innerHTML = string;
+  // Update the printed Sort Status information on screen
+  string = 'Run '+dataStore.SortStatusCurrentRunNumber+', subrun '+dataStore.SortStatusCurrentSubRunNumber+' at '+dataStore.SortStatusAverageSortSpeed+' MB/s. Sorted '+prettyFileSizeString(dataStore.SortStatusCurrentBytesSorted)+' of '+prettyFileSizeString(dataStore.SortStatusCurrentBytesFileSize)+'s ('+dataStore.SortStatusCurrentPercentageComplete+'% completed).<br>Estimated '+prettyTimeString(parseInt(dataStore.SortStatusCurrentRemainingSortTime))+' remaining.';
+  document.getElementById("sortStatusDisplay").innerHTML = string;
 
-    // Update the progress bar to show the current sort progress
-    if(document.getElementById('progress').className == 'progress-bar progress-bar-warning progress-bar-striped'){
-	document.getElementById('progress').className = 'progress-bar progress-bar-success progress-bar-striped';
+  // Update the progress bar to show the current sort progress
+  if(document.getElementById('progress').className == 'progress-bar progress-bar-warning progress-bar-striped'){
+    document.getElementById('progress').className = 'progress-bar progress-bar-success progress-bar-striped';
+  }
+  document.getElementById('progress').setAttribute('style', 'width:' + dataStore.SortStatusCurrentPercentageComplete + '%' );
+  string = dataStore.SortStatusCurrentPercentageComplete+'% Completed';
+  if(dataStore.SortStatusCurrentPercentageComplete == 100){ string += ", saving tar file to disk"; }
+  document.getElementById('progress').innerHTML = string;
+
+  // Save the timestamp, run number and bytes sorted for use at the next update
+  dataStore.SortStatusPreviousTimestamp = dataStore.SortStatusCurrentTimestamp;
+  dataStore.SortStatusPreviousMegaBytesSorted = dataStore.SortStatusCurrentMegaBytesSorted;
+  dataStore.SortStatusPreviousRunNumber = dataStore.SortStatusCurrentRunNumber;
+
+  // Update the Sort queue table
+  var thisPayloadArray = payload.split(",");
+  document.getElementById("JobsQueue").innerHTML = '';
+  var totalQueueFileSize = 0;
+  for(i=0; i<thisPayloadArray.length-1; i++){
+    var thisPayload = thisPayloadArray[i].split(" ");
+    if(i>0){
+      document.getElementById("JobsQueue").innerHTML += '<br>'+thisPayload[1]+' ('+prettyFileSizeString(thisPayload[4])+', requires '+prettyTimeString(parseInt(thisPayload[4] / 1000000)/dataStore.SortStatusAverageSortSpeed)+' to sort)';
+      totalQueueFileSize += parseInt(thisPayload[4]);
+    }else{
+      document.getElementById("JobsQueue").innerHTML += thisPayload[1]+' ('+prettyFileSizeString(thisPayload[4])+', requires '+prettyTimeString(parseInt(thisPayload[4] / 1000000)/dataStore.SortStatusAverageSortSpeed)+' to sort)';
     }
-    document.getElementById('progress').setAttribute('style', 'width:' + dataStore.SortStatusCurrentPercentageComplete + '%' );
-    string = dataStore.SortStatusCurrentPercentageComplete+'% Completed';
-    if(dataStore.SortStatusCurrentPercentageComplete == 100){ string += ", saving tar file to disk"; }
-    document.getElementById('progress').innerHTML = string;
+  }
+  if(totalQueueFileSize>0){
+    // document.getElementById("JobsQueue").innerHTML += '<br>Time to sort entire queue is '+parseFloat(totalQueueFileSize/dataStore.SortStatusAverageSortSpeed).toFixed(1)+' seconds';
+    document.getElementById("JobsQueue").innerHTML += '<br>Time to sort entire queue of '+(thisPayloadArray.length-1)+' runs ('+prettyFileSizeString(totalQueueFileSize)+') is '+prettyTimeString((totalQueueFileSize/1000000)/dataStore.SortStatusAverageSortSpeed);
+  }
 
-    // Save the timestamp, run number and bytes sorted for use at the next update
-    dataStore.SortStatusPreviousTimestamp = dataStore.SortStatusCurrentTimestamp;
-    dataStore.SortStatusPreviousMegaBytesSorted = dataStore.SortStatusCurrentMegaBytesSorted;
-    dataStore.SortStatusPreviousRunNumber = dataStore.SortStatusCurrentRunNumber;
-
-    // Update the Sort queue table
-    var thisPayloadArray = payload.split(",");
-    document.getElementById("JobsQueue").innerHTML = '';
-    var totalQueueFileSize = 0;
-    for(i=0; i<thisPayloadArray.length-1; i++){
-	var thisPayload = thisPayloadArray[i].split(" ");
-	if(i>0){
-	    document.getElementById("JobsQueue").innerHTML += '<br>'+thisPayload[1]+' ('+prettyFileSizeString(thisPayload[4])+', requires '+prettyTimeString(parseInt(thisPayload[4] / 1000000)/dataStore.SortStatusAverageSortSpeed)+' to sort)';
-	    totalQueueFileSize += parseInt(thisPayload[4]);
-	}else{
-	    document.getElementById("JobsQueue").innerHTML += thisPayload[1]+' ('+prettyFileSizeString(thisPayload[4])+', requires '+prettyTimeString(parseInt(thisPayload[4] / 1000000)/dataStore.SortStatusAverageSortSpeed)+' to sort)';
-	}
-    }
-    if(totalQueueFileSize>0){
-   // document.getElementById("JobsQueue").innerHTML += '<br>Time to sort entire queue is '+parseFloat(totalQueueFileSize/dataStore.SortStatusAverageSortSpeed).toFixed(1)+' seconds';
-	document.getElementById("JobsQueue").innerHTML += '<br>Time to sort entire queue of '+(thisPayloadArray.length-1)+' runs ('+prettyFileSizeString(totalQueueFileSize)+') is '+prettyTimeString((totalQueueFileSize/1000000)/dataStore.SortStatusAverageSortSpeed);
-    }
-
-   // console.log('End of processSortStatus: Lock='+dataStore.SortStatusRequestLock+', count='+dataStore.sortStatusRequestBlockCount);
+  // console.log('End of processSortStatus: Lock='+dataStore.SortStatusRequestLock+', count='+dataStore.sortStatusRequestBlockCount);
 }
 
 function checkConfigTimestamps(serverTimestamp){
 
-    // Compare this lastest Config timestamp received from the sever with the timestamp saved the last time we received a Config file
-    // If our local version is out-of-date then request the lastest version from the server
+  // Compare this lastest Config timestamp received from the sever with the timestamp saved the last time we received a Config file
+  // If our local version is out-of-date then request the lastest version from the server
   //  console.log(serverTimestamp);
-    if(serverTimestamp > dataStore.configFileTimestamp){
-  //  console.log('Fetch config because server '+serverTimestamp+' > '+dataStore.configFileTimestamp);
-	  getConfigFileFromServer();
-    }
+  if(serverTimestamp > dataStore.configFileTimestamp){
+    //  console.log('Fetch config because server '+serverTimestamp+' > '+dataStore.configFileTimestamp);
+    getConfigFileFromServer();
+  }
 }

@@ -25,11 +25,11 @@
 function setupDataStore(){
   //sets up global variable datastore
 
-var thisX=[0,5,10,15,20,25];
-var thisY=[5,20,35,50,65,80];
-var thisYerror=[2,2,2,0.2,0.2,0.2];
+  var thisX=[0,5,10,15,20,25];
+  var thisY=[5,20,35,50,65,80];
+  var thisYerror=[2,2,2,0.2,0.2,0.2];
 
-efficiencyRegression(thisX,thisY,thisYerror);
+  efficiencyRegression(thisX,thisY,thisYerror);
 
 
   var i, groups = [];
@@ -394,8 +394,8 @@ dataStore.plotStyle[1] = {                                              //dygrap
   labelsDiv: 'efficiencyPlotRelLegend',
   drawPoints: true,
   underlayCallback: drawDygraphCanvasObjects,
-//  connectSeparatedPoints: 'true',
-//  customBars: true,
+  //  connectSeparatedPoints: 'true',
+  //  customBars: true,
   pointSize: 5,
   highlightCircleSize: 7,
   strokeWidth: 0.0,
@@ -424,7 +424,7 @@ dataStore.plotStyle[2] = {                                              //dygrap
   colors: ["#AAE66A", "#EFB2F0", "#B2D1F0", "#F0DBB2"],
   labelsDiv: 'efficiencyPlot133BaLegend',
   drawPoints: 'true',
-//  customBars: true,
+  //  customBars: true,
   pointSize: 5,
   highlightCircleSize: 7,
   strokeWidth: 0.0,
@@ -447,7 +447,7 @@ dataStore.plotStyle[3] = {                                              //dygrap
   colors: ["#AAE66A", "#EFB2F0", "#B2D1F0", "#F0DBB2"],
   labelsDiv: 'efficiencyPlot152EuLegend',
   drawPoints: 'true',
-//  customBars: true,
+  //  customBars: true,
   pointSize: 5,
   highlightCircleSize: 7,
   strokeWidth: 0.0,
@@ -470,7 +470,7 @@ dataStore.plotStyle[4] = {                                              //dygrap
   colors: ["#AAE66A", "#EFB2F0", "#B2D1F0", "#F0DBB2"],
   labelsDiv: 'efficiencyPlot56CoLegend',
   drawPoints: 'true',
-//  customBars: true,
+  //  customBars: true,
   pointSize: 5,
   highlightCircleSize: 7,
   strokeWidth: 0.0,
@@ -493,7 +493,7 @@ dataStore.plotStyle[5] = {                                              //dygrap
   colors: ["#AAE66A", "#EFB2F0", "#B2D1F0", "#F0DBB2"],
   labelsDiv: 'efficiencyPlot60CoLegend',
   drawPoints: 'true',
-//  customBars: true,
+  //  customBars: true,
   pointSize: 5,
   highlightCircleSize: 7,
   strokeWidth: 0.0,
@@ -516,7 +516,7 @@ dataStore.plotStyle[6] = {                                              //dygrap
   colors: ["#AAE66A", "#EFB2F0", "#B2D1F0", "#F0DBB2"],
   labelsDiv: 'efficiencyPlot60CoLegend',
   drawPoints: 'true',
-//  customBars: true,
+  //  customBars: true,
   pointSize: 5,
   highlightCircleSize: 7,
   strokeWidth: 0.0,
@@ -538,20 +538,20 @@ setupDataStore();
 
 function drawDygraphCanvasObjects(ctx, area, layout) {
 
-    // Identify which graph this is
-            if(layout.maindiv_.id.includes('Abs')){
-              var thisPlotID = 0;
-            }else if(layout.maindiv_.id.includes('Rel')){
-              var thisPlotID = 1;
-            }else{ console.log('Unrecognized Div for dygraph drawEfficiencyLine'); return;}
+  // Identify which graph this is
+  if(layout.maindiv_.id.includes('Abs')){
+    var thisPlotID = 0;
+  }else if(layout.maindiv_.id.includes('Rel')){
+    var thisPlotID = 1;
+  }else{ console.log('Unrecognized Div for dygraph drawEfficiencyLine'); return;}
 
   // Bail out if there is no data yet
   if (typeof(dataStore._dataplot[thisPlotID].dygraph) == 'undefined') return;  // won't be set on the initial draw.
   if (dataStore.efficiencyPlotData.length<1) return;  // won't be set on the initial draw.
   if (dataStore.efficiencyPlotData[thisPlotID].length<1) return;  // won't be set on the initial draw.
 
-    drawDygraphEfficiencyLine(thisPlotID, ctx, area, layout);
-    drawDygraphErrorBars(thisPlotID, ctx, area, layout);
+  drawDygraphEfficiencyLine(thisPlotID, ctx, area, layout);
+  drawDygraphErrorBars(thisPlotID, ctx, area, layout);
 }
 
 function drawDygraphEfficiencyLine(thisPlotID, ctx, area, layout) {
@@ -597,8 +597,8 @@ function drawDygraphErrorBars(thisPlotID, ctx, area, layout) {
     x1 = dataStore.efficiencyPlotXData[thisPlotID][i];
     y1 = dataStore.efficiencyPlotData[thisPlotID][i] - dataStore.efficiencyPlotDataUnc[thisPlotID][i];
     y2 = dataStore.efficiencyPlotData[thisPlotID][i] + dataStore.efficiencyPlotDataUnc[thisPlotID][i];
-  //  y1 = dataStore.efficiencyPlotData[thisPlotID][i] * 0.8;
-//    y2 = dataStore.efficiencyPlotData[thisPlotID][i] *1.2;
+    //  y1 = dataStore.efficiencyPlotData[thisPlotID][i] * 0.8;
+    //    y2 = dataStore.efficiencyPlotData[thisPlotID][i] *1.2;
     var p1 = dataStore._dataplot[thisPlotID].dygraph.toDomCoords(x1, y1);
     var p2 = dataStore._dataplot[thisPlotID].dygraph.toDomCoords(x1, y2);
 
@@ -613,382 +613,382 @@ function drawDygraphErrorBars(thisPlotID, ctx, area, layout) {
 }
 
 function fetchCallback(){
-    console.log('fetchCallback');
+  console.log('fetchCallback');
 
-    // If we have not recieved the histograms from all sources yet, request the histograms from the next source
-    // Get the keys of all the different sources
-    var keys = Object.keys(dataStore.sourceInfo);
-    if(dataStore.currentSource != keys[keys.length-1]){
-	var j=0;
-	while(keys[j] != dataStore.currentSource){ j++; }
-	j++;
-	console.log('Next source in fetchCallback(): '+dataStore.sourceInfo[keys[j]].title);
-  document.getElementById('progress').setAttribute('style', 'width:' + (5*(j+1)) + '%' );
+  // If we have not recieved the histograms from all sources yet, request the histograms from the next source
+  // Get the keys of all the different sources
+  var keys = Object.keys(dataStore.sourceInfo);
+  if(dataStore.currentSource != keys[keys.length-1]){
+    var j=0;
+    while(keys[j] != dataStore.currentSource){ j++; }
+    j++;
+    console.log('Next source in fetchCallback(): '+dataStore.sourceInfo[keys[j]].title);
+    document.getElementById('progress').setAttribute('style', 'width:' + (5*(j+1)) + '%' );
 
-	// Set the dataStore.histoFileName to this source so that constructQueries requests the correct spectrum
-	dataStore.currentSource = keys[j];
-	dataStore.histoFileName = dataStore.sourceInfo[keys[j]].histoFileName;
+    // Set the dataStore.histoFileName to this source so that constructQueries requests the correct spectrum
+    dataStore.currentSource = keys[j];
+    dataStore.histoFileName = dataStore.sourceInfo[keys[j]].histoFileName;
 
-	// Request spectra from the server
-	dataStore._plotControl.refreshAll();
-	return;
-    }
-    document.getElementById('progress').setAttribute('style', 'width:' + (25) + '%' );
-    console.log('I think I have all the spectra from all histogram files!');
-    console.log(dataStore.rawData);
-    console.log(dataStore.THESEdetectors);
+    // Request spectra from the server
+    dataStore._plotControl.refreshAll();
+    return;
+  }
+  document.getElementById('progress').setAttribute('style', 'width:' + (25) + '%' );
+  console.log('I think I have all the spectra from all histogram files!');
+  console.log(dataStore.rawData);
+  console.log(dataStore.THESEdetectors);
 
-    // change messages
-    deleteNode('downloadMessage');
-    document.getElementById('projectionsMessage').classList.remove('hidden');
+  // change messages
+  deleteNode('downloadMessage');
+  document.getElementById('projectionsMessage').classList.remove('hidden');
 
-    // Set the current task to keep track of our progress
-    dataStore.currentTask = 'Projections';
+  // Set the current task to keep track of our progress
+  dataStore.currentTask = 'Projections';
 
-    // Now we have all the spectra received...
+  // Now we have all the spectra received...
 
-    // Revise the spectrum list to include the histogram names.
-    if(dataStore.dataType == 'Addback'){
-  	    dataStore.THESEdetectors =   [
+  // Revise the spectrum list to include the histogram names.
+  if(dataStore.dataType == 'Addback'){
+    dataStore.THESEdetectors =   [
       'Addback_Sum_Energy'
-      ];
-    }else{ // Singles
-    	    dataStore.THESEdetectors =   [
-    		'Ge_Sum_Energy'
-        ];
+    ];
+  }else{ // Singles
+    dataStore.THESEdetectors =   [
+      'Ge_Sum_Energy'
+    ];
+  }
+
+  var spectrumKeys = Object.keys(dataStore.rawData);
+  for(i=0; i<spectrumKeys.length; i++){
+    if(spectrumKeys[i].includes('Sum')){
+      // List of all singles spectra to be fitted
+      dataStore.spectrumListSingles[spectrumKeys[i]] = dataStore.rawData[spectrumKeys[i]];
     }
 
-    var spectrumKeys = Object.keys(dataStore.rawData);
-    for(i=0; i<spectrumKeys.length; i++){
-	if(spectrumKeys[i].includes('Sum')){
-	    // List of all singles spectra to be fitted
-	    dataStore.spectrumListSingles[spectrumKeys[i]] = dataStore.rawData[spectrumKeys[i]];
-	}
-
-	if(spectrumKeys[i].includes('Hit')){
-    // List of all Hitpattern spectra to be fitted
-	    dataStore.spectrumListHits[spectrumKeys[i]] = dataStore.rawData[spectrumKeys[i]];
-	}
-
-	if(spectrumKeys[i].includes('oppo')){
-    // List of all Hitpattern spectra to be fitted
-	    dataStore.spectrumListOpp[spectrumKeys[i]] = dataStore.rawData[spectrumKeys[i]];
-	}
+    if(spectrumKeys[i].includes('Hit')){
+      // List of all Hitpattern spectra to be fitted
+      dataStore.spectrumListHits[spectrumKeys[i]] = dataStore.rawData[spectrumKeys[i]];
     }
 
-    console.log(spectrumKeys);
-    console.log(dataStore.spectrumListSingles);
-    console.log(dataStore.spectrumListHits);
+    if(spectrumKeys[i].includes('oppo')){
+      // List of all Hitpattern spectra to be fitted
+      dataStore.spectrumListOpp[spectrumKeys[i]] = dataStore.rawData[spectrumKeys[i]];
+    }
+  }
 
-    //show first plot for the first source
-    dataStore.currentSource = keys[0];
+  console.log(spectrumKeys);
+  console.log(dataStore.spectrumListSingles);
+  console.log(dataStore.spectrumListHits);
 
-    // Make the projections needed from each matrix
-    projectAllMatrices();
+  //show first plot for the first source
+  dataStore.currentSource = keys[0];
+
+  // Make the projections needed from each matrix
+  projectAllMatrices();
 }
 
 function projectionsCallback(){
-    console.log('projectionsCallback');
+  console.log('projectionsCallback');
 
-    console.log('Projections have been made so all spectra are ready for fitting.');
-    console.log('Ready to fit all spectra');
+  console.log('Projections have been made so all spectra are ready for fitting.');
+  console.log('Ready to fit all spectra');
 
-    // change messages
-    deleteNode('projectionsMessage');
-    document.getElementById('fittingSinglesMessage').classList.remove('hidden');
+  // change messages
+  deleteNode('projectionsMessage');
+  document.getElementById('fittingSinglesMessage').classList.remove('hidden');
 
-    // Set the current task to keep track of our progress
-    dataStore.currentTask = 'SinglesFitting';
+  // Set the current task to keep track of our progress
+  dataStore.currentTask = 'SinglesFitting';
 
-    // Start the whole fitting routine for singles peaks
-    dataStore._efficiencyFitterReport.fitAllSinglesPeaks();
+  // Start the whole fitting routine for singles peaks
+  dataStore._efficiencyFitterReport.fitAllSinglesPeaks();
 }
 
-function setupHistoListSelect(){
-    // Remove the select if it already exists
-    try{
-	document.getElementById('HistoListSelect').remove();
-	document.getElementById('HistoListSelectLabel').remove();
-    }
-    catch(err){ }
-
-    var keys = Object.keys(dataStore.sourceInfo);
-
-    // loop over all sources
-    for(i=0; i<keys.length; i++){
-	thisTitle = dataStore.sourceInfo[keys[i]].title;
-
-	// Add the title text
-	var newLabel = document.createElement("label");
-	newLabel.for = 'HistoListSelect'+thisTitle;
-	newLabel.id = 'HistoListSelectLabel'+thisTitle;
-	newLabel.innerHTML = thisTitle+' Histogram file: ';
-	document.getElementById('histoChoice'+thisTitle).appendChild(newLabel);
-
-	// Create a select input for the histo file list
-	var newSelect = document.createElement("select");
-	newSelect.id = 'HistoListSelect'+thisTitle;
-	newSelect.name = 'HistoListSelect'+thisTitle;
-	newSelect.onchange = function(){
-	   var thisKey = this.name.split('Select')[1];
-	   dataStore.sourceInfo[thisKey].histoFileName = this.value;
-	}.bind(newSelect);
-	document.getElementById('histoChoice'+thisTitle).appendChild(newSelect);
-
-	// Add the list of histo files as the options
-	thisSelect = document.getElementById('HistoListSelect'+thisTitle);
-  if(thisTitle == "11Be" || thisTitle == "133Ba"){
-	  thisSelect.add( new Option("Do not include "+thisTitle, "exclude") );
+function setupHistoListSelects(){
+  // Remove the select if it already exists
+  try{
+    document.getElementById('HistoListSelect').remove();
+    document.getElementById('HistoListSelectLabel').remove();
   }
-	for(var j=0; j<dataStore.histoFileList.length; j++){
-	    thisSelect.add( new Option(dataStore.histoFileList[j], dataStore.histoFileList[j]) );
-	}
+  catch(err){ }
 
-	// Fire the onchange event for the select with the default value to set it
-	document.getElementById('HistoListSelect'+thisTitle).onchange();
+  var keys = Object.keys(dataStore.sourceInfo);
+
+  // loop over all sources
+  for(i=0; i<keys.length; i++){
+    thisTitle = dataStore.sourceInfo[keys[i]].title;
+
+    // Add the title text
+    var newLabel = document.createElement("label");
+    newLabel.for = 'HistoListSelect'+thisTitle;
+    newLabel.id = 'HistoListSelectLabel'+thisTitle;
+    newLabel.innerHTML = thisTitle+' Histogram file: ';
+    document.getElementById('histoChoice'+thisTitle).appendChild(newLabel);
+
+    // Create a select input for the histo file list
+    var newSelect = document.createElement("select");
+    newSelect.id = 'HistoListSelect'+thisTitle;
+    newSelect.name = 'HistoListSelect'+thisTitle;
+    newSelect.onchange = function(){
+      var thisKey = this.name.split('Select')[1];
+      dataStore.sourceInfo[thisKey].histoFileName = this.value;
+    }.bind(newSelect);
+    document.getElementById('histoChoice'+thisTitle).appendChild(newSelect);
+
+    // Add the list of histo files as the options
+    thisSelect = document.getElementById('HistoListSelect'+thisTitle);
+    if(thisTitle == "11Be" || thisTitle == "133Ba"){
+      thisSelect.add( new Option("Do not include "+thisTitle, "exclude") );
     }
-
-    // Create the input and select for the 60Co which defines the activity
-	// Add the title text
-	var newLabel = document.createElement("label");
-	newLabel.for = 'SourceChoiceSelect60Co';
-	newLabel.id = 'SourceChoiceSelect60CoLabel';
-	newLabel.innerHTML = '60Co source: ';
-	document.getElementById('sourceChoice60Co').appendChild(newLabel);
-
-	// Create a select input for the 60Co source list
-	var newSelect = document.createElement("select");
-	newSelect.id = 'SourceChoiceSelect60Co';
-	newSelect.name = 'SourceChoiceSelect60Co';
-	newSelect.onchange = function(){
-	    console.log('onchange of sourceSelect: '+this.value);
-	    dataStore.sourceInfo['60Co'].sourceCalibration = dataStore.sourceCalibration[this.value];
-	}.bind(newSelect);
-	document.getElementById('sourceChoice60Co').appendChild(newSelect);
-
-	// Add the list of histo files as the options
-	thisSelect = document.getElementById('SourceChoiceSelect60Co');
-        var keys = Object.keys(dataStore.sourceCalibration);
-        for(i=0; i<keys.length; i++){
-	    thisSelect.add( new Option(keys[i], keys[i]) );
-	}
+    for(var j=0; j<dataStore.histoFileList.length; j++){
+      thisSelect.add( new Option(dataStore.histoFileList[j], dataStore.histoFileList[j]) );
+    }
 
     // Fire the onchange event for the select with the default value to set it
+    document.getElementById('HistoListSelect'+thisTitle).onchange();
+  }
+
+  // Create the input and select for the 60Co which defines the activity
+  // Add the title text
+  var newLabel = document.createElement("label");
+  newLabel.for = 'SourceChoiceSelect60Co';
+  newLabel.id = 'SourceChoiceSelect60CoLabel';
+  newLabel.innerHTML = '60Co source: ';
+  document.getElementById('sourceChoice60Co').appendChild(newLabel);
+
+  // Create a select input for the 60Co source list
+  var newSelect = document.createElement("select");
+  newSelect.id = 'SourceChoiceSelect60Co';
+  newSelect.name = 'SourceChoiceSelect60Co';
+  newSelect.onchange = function(){
+    console.log('onchange of sourceSelect: '+this.value);
+    dataStore.sourceInfo['60Co'].sourceCalibration = dataStore.sourceCalibration[this.value];
+  }.bind(newSelect);
+  document.getElementById('sourceChoice60Co').appendChild(newSelect);
+
+  // Add the list of histo files as the options
+  thisSelect = document.getElementById('SourceChoiceSelect60Co');
+  var keys = Object.keys(dataStore.sourceCalibration);
+  for(i=0; i<keys.length; i++){
+    thisSelect.add( new Option(keys[i], keys[i]) );
+  }
+
+  // Fire the onchange event for the select with the default value to set it
+  document.getElementById('SourceChoiceSelect60Co').onchange();
+
+
+  // Create the singles Submit button
+  newButton = document.createElement('button');
+  newButton.setAttribute('id', 'submitHistoFilenameChoicesButton');
+  newButton.setAttribute('class', 'btn btn-default btn-lg');
+  newButton.innerHTML = "Build Singles efficiency curve";
+  newButton.style.padding = '4px';
+  newButton.onclick = function(){
+    document.getElementById('progressDiv').classList.remove('hidden');
+    dataStore.dataType = 'Singles';
+    submitHistoFilenameChoices();
+  }.bind(newButton);
+  document.getElementById('histoChoiceSubmit').appendChild(newButton);
+
+  // Create the addback Submit button
+  newButton = document.createElement('button');
+  newButton.setAttribute('id', 'submitHistoFilenameChoicesButton');
+  newButton.setAttribute('class', 'btn btn-default btn-lg');
+  newButton.innerHTML = "Build Addback efficiency curve";
+  newButton.style.padding = '4px';
+  newButton.onclick = function(){
+    document.getElementById('progressDiv').classList.remove('hidden');
+    dataStore.dataType = 'Addback';
+    submitHistoFilenameChoices();
+  }.bind(newButton);
+  document.getElementById('histoChoiceSubmit').appendChild(newButton);
+
+  // Create the Auto-fill for development button
+  newButton = document.createElement('button');
+  newButton.setAttribute('id', 'submitHistoFilenameChoicesButton');
+  newButton.setAttribute('class', 'btn btn-default btn-lg');
+  newButton.innerHTML = "Auto-fill for development, S2319";
+  newButton.style.padding = '4px';
+  newButton.onclick = function(){
+
+    document.getElementById('HistoListSelect133Ba').value = "run28177.tar";
+    document.getElementById('HistoListSelect152Eu').value = "run28171.tar";
+    document.getElementById('HistoListSelect56Co').value = "run28174.tar";
+    document.getElementById('HistoListSelect60Co').value = "run28175.tar";
+    document.getElementById('HistoListSelect133Ba').onchange();
+    document.getElementById('HistoListSelect152Eu').onchange();
+    document.getElementById('HistoListSelect56Co').onchange();
+    document.getElementById('HistoListSelect60Co').onchange();
+  }.bind(newButton);
+  document.getElementById('histoChoiceSubmit').appendChild(newButton);
+
+  // Create the Auto-fill for development button
+  newButton = document.createElement('button');
+  newButton.setAttribute('id', 'submitHistoFilenameChoicesButton');
+  newButton.setAttribute('class', 'btn btn-default btn-lg');
+  newButton.innerHTML = "Auto-fill for development, S1723";
+  newButton.style.padding = '4px';
+  newButton.onclick = function(){
+
+    document.getElementById('HistoListSelect133Ba').value = "run20567.tar";
+    document.getElementById('HistoListSelect152Eu').value = "run20570.tar";
+    document.getElementById('HistoListSelect56Co').value = "run20573.tar";
+    document.getElementById('HistoListSelect60Co').value = "run20571.tar";
+    document.getElementById('SourceChoiceSelect60Co').value = "R-1105";
+    document.getElementById('HistoListSelect133Ba').onchange();
+    document.getElementById('HistoListSelect152Eu').onchange();
+    document.getElementById('HistoListSelect56Co').onchange();
+    document.getElementById('HistoListSelect60Co').onchange();
     document.getElementById('SourceChoiceSelect60Co').onchange();
-
-
-    // Create the singles Submit button
-    newButton = document.createElement('button');
-    newButton.setAttribute('id', 'submitHistoFilenameChoicesButton');
-    newButton.setAttribute('class', 'btn btn-default btn-lg');
-    newButton.innerHTML = "Build Singles efficiency curve";
-    newButton.style.padding = '4px';
-    newButton.onclick = function(){
-        document.getElementById('progressDiv').classList.remove('hidden');
-        dataStore.dataType = 'Singles';
-	submitHistoFilenameChoices();
-    }.bind(newButton);
-      document.getElementById('histoChoiceSubmit').appendChild(newButton);
-
-          // Create the addback Submit button
-          newButton = document.createElement('button');
-          newButton.setAttribute('id', 'submitHistoFilenameChoicesButton');
-          newButton.setAttribute('class', 'btn btn-default btn-lg');
-          newButton.innerHTML = "Build Addback efficiency curve";
-          newButton.style.padding = '4px';
-          newButton.onclick = function(){
-              document.getElementById('progressDiv').classList.remove('hidden');
-              dataStore.dataType = 'Addback';
-      	submitHistoFilenameChoices();
-          }.bind(newButton);
-            document.getElementById('histoChoiceSubmit').appendChild(newButton);
-
-          // Create the Auto-fill for development button
-          newButton = document.createElement('button');
-          newButton.setAttribute('id', 'submitHistoFilenameChoicesButton');
-          newButton.setAttribute('class', 'btn btn-default btn-lg');
-          newButton.innerHTML = "Auto-fill for development, S2319";
-          newButton.style.padding = '4px';
-          newButton.onclick = function(){
-
-            document.getElementById('HistoListSelect133Ba').value = "run28177.tar";
-            document.getElementById('HistoListSelect152Eu').value = "run28171.tar";
-            document.getElementById('HistoListSelect56Co').value = "run28174.tar";
-            document.getElementById('HistoListSelect60Co').value = "run28175.tar";
-            document.getElementById('HistoListSelect133Ba').onchange();
-            document.getElementById('HistoListSelect152Eu').onchange();
-            document.getElementById('HistoListSelect56Co').onchange();
-            document.getElementById('HistoListSelect60Co').onchange();
-          }.bind(newButton);
-            document.getElementById('histoChoiceSubmit').appendChild(newButton);
-
-          // Create the Auto-fill for development button
-          newButton = document.createElement('button');
-          newButton.setAttribute('id', 'submitHistoFilenameChoicesButton');
-          newButton.setAttribute('class', 'btn btn-default btn-lg');
-          newButton.innerHTML = "Auto-fill for development, S1723";
-          newButton.style.padding = '4px';
-          newButton.onclick = function(){
-
-            document.getElementById('HistoListSelect133Ba').value = "run20567.tar";
-            document.getElementById('HistoListSelect152Eu').value = "run20570.tar";
-            document.getElementById('HistoListSelect56Co').value = "run20573.tar";
-            document.getElementById('HistoListSelect60Co').value = "run20571.tar";
-            document.getElementById('SourceChoiceSelect60Co').value = "R-1105";
-            document.getElementById('HistoListSelect133Ba').onchange();
-            document.getElementById('HistoListSelect152Eu').onchange();
-            document.getElementById('HistoListSelect56Co').onchange();
-            document.getElementById('HistoListSelect60Co').onchange();
-            document.getElementById('SourceChoiceSelect60Co').onchange();
-          }.bind(newButton);
-            document.getElementById('histoChoiceSubmit').appendChild(newButton);
+  }.bind(newButton);
+  document.getElementById('histoChoiceSubmit').appendChild(newButton);
 
 }
 
 function submitHistoFilenameChoices(){
-    // this is the main setup and start of the automatic process.
+  // this is the main setup and start of the automatic process.
 
-// TRIGGERING THIS FUNCTION SHOULD DISABLE CHANGING THE SELECTS
-var group = document.getElementsByTagName('select');
-for(var i=0; i<group.length; i++){
-  group[i].disabled = true;
-}
-/*
-document.getElementById('HistoListSelect11Be').disabled = true;
-document.getElementById('HistoListSelect133Ba').disabled = true;
-document.getElementById('HistoListSelect152Eu').disabled = true;
-document.getElementById('HistoListSelect56Co').disabled = true;
-document.getElementById('HistoListSelect60Co').disabled = true;
-*/
-document.getElementById('SourceChoiceSelect60Co').disabled = true;
-document.getElementById('HistoDirectoryInput').disabled = true;
-document.getElementById('submitHistoFilenameChoicesButton').disabled = true;
-
-    // Get the keys of the different sources
-    var keys = Object.keys(dataStore.sourceInfo);
-
-// Remove any sources that are set to exclude
-for(i=0; i<keys.length; i++){
-  if(dataStore.sourceInfo[keys[i]].histoFileName == "exclude"){
-    console.log("Deleting "+keys[i]+"from dataStore.sourceInfo");
-    delete dataStore.sourceInfo[keys[i]];
-    document.getElementById('efficiencyPlot'+keys[i]).style.display = 'none';
+  // TRIGGERING THIS FUNCTION SHOULD DISABLE CHANGING THE SELECTS
+  var group = document.getElementsByTagName('select');
+  for(var i=0; i<group.length; i++){
+    group[i].disabled = true;
   }
-}
+  /*
+  document.getElementById('HistoListSelect11Be').disabled = true;
+  document.getElementById('HistoListSelect133Ba').disabled = true;
+  document.getElementById('HistoListSelect152Eu').disabled = true;
+  document.getElementById('HistoListSelect56Co').disabled = true;
+  document.getElementById('HistoListSelect60Co').disabled = true;
+  */
+  document.getElementById('SourceChoiceSelect60Co').disabled = true;
+  document.getElementById('HistoDirectoryInput').disabled = true;
+  document.getElementById('submitHistoFilenameChoicesButton').disabled = true;
 
-    // Get the keys of the different sources again in case it changed
-    var keys = Object.keys(dataStore.sourceInfo);
+  // Get the keys of the different sources
+  var keys = Object.keys(dataStore.sourceInfo);
 
-    // Get the config file for the 60Co histogram file in order to get the details for absolute efficiency
-    // Format check for the data file
-    var filename = dataStore.histoFileDirectoryPath;
-    if(filename[filename.length]!='/'){
-	filename += '/';
+  // Remove any sources that are set to exclude
+  for(i=0; i<keys.length; i++){
+    if(dataStore.sourceInfo[keys[i]].histoFileName == "exclude"){
+      console.log("Deleting "+keys[i]+"from dataStore.sourceInfo");
+      delete dataStore.sourceInfo[keys[i]];
+      document.getElementById('efficiencyPlot'+keys[i]).style.display = 'none';
     }
-    filename += dataStore.sourceInfo['60Co'].histoFileName;
-    url = dataStore.spectrumServer + '/?cmd=viewConfig' + '&filename=' + filename;
-    XHR(url, "Problem getting Config file for "+ filename +" from analyzer server", processConfigFileForRuntime, function(error){ErrorConnectingToAnalyzerServer(error)});
+  }
+
+  // Get the keys of the different sources again in case it changed
+  var keys = Object.keys(dataStore.sourceInfo);
+
+  // Get the config file for the 60Co histogram file in order to get the details for absolute efficiency
+  // Format check for the data file
+  var filename = dataStore.histoFileDirectoryPath;
+  if(filename[filename.length]!='/'){
+    filename += '/';
+  }
+  filename += dataStore.sourceInfo['60Co'].histoFileName;
+  url = dataStore.spectrumServer + '/?cmd=viewConfig' + '&filename=' + filename;
+  XHR(url, "Problem getting Config file for "+ filename +" from analyzer server", processConfigFileForRuntime, function(error){ErrorConnectingToAnalyzerServer(error)});
 
 
-    // setup the dataStore for this choice of detectorType
-    var i, num=0, groups = [], spectrumNameString;
+  // setup the dataStore for this choice of detectorType
+  var i, num=0, groups = [], spectrumNameString;
 
-    // Save the lists of spectrum names to the dataStore for this detectorType
-    if(dataStore.detectorType == 'HPGe'){
-	// Set up GRIFFIN detectors
+  // Save the lists of spectrum names to the dataStore for this detectorType
+  if(dataStore.detectorType == 'HPGe'){
+    // Set up GRIFFIN detectors
 
-	//10-char codes of all possible griffin detectors.
-  if(dataStore.dataType == 'Addback'){
-	    dataStore.THESEdetectors =   [
-    'Addback_Sum_Energy',
-		'Hitpattern_Energy',
-    'Addback_GGoppo'
-    ];
-    spectrumNameString = 'Addback_Sum_Energy';
-  }else{ // Singles
-  	    dataStore.THESEdetectors =   [
-  		'Ge_Sum_Energy',
-  		'Hitpattern_Energy',
-  		'GGoppo'
+    //10-char codes of all possible griffin detectors.
+    if(dataStore.dataType == 'Addback'){
+      dataStore.THESEdetectors =   [
+        'Addback_Sum_Energy',
+        'Hitpattern_Energy',
+        'Addback_GGoppo'
+      ];
+      spectrumNameString = 'Addback_Sum_Energy';
+    }else{ // Singles
+      dataStore.THESEdetectors =   [
+        'Ge_Sum_Energy',
+        'Hitpattern_Energy',
+        'GGoppo'
       ];
       spectrumNameString = 'Ge_Sum_Energy';
+    }
+
+    for(i=0; i<keys.length; i++){
+
+      //generate groups for plot selector
+      groups.push({
+        "groupID": dataStore.sourceInfo[keys[i]].title,
+        "groupTitle": dataStore.sourceInfo[keys[i]].title+':'+dataStore.sourceInfo[keys[i]].histoFileName.split('.')[0],
+        "plots": [
+          {
+            "plotID": dataStore.sourceInfo[keys[i]].histoFileName.split('.')[0]+':'+spectrumNameString,
+            "title": spectrumNameString
+          }//,
+          //    {
+          //        "plotID": dataStore.sourceInfo[keys[i]].histoFileName.split('.')[0]+':'+'Addback_Sum_Energy',
+          //        "title": 'Addback_Sum_Energy'
+          //    }//,
+          // {
+          //     "plotID": dataStore.sourceInfo[keys[i]].histoFileName+':'+'Hitpattern_Energy',
+          //      "title": 'Hitpattern_Energy'
+          //  }
+        ]
+      })
+    }
+
+  }else if(dataStore.detectorType == 'PACES'){
+
   }
 
-	for(i=0; i<keys.length; i++){
+  dataStore.plotGroups = groups;     //groups to arrange detectors into for dropdowns
 
-	//generate groups for plot selector
-        groups.push({
-            "groupID": dataStore.sourceInfo[keys[i]].title,
-            "groupTitle": dataStore.sourceInfo[keys[i]].title+':'+dataStore.sourceInfo[keys[i]].histoFileName.split('.')[0],
-            "plots": [
-                {
-                    "plotID": dataStore.sourceInfo[keys[i]].histoFileName.split('.')[0]+':'+spectrumNameString,
-                    "title": spectrumNameString
-                }//,
-                //    {
-                //        "plotID": dataStore.sourceInfo[keys[i]].histoFileName.split('.')[0]+':'+'Addback_Sum_Energy',
-                //        "title": 'Addback_Sum_Energy'
-                //    }//,
-               // {
-               //     "plotID": dataStore.sourceInfo[keys[i]].histoFileName+':'+'Hitpattern_Energy',
-              //      "title": 'Hitpattern_Energy'
-              //  }
-            ]
-        })
-    }
+  // Generate the spectrum lists based on the list of detectors
+  dataStore._plotListLite = new plotListLite('plotList');
+  dataStore._plotListLite.setup();
 
-    }else if(dataStore.detectorType == 'PACES'){
+  // Generate the Efficiency Fitter report table
+  dataStore._efficiencyFitterReport = new efficiencyFitterReport('efficiencyFitter');
+  dataStore._efficiencyFitterReport.setup();
 
-}
+  //user guidance
+  deleteNode('histogramMessage');
+  document.getElementById('downloadMessage').classList.remove('hidden');
 
-    dataStore.plotGroups = groups;     //groups to arrange detectors into for dropdowns
+  // Draw the search region
+  dataStore.viewers[dataStore.plots[0]].plotData();
 
-    // Generate the spectrum lists based on the list of detectors
-    dataStore._plotListLite = new plotListLite('plotList');
-    dataStore._plotListLite.setup();
+  //plug in special fit controls
+  // MIGHT not need refit buttons when using energy spectra??
+  /*
+  document.getElementById('fitLow').onclick = dataStore._efficiencyFitterReport.toggleFitMode;
+  document.getElementById('fitMid').onclick = dataStore._efficiencyFitterReport.toggleFitMode;
+  document.getElementById('fitHigh').onclick = dataStore._efficiencyFitterReport.toggleFitMode;
+  document.getElementById('fitvHi').onclick = dataStore._efficiencyFitterReport.toggleFitMode;
+  */
 
-    // Generate the Efficiency Fitter report table
-    dataStore._efficiencyFitterReport = new efficiencyFitterReport('efficiencyFitter');
-    dataStore._efficiencyFitterReport.setup();
+  // Plug in the active spectra names
+  for(i=0; i<dataStore.THESEdetectors.length; i++){
+    dataStore._plotControl.activeSpectra.push(dataStore.THESEdetectors[i]);
+  }
 
-    //user guidance
-    deleteNode('histogramMessage');
-    document.getElementById('downloadMessage').classList.remove('hidden');
-
-    // Draw the search region
-    dataStore.viewers[dataStore.plots[0]].plotData();
-
-    //plug in special fit controls
-    // MIGHT not need refit buttons when using energy spectra??
-    /*
-    document.getElementById('fitLow').onclick = dataStore._efficiencyFitterReport.toggleFitMode;
-    document.getElementById('fitMid').onclick = dataStore._efficiencyFitterReport.toggleFitMode;
-    document.getElementById('fitHigh').onclick = dataStore._efficiencyFitterReport.toggleFitMode;
-    document.getElementById('fitvHi').onclick = dataStore._efficiencyFitterReport.toggleFitMode;
-    */
-
-    // Plug in the active spectra names
-    for(i=0; i<dataStore.THESEdetectors.length; i++){
-            dataStore._plotControl.activeSpectra.push(dataStore.THESEdetectors[i]);
-    }
-
-    // Define the Regions of Interest for the full peak fitting based on the literature peaks for each source
-    // dataStore.ROI[sourceKey][peakIndex] = [low bin, high bin]
-    for(i=0; i<keys.length; i++){
-	dataStore.ROI[keys[i]] = [];
-	for(j=0; j<dataStore.sourceInfo[keys[i]]['literaturePeaks'].length; j++){
+  // Define the Regions of Interest for the full peak fitting based on the literature peaks for each source
+  // dataStore.ROI[sourceKey][peakIndex] = [low bin, high bin]
+  for(i=0; i<keys.length; i++){
+    dataStore.ROI[keys[i]] = [];
+    for(j=0; j<dataStore.sourceInfo[keys[i]]['literaturePeaks'].length; j++){
       var ROIwidth= typicalPeakWidth(dataStore.sourceInfo[keys[i]].literaturePeaks[j],"HPGe")*3; // HPGe singles ROI width
       if(dataStore.sourceInfo[keys[i]].literaturePeaks[j] == 2015.18 ||
-         dataStore.sourceInfo[keys[i]].literaturePeaks[j] == 2034.76 ||
-         dataStore.sourceInfo[keys[i]].literaturePeaks[j] == 3253.42){
-        // Special cases for close-lying peaks.
-        ROIwidth *= 0.5;
-      }
-	    dataStore.ROI[keys[i]][j] = [Math.floor(dataStore.sourceInfo[keys[i]].literaturePeaks[j] - ROIwidth), Math.ceil(dataStore.sourceInfo[keys[i]].literaturePeaks[j] + ROIwidth)];
+        dataStore.sourceInfo[keys[i]].literaturePeaks[j] == 2034.76 ||
+        dataStore.sourceInfo[keys[i]].literaturePeaks[j] == 3253.42){
+          // Special cases for close-lying peaks.
+          ROIwidth *= 0.5;
+        }
+        dataStore.ROI[keys[i]][j] = [Math.floor(dataStore.sourceInfo[keys[i]].literaturePeaks[j] - ROIwidth), Math.ceil(dataStore.sourceInfo[keys[i]].literaturePeaks[j] + ROIwidth)];
 
-	    // Count the total number of peaks to fit for use in the progress bar
-	    dataStore.progressBarNumberTasks++;
-	}
+        // Count the total number of peaks to fit for use in the progress bar
+        dataStore.progressBarNumberTasks++;
+      }
     }
     console.log(dataStore.ROI);
 
@@ -1007,9 +1007,9 @@ for(i=0; i<keys.length; i++){
     dataStore._plotControl.refreshAll();
 
     console.log(dataStore);
-}
+  }
 
-function buildCSVfile(){
+  function buildCSVfile(){
     console.log('Download initiated');
     var keys = Object.keys(dataStore.sourceInfo);
 
@@ -1067,8 +1067,8 @@ function buildCSVfile(){
         CSV += dataStore.sourceInfo[currentSource].normalizationAbsFactor+',';
         CSV += dataStore.sourceInfo[currentSource].absoluteEfficiency[currentPeak]+','+dataStore.sourceInfo[currentSource].absoluteEfficiencyUnc[currentPeak]+'\n';
 
-        }
-     }
+      }
+    }
 
     // Define all the columns in a legend
 
@@ -1083,9 +1083,9 @@ function buildCSVfile(){
     // Trigger the download
     document.body.appendChild(downloadLink);
     downloadLink.click();
-}
+  }
 
-function buildDatafile(){
+  function buildDatafile(){
     console.log('Download of data file initiated');
     var keys = Object.keys(dataStore.sourceInfo);
 
@@ -1112,9 +1112,9 @@ function buildDatafile(){
     // Trigger the download
     document.body.appendChild(downloadLink);
     downloadLink.click();
-}
+  }
 
-function buildRootfile(){
+  function buildRootfile(){
     console.log('Download of Root script initiated');
     var keys = Object.keys(dataStore.sourceInfo);
 
@@ -1178,9 +1178,9 @@ function buildRootfile(){
     // Trigger the download
     document.body.appendChild(downloadLink);
     downloadLink.click();
-}
+  }
 
-function buildGNUfile(){
+  function buildGNUfile(){
     console.log('Download of GNUPlot file initiated');
     var keys = Object.keys(dataStore.sourceInfo);
 
@@ -1222,7 +1222,7 @@ function buildGNUfile(){
     GNU += 'plot [40:10000] \"GRIFFIN_'+dataStore.dataType+'_efficiency_data.dat\" t \"Data from ';
     for(i=0; i<keys.length; i++){
       if(i>0){ GNU += '+'; }
-    GNU += keys[i];
+      GNU += keys[i];
     }
     GNU += '\" w yerr, \\\n';
     GNU += 'gf1(x) t \"'+dataStore.dataType+' Efficiency fit\"\n';
@@ -1237,190 +1237,190 @@ function buildGNUfile(){
     // Trigger the download
     document.body.appendChild(downloadLink);
     downloadLink.click();
-}
+  }
 
-function projectAllMatrices(){
-  //make the projections for the matrix of each source based on the peaks defined.
-  console.log(dataStore);
+  function projectAllMatrices(){
+    //make the projections for the matrix of each source based on the peaks defined.
+    console.log(dataStore);
 
-  // Change rawData to another list that is just the Opp spectrum
-  var i,j,k, plotName, thisKey, oppKeys = Object.keys(dataStore.spectrumListOpp),
-  buffer = dataStore.currentPlot //keep track of whatever was originally plotted so we can return to it
+    // Change rawData to another list that is just the Opp spectrum
+    var i,j,k, plotName, thisKey, oppKeys = Object.keys(dataStore.spectrumListOpp),
+    buffer = dataStore.currentPlot //keep track of whatever was originally plotted so we can return to it
 
-  releaser(
-    function(i){
-      // Change rawData to another list that is just the Sum_Energy_ spectrum
-      var oppKeys = Object.keys(dataStore.spectrumListOpp);
+    releaser(
+      function(i){
+        // Change rawData to another list that is just the Sum_Energy_ spectrum
+        var oppKeys = Object.keys(dataStore.spectrumListOpp);
 
-      // Identify the source from the histogram name in the spectrum title
-      dataStore.currentSource = Object.keys(dataStore.sourceInfo).find(key => dataStore.sourceInfo[key].histoFileName.split('.')[0] === oppKeys[i].split(':')[0])
+        // Identify the source from the histogram name in the spectrum title
+        dataStore.currentSource = Object.keys(dataStore.sourceInfo).find(key => dataStore.sourceInfo[key].histoFileName.split('.')[0] === oppKeys[i].split(':')[0])
 
-      // Set the details for this matrix and then unpack it
-      dataStore.activeMatrix = oppKeys[i];
-      dataStore.raw2 = dataStore.rawData[oppKeys[i]].data2;
-      dataStore.activeMatrixXaxisLength = dataStore.rawData[oppKeys[i]].XaxisLength;
-      dataStore.activeMatrixYaxisLength = dataStore.rawData[oppKeys[i]].YaxisLength;
-      dataStore.activeMatrixSymmetrized = dataStore.rawData[oppKeys[i]].symmetrized;
-      dataStore.hm._raw = packZcompressed(dataStore.rawData[oppKeys[i]].data2,dataStore.activeMatrixXaxisLength,dataStore.activeMatrixYaxisLength,dataStore.activeMatrixZaxisMax,dataStore.activeMatrixSymmetrized,false);
+        // Set the details for this matrix and then unpack it
+        dataStore.activeMatrix = oppKeys[i];
+        dataStore.raw2 = dataStore.rawData[oppKeys[i]].data2;
+        dataStore.activeMatrixXaxisLength = dataStore.rawData[oppKeys[i]].XaxisLength;
+        dataStore.activeMatrixYaxisLength = dataStore.rawData[oppKeys[i]].YaxisLength;
+        dataStore.activeMatrixSymmetrized = dataStore.rawData[oppKeys[i]].symmetrized;
+        dataStore.hm._raw = packZcompressed(dataStore.rawData[oppKeys[i]].data2,dataStore.activeMatrixXaxisLength,dataStore.activeMatrixYaxisLength,dataStore.activeMatrixZaxisMax,dataStore.activeMatrixSymmetrized,false);
 
 
-      // Loop through the making all the projections required for this source
-      for(j=0; j<dataStore.sourceInfo[dataStore.currentSource].literaturePeaks.length; j++){
+        // Loop through the making all the projections required for this source
+        for(j=0; j<dataStore.sourceInfo[dataStore.currentSource].literaturePeaks.length; j++){
 
-        // Convenient to set the summing-in counts to zero here for all literature peaks
-        dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionCounts[j] = 0;
-        dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionCountsUnc[j] = 0;
+          // Convenient to set the summing-in counts to zero here for all literature peaks
+          dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionCounts[j] = 0;
+          dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionCountsUnc[j] = 0;
 
-        // Set limits for the projections
-        console.log('Make projection for '+dataStore.sourceInfo[dataStore.currentSource].literaturePeaks[j]);
-        var thisPeakWidth = typicalPeakWidth(dataStore.sourceInfo[dataStore.currentSource].literaturePeaks[j],"HPGe"); // HPGe singles peak width
-        min = Math.floor(dataStore.sourceInfo[dataStore.currentSource].literaturePeaks[j]-thisPeakWidth);
-        max = Math.ceil(dataStore.sourceInfo[dataStore.currentSource].literaturePeaks[j]+thisPeakWidth);
+          // Set limits for the projections
+          console.log('Make projection for '+dataStore.sourceInfo[dataStore.currentSource].literaturePeaks[j]);
+          var thisPeakWidth = typicalPeakWidth(dataStore.sourceInfo[dataStore.currentSource].literaturePeaks[j],"HPGe"); // HPGe singles peak width
+          min = Math.floor(dataStore.sourceInfo[dataStore.currentSource].literaturePeaks[j]-thisPeakWidth);
+          max = Math.ceil(dataStore.sourceInfo[dataStore.currentSource].literaturePeaks[j]+thisPeakWidth);
 
-        plotName = projectYaxis(min,max);
-        console.log('Created '+plotName);
-        // Add this projection to the rawData storage for plotting
-        // Add this projection spectrum to the list which need to be fitted
-        dataStore.rawData[plotName] = dataStore.createdSpectra[plotName];
-        dataStore.spectrumListProjections[plotName] = dataStore.createdSpectra[plotName];
-        dataStore.spectrumListProjectionsPeaks[plotName] = {
-          // First entry is the peak index, second entry is the Parent peak index
-          'peaks': []
-        };
+          plotName = projectYaxis(min,max);
+          console.log('Created '+plotName);
+          // Add this projection to the rawData storage for plotting
+          // Add this projection spectrum to the list which need to be fitted
+          dataStore.rawData[plotName] = dataStore.createdSpectra[plotName];
+          dataStore.spectrumListProjections[plotName] = dataStore.createdSpectra[plotName];
+          dataStore.spectrumListProjectionsPeaks[plotName] = {
+            // First entry is the peak index, second entry is the Parent peak index
+            'peaks': []
+          };
 
-        // Add this projection to the spectrum menu
-        newMenuItem = document.createElement('li');
-        newMenuItem.setAttribute('id', 'plotList'+plotName);
-        newMenuItem.setAttribute('value', plotName);
-        newMenuItem.setAttribute('class', 'list-group-item toggle');
-        newMenuItem.innerHTML = plotName.split(':')[1].trim()+'<span id=\'plotListbadge'+plotName+'\' class=\"badge plotPresence hidden\">&#x2713;</span>';
-        document.getElementById('plotListplots'+dataStore.currentSource).appendChild(newMenuItem);
-        document.getElementById('plotList'+plotName).onclick = function(){ dataStore._plotListLite.exclusivePlot(this.id.split('plotList')[1], dataStore.viewers[dataStore.plots[0]]); }
+          // Add this projection to the spectrum menu
+          newMenuItem = document.createElement('li');
+          newMenuItem.setAttribute('id', 'plotList'+plotName);
+          newMenuItem.setAttribute('value', plotName);
+          newMenuItem.setAttribute('class', 'list-group-item toggle');
+          newMenuItem.innerHTML = plotName.split(':')[1].trim()+'<span id=\'plotListbadge'+plotName+'\' class=\"badge plotPresence hidden\">&#x2713;</span>';
+          document.getElementById('plotListplots'+dataStore.currentSource).appendChild(newMenuItem);
+          document.getElementById('plotList'+plotName).onclick = function(){ dataStore._plotListLite.exclusivePlot(this.id.split('plotList')[1], dataStore.viewers[dataStore.plots[0]]); }
 
-        // The summing-out correction is the total number of counts in this 180 degree coincidence multiplied by the F factor.
-        // The F factor is determined from the number of active crystals which contributed to this 180degree coincidence matrix.
-        // F factor will be deduced from the Hittpattern for this source histrogram file.
-        dataStore.sourceInfo[dataStore.currentSource].summingOutCorrectionCounts[j] = dataStore.createdSpectra[plotName].reduce((partialSum, a) => parseFloat(partialSum) + parseFloat(a), 0);
-        dataStore.sourceInfo[dataStore.currentSource].summingOutCorrectionCountsUnc[j] = Math.ceil(Math.sqrt(dataStore.sourceInfo[dataStore.currentSource].summingOutCorrectionCounts[j]));
+          // The summing-out correction is the total number of counts in this 180 degree coincidence multiplied by the F factor.
+          // The F factor is determined from the number of active crystals which contributed to this 180degree coincidence matrix.
+          // F factor will be deduced from the Hittpattern for this source histrogram file.
+          dataStore.sourceInfo[dataStore.currentSource].summingOutCorrectionCounts[j] = dataStore.createdSpectra[plotName].reduce((partialSum, a) => parseFloat(partialSum) + parseFloat(a), 0);
+          dataStore.sourceInfo[dataStore.currentSource].summingOutCorrectionCountsUnc[j] = Math.ceil(Math.sqrt(dataStore.sourceInfo[dataStore.currentSource].summingOutCorrectionCounts[j]));
 
-        // Build the list of peaks to be fitted for this projection spectrum - these contribute to the summing-in corrections.
-        for(k=0; k<dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j].length; k++){
-          // This is an array of two peak energies. The first will be the peak energy to fit in the projection of the second energy.
-          // Check if this projection has been made yet and if not make it.
-          // Make a list of the peaks to fit for this projection name.
-          console.log('Process summingInCorrectionPeaks:');
-          console.log(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j]);
-          console.log(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][0].length);
-          if(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][0].length==0){ continue; }
+          // Build the list of peaks to be fitted for this projection spectrum - these contribute to the summing-in corrections.
+          for(k=0; k<dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j].length; k++){
+            // This is an array of two peak energies. The first will be the peak energy to fit in the projection of the second energy.
+            // Check if this projection has been made yet and if not make it.
+            // Make a list of the peaks to fit for this projection name.
+            console.log('Process summingInCorrectionPeaks:');
+            console.log(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j]);
+            console.log(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][0].length);
+            if(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][0].length==0){ continue; }
 
-          if(dataStore.sourceInfo[dataStore.currentSource].literaturePeaks.indexOf(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1])<0){
-            // This peak is not a peak we are fitting as a single, so it does not have a projection spectrum yet.
-            // Make it now, unless it has already been created
+            if(dataStore.sourceInfo[dataStore.currentSource].literaturePeaks.indexOf(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1])<0){
+              // This peak is not a peak we are fitting as a single, so it does not have a projection spectrum yet.
+              // Make it now, unless it has already been created
 
-            console.log('Projections: This peak is not a literature peak, '+dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1]);
-            var thisPeakWidth = typicalPeakWidth(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1]); // HPGe singles peak width
-            min = Math.floor(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1]-thisPeakWidth);
-            max = Math.ceil(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1]+thisPeakWidth);
+              console.log('Projections: This peak is not a literature peak, '+dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1]);
+              var thisPeakWidth = typicalPeakWidth(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1]); // HPGe singles peak width
+              min = Math.floor(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1]-thisPeakWidth);
+              max = Math.ceil(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1]+thisPeakWidth);
 
-            thisKey = dataStore.activeMatrix+'y-'+min+'-'+max;
-            if(!(thisKey in dataStore.createdSpectra)){
-              console.log('This projection is not in createdSpectra so make it now');
+              thisKey = dataStore.activeMatrix+'y-'+min+'-'+max;
+              if(!(thisKey in dataStore.createdSpectra)){
+                console.log('This projection is not in createdSpectra so make it now');
 
-              plotName = projectYaxis(min,max);
-              console.log('Created '+plotName);
-              // Add this projection to the rawData storage for plotting
-              // Add this projection spectrum to the list which need to be fitted
-              dataStore.rawData[plotName] = dataStore.createdSpectra[plotName];
-              dataStore.spectrumListProjections[plotName] = dataStore.createdSpectra[plotName];
-              dataStore.spectrumListProjectionsPeaks[plotName] = {
-                // First entry is the peak index, second entry is the Parent peak index
-                'peaks': []
-              };
+                plotName = projectYaxis(min,max);
+                console.log('Created '+plotName);
+                // Add this projection to the rawData storage for plotting
+                // Add this projection spectrum to the list which need to be fitted
+                dataStore.rawData[plotName] = dataStore.createdSpectra[plotName];
+                dataStore.spectrumListProjections[plotName] = dataStore.createdSpectra[plotName];
+                dataStore.spectrumListProjectionsPeaks[plotName] = {
+                  // First entry is the peak index, second entry is the Parent peak index
+                  'peaks': []
+                };
 
-              // Add this projection to the spectrum menu
-              newMenuItem = document.createElement('li');
-              newMenuItem.setAttribute('id', 'plotList'+plotName);
-              newMenuItem.setAttribute('value', plotName);
-              newMenuItem.setAttribute('class', 'list-group-item toggle');
-              newMenuItem.innerHTML = plotName.split(':')[1].trim()+'<span id=\'plotListbadge'+plotName+'\' class=\"badge plotPresence hidden\">&#x2713;</span>';
-              document.getElementById('plotListplots'+dataStore.currentSource).appendChild(newMenuItem);
-              document.getElementById('plotList'+plotName).onclick = function(){ dataStore._plotListLite.exclusivePlot(this.id.split('plotList')[1], dataStore.viewers[dataStore.plots[0]]); }
+                // Add this projection to the spectrum menu
+                newMenuItem = document.createElement('li');
+                newMenuItem.setAttribute('id', 'plotList'+plotName);
+                newMenuItem.setAttribute('value', plotName);
+                newMenuItem.setAttribute('class', 'list-group-item toggle');
+                newMenuItem.innerHTML = plotName.split(':')[1].trim()+'<span id=\'plotListbadge'+plotName+'\' class=\"badge plotPresence hidden\">&#x2713;</span>';
+                document.getElementById('plotListplots'+dataStore.currentSource).appendChild(newMenuItem);
+                document.getElementById('plotList'+plotName).onclick = function(){ dataStore._plotListLite.exclusivePlot(this.id.split('plotList')[1], dataStore.viewers[dataStore.plots[0]]); }
+              }
+            }else{
+              // This peak for summing-in corrections is also a literature peak so it already has a projection spectrum.
+              // Set the plotname variable so that the peak to be fitted are added to the correct list.
+              var thisPeakWidth = typicalPeakWidth(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1]); // HPGe singles peak width
+              min = Math.floor(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1]-thisPeakWidth);
+              max = Math.ceil(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1]+thisPeakWidth);
+              plotName = dataStore.activeMatrix+'y-'+min+'-'+max;
             }
-          }else{
-            // This peak for summing-in corrections is also a literature peak so it already has a projection spectrum.
-            // Set the plotname variable so that the peak to be fitted are added to the correct list.
-            var thisPeakWidth = typicalPeakWidth(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1]); // HPGe singles peak width
-            min = Math.floor(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1]-thisPeakWidth);
-            max = Math.ceil(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][1]+thisPeakWidth);
-            plotName = dataStore.activeMatrix+'y-'+min+'-'+max;
+            // Add the peak to the list to fit in this projection spectrum
+            dataStore.spectrumListProjectionsPeaks[plotName].peaks.push([dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0],j]);
+            console.log('Save this peak '+dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0]+' for the projection '+plotName);
+
+            // Count the total number of peaks to fit for use in the progress bar
+            dataStore.progressBarNumberTasks++;
+
+            // Save the ROI for projections so it can be used for drawing the fitlines
+            if(!dataStore.ROIprojections[plotName]) dataStore.ROIprojections[plotName] = [];
+            var ROIwidth= typicalPeakWidth(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0])*3; // HPGe singles ROI width
+            if(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0] == 2015.18 ||
+              dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0] == 2034.76 ||
+              dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0] == 3253.42){
+                // Special cases for close-lying peaks.
+                ROIwidth *= 0.5;
+              }
+              dataStore.ROIprojections[plotName].push([Math.floor(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0]-ROIwidth),Math.ceil(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0]+ROIwidth)]);
+            }
+            console.log(dataStore.spectrumListProjectionsPeaks[plotName].peaks);
+
           }
-          // Add the peak to the list to fit in this projection spectrum
-          dataStore.spectrumListProjectionsPeaks[plotName].peaks.push([dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0],j]);
-          console.log('Save this peak '+dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0]+' for the projection '+plotName);
+        }.bind(this),
 
-          // Count the total number of peaks to fit for use in the progress bar
-          dataStore.progressBarNumberTasks++;
+        function(){
+          //leave the viewer pointing at the first spectrum for fitting
+          dispatcher({target: buffer}, 'fitAllComplete')
+          console.log('Completed all projections for all sources.');
 
-          // Save the ROI for projections so it can be used for drawing the fitlines
-          if(!dataStore.ROIprojections[plotName]) dataStore.ROIprojections[plotName] = [];
-          var ROIwidth= typicalPeakWidth(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0])*3; // HPGe singles ROI width
-          if(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0] == 2015.18 ||
-             dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0] == 2034.76 ||
-             dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0] == 3253.42){
-            // Special cases for close-lying peaks.
-            ROIwidth *= 0.5;
-          }
-          dataStore.ROIprojections[plotName].push([Math.floor(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0]-ROIwidth),Math.ceil(dataStore.sourceInfo[dataStore.currentSource].summingInCorrectionPeaks[j][k][0]+ROIwidth)]);
-        }
-        console.log(dataStore.spectrumListProjectionsPeaks[plotName].peaks);
+          projectionsCallback();
+        }.bind(this),
 
-      }
-                }.bind(this),
-
-                function(){
-                    //leave the viewer pointing at the first spectrum for fitting
-                    dispatcher({target: buffer}, 'fitAllComplete')
-		    console.log('Completed all projections for all sources.');
-
-		    projectionsCallback();
-                }.bind(this),
-
-                oppKeys.length-1
-            )
-        };
-
-
-function processConfigFileForRuntime(payload){
-// The run duration is required for calculating the absolute efficiency.
-// The run start date and time is required for calculating the source activity at the time of the data collection.
-	// Unpack the response from the server into a local variable
-	console.log(payload);
-    var thisConfig = JSON.parse(payload);
-	console.log(thisConfig.Analyzer[6].Midas);
-
-    // Unpack Midas content
-    dataStore.sourceInfo['60Co'].Midas = {
-	'Title': thisConfig.Analyzer[6].Midas[0].Value,
-	'StartTime': thisConfig.Analyzer[6].Midas[1].Value,
-	'Duration': thisConfig.Analyzer[6].Midas[2].Value,
+        oppKeys.length-1
+      )
     };
 
-    // Calculate the time in seconds between the certification of the source activity and the run start
-    dataStore.sourceInfo['60Co'].timeSinceCertification = dataStore.sourceInfo['60Co'].Midas.StartTime - dataStore.sourceInfo['60Co'].sourceCalibration.date;
 
-    // Calculate the source activity at the time of the run start
-    dataStore.sourceInfo['60Co'].sourceActivity = dataStore.sourceInfo['60Co'].sourceCalibration.activity * Math.exp(-1.0*dataStore.sourceInfo['60Co'].sourceCalibration.lambda*dataStore.sourceInfo['60Co'].timeSinceCertification);
-    dataStore.sourceInfo['60Co'].sourceActivityUnc = dataStore.sourceInfo['60Co'].sourceActivity * (dataStore.sourceInfo['60Co'].sourceCalibration.activityUnc / dataStore.sourceInfo['60Co'].sourceCalibration.activity);
+    function processConfigFileForRuntime(payload){
+      // The run duration is required for calculating the absolute efficiency.
+      // The run start date and time is required for calculating the source activity at the time of the data collection.
+      // Unpack the response from the server into a local variable
+      console.log(payload);
+      var thisConfig = JSON.parse(payload);
+      console.log(thisConfig.Analyzer[6].Midas);
 
-    // Calculate the number of decays of this source during the full run duration
-    dataStore.sourceInfo['60Co'].sourceTotalDecaysDuringThisRun = dataStore.sourceInfo['60Co'].sourceActivity * dataStore.sourceInfo['60Co'].Midas.Duration;
-    dataStore.sourceInfo['60Co'].normalizationAbsFactor = 1.0/dataStore.sourceInfo['60Co'].sourceTotalDecaysDuringThisRun;
-    dataStore.sourceInfo['60Co'].normalizationAbsFactorUnc = dataStore.sourceInfo['60Co'].normalizationAbsFactor * (dataStore.sourceInfo['60Co'].sourceActivityUnc/dataStore.sourceInfo['60Co'].sourceActivity);
+      // Unpack Midas content
+      dataStore.sourceInfo['60Co'].Midas = {
+        'Title': thisConfig.Analyzer[6].Midas[0].Value,
+        'StartTime': thisConfig.Analyzer[6].Midas[1].Value,
+        'Duration': thisConfig.Analyzer[6].Midas[2].Value,
+      };
 
-    console.log('Source activity at Run start:');
-    console.log(dataStore.sourceInfo['60Co'].timeSinceCertification);
-    console.log(dataStore.sourceInfo['60Co'].sourceActivity);
-    console.log(dataStore.sourceInfo['60Co'].sourceTotalDecaysDuringThisRun);
-    console.log(dataStore.sourceInfo['60Co'].normalizationFactor);
-    console.log(dataStore);
-}
+      // Calculate the time in seconds between the certification of the source activity and the run start
+      dataStore.sourceInfo['60Co'].timeSinceCertification = dataStore.sourceInfo['60Co'].Midas.StartTime - dataStore.sourceInfo['60Co'].sourceCalibration.date;
+
+      // Calculate the source activity at the time of the run start
+      dataStore.sourceInfo['60Co'].sourceActivity = dataStore.sourceInfo['60Co'].sourceCalibration.activity * Math.exp(-1.0*dataStore.sourceInfo['60Co'].sourceCalibration.lambda*dataStore.sourceInfo['60Co'].timeSinceCertification);
+      dataStore.sourceInfo['60Co'].sourceActivityUnc = dataStore.sourceInfo['60Co'].sourceActivity * (dataStore.sourceInfo['60Co'].sourceCalibration.activityUnc / dataStore.sourceInfo['60Co'].sourceCalibration.activity);
+
+      // Calculate the number of decays of this source during the full run duration
+      dataStore.sourceInfo['60Co'].sourceTotalDecaysDuringThisRun = dataStore.sourceInfo['60Co'].sourceActivity * dataStore.sourceInfo['60Co'].Midas.Duration;
+      dataStore.sourceInfo['60Co'].normalizationAbsFactor = 1.0/dataStore.sourceInfo['60Co'].sourceTotalDecaysDuringThisRun;
+      dataStore.sourceInfo['60Co'].normalizationAbsFactorUnc = dataStore.sourceInfo['60Co'].normalizationAbsFactor * (dataStore.sourceInfo['60Co'].sourceActivityUnc/dataStore.sourceInfo['60Co'].sourceActivity);
+
+      console.log('Source activity at Run start:');
+      console.log(dataStore.sourceInfo['60Co'].timeSinceCertification);
+      console.log(dataStore.sourceInfo['60Co'].sourceActivity);
+      console.log(dataStore.sourceInfo['60Co'].sourceTotalDecaysDuringThisRun);
+      console.log(dataStore.sourceInfo['60Co'].normalizationFactor);
+      console.log(dataStore);
+    }

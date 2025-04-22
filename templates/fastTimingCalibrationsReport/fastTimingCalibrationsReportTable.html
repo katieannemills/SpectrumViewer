@@ -1,0 +1,40 @@
+<template id='fastTimingCalibrationsReportTable'>
+  <tr>
+    <td class='col-md-2'>Fit Index</td>
+    <td class='col-md-2'>Histogram File</td>
+    <td class='col-md-2'>Run Title</td>
+    <td class='col-md-2'>Run StartTime</td>
+    <td class='col-md-2'>Run Duration</td>
+    <td class='col-md-2'>Spectrum</td>
+    <td class='col-md-2'>Centroid</td>
+    <td class='col-md-2'>Height</td>
+    <td class='col-md-2'>Width</td>
+    <td class='col-md-2'>Intercept (BG)</td>
+    <td class='col-md-2'>Slope (BG)</td>
+    <td class='col-md-2'>Area</td>
+    <td class='col-md-2'>Area Unc.</td>
+    <td class='col-md-2'>FWHM</td>
+  </tr>
+</template>
+
+
+<template id='fastTimingCalibrationsReportTable'>
+    <tr>
+        <td class='col-md-2'>Detector</td>
+        <td class='col-md-2'>Offset</td>
+        <td class='col-md-2'>Gain</td>
+        <td class='col-md-2'>Quad</td>
+        <td class='col-md-2'>R^2</td>
+        <td class='col-md-2'>Mean of |Residuals|</td>
+    </tr>
+    {{# detectors}}
+        <tr id='{{id}}{{.}}row'>
+            <td id='{{id}}{{.}}detector'>{{.}}</td>
+            <td id='{{id}}{{.}}offset'>-</td>
+            <td id='{{id}}{{.}}gain'>-</td>
+            <td id='{{id}}{{.}}quad'>-</td>
+            <td id='{{id}}{{.}}r2'>-</td>
+            <td id='{{id}}{{.}}residual'>-</td>
+        </tr>
+    {{/ detectors}}
+</template>

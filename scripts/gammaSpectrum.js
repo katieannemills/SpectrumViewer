@@ -21,7 +21,7 @@ function spectrumViewer(canvasID){
 	this.stage.addChild(this.containerAnnotations);
 	this.stage.addChild(this.containerFit);
 	this.stage.addChild(this.containerGate);
-
+	
 	//axes & drawing
 	this.fontScale = Math.min(Math.max(this.canvas.width / 50, 10), 16); // 10 < fontScale < 16
 	this.context.font = this.fontScale + 'px Arial';
@@ -73,60 +73,60 @@ function spectrumViewer(canvasID){
 	this.colorAssignment = [null, null, null, null, null, null, null, null, null, null, null, null]; //holds the data series key in the array position corresponding to the color to draw it with from this.dataColor
 	this.hideSpectrum = {}; //any spectrum name used as a key holding a truthy value here will be skipped during plotting
 
-		//fitting
-		this.fitTarget = null //id of the spectrum to fit to
-		this.fitted = false; //has the spectrum been fit since the last repaint?
-		this.fitModeEngage = false; //are we currently fitting the spectrum?
-		this.FitLimitLower = -1; //fitting limits
-		this.FitLimitUpper = -1;
-		this.fitCallback = function(){}; //callback to run after fitting, arguments are (center, width, amplitude, linear background intercept, slope)
-		this.MLfit = true; //do a maximum likelihood fit for putting gaussians on peaks; otherwise fit just estimates gaussian form mode and half-max
-		// mask so fits only appear in plot area (ie don't overflow the axes)
-		this.fitMask = new createjs.Shape();
-		this.fitMask.graphics.mt(this.leftMargin, this.canvas.height - this.bottomMargin).lt(this.leftMargin, this.topMargin).lt(this.canvas.width - this.rightMargin, this.topMargin).lt(this.canvas.width-this.rightMargin, this.canvas.height - this.bottomMargin).closePath();
-		this.containerFit.mask = this.fitMask;
-		this.activeFitLines = {} //object containing fit lines to repaint
+	//fitting
+	this.fitTarget = null //id of the spectrum to fit to
+	this.fitted = false; //has the spectrum been fit since the last repaint?
+	this.fitModeEngage = false; //are we currently fitting the spectrum?
+	this.FitLimitLower = -1; //fitting limits
+	this.FitLimitUpper = -1;
+	this.fitCallback = function(){}; //callback to run after fitting, arguments are (center, width, amplitude, linear background intercept, slope)
+	this.MLfit = true; //do a maximum likelihood fit for putting gaussians on peaks; otherwise fit just estimates gaussian form mode and half-max
+	// mask so fits only appear in plot area (ie don't overflow the axes)
+	this.fitMask = new createjs.Shape();
+	this.fitMask.graphics.mt(this.leftMargin, this.canvas.height - this.bottomMargin).lt(this.leftMargin, this.topMargin).lt(this.canvas.width - this.rightMargin, this.topMargin).lt(this.canvas.width-this.rightMargin, this.canvas.height - this.bottomMargin).closePath();
+	this.containerFit.mask = this.fitMask;
+	this.activeFitLines = {} //object containing fit lines to repaint
 
-			//Gating for 2D matrices
-			this.gateTarget = null //id of the spectrum to set gate limits with
-			this.gated = false; //has the spectrum been gate since the last repaint?
-			this.gateModeEngage = false; //are we currently setting gate limits for this spectrum?
-			this.GateLimitLower = -1; //gating limits
-			this.GateLimitUpper = -1;
-			this.BG1LimitLower = -1; // BG1 limits
-			this.BG1LimitUpper = -1;
-			this.BG2LimitLower = -1; // BG2 limits
-			this.BG2LimitUpper = -1;
-			this.gateColor = '#28B463';
-			this.bkgColor = '#B42879';
-			this.gateCallback = function(){}; //callback to run after gating
-			// mask so gates only appear in plot area (ie don't overflow the axes)
-			this.gateMask = new createjs.Shape();
-			this.gateMask.graphics.mt(this.leftMargin, this.canvas.height - this.bottomMargin).lt(this.leftMargin, this.topMargin).lt(this.canvas.width - this.rightMargin, this.topMargin).lt(this.canvas.width-this.rightMargin, this.canvas.height - this.bottomMargin).closePath();
-			this.containerGate.mask = this.gateMask;
-			this.activeGateLines = {} //object containing gate regions to repaint
+	//Gating for 2D matrices
+	this.gateTarget = null //id of the spectrum to set gate limits with
+	this.gated = false; //has the spectrum been gate since the last repaint?
+	this.gateModeEngage = false; //are we currently setting gate limits for this spectrum?
+	this.GateLimitLower = -1; //gating limits
+	this.GateLimitUpper = -1;
+	this.BG1LimitLower = -1; // BG1 limits
+	this.BG1LimitUpper = -1;
+	this.BG2LimitLower = -1; // BG2 limits
+	this.BG2LimitUpper = -1;
+	this.gateColor = '#28B463';
+	this.bkgColor = '#B42879';
+	this.gateCallback = function(){}; //callback to run after gating
+	// mask so gates only appear in plot area (ie don't overflow the axes)
+	this.gateMask = new createjs.Shape();
+	this.gateMask.graphics.mt(this.leftMargin, this.canvas.height - this.bottomMargin).lt(this.leftMargin, this.topMargin).lt(this.canvas.width - this.rightMargin, this.topMargin).lt(this.canvas.width-this.rightMargin, this.canvas.height - this.bottomMargin).closePath();
+	this.containerGate.mask = this.gateMask;
+	this.activeGateLines = {} //object containing gate regions to repaint
 
-    //cursors
-    this.cursorX = 0; //x-bin of cursor
-    this.cursorY = 0; //y-bin of cursor
-    this.mouseMoveCallback = function(){}; //callback on moving the cursor over the plot, arguments are (x-bin, y-bin)
-    this.highlightColor = '#8e44ad'; //color of drag highlight
+	//cursors
+	this.cursorX = 0; //x-bin of cursor
+	this.cursorY = 0; //y-bin of cursor
+	this.mouseMoveCallback = function(){}; //callback on moving the cursor over the plot, arguments are (x-bin, y-bin)
+	this.highlightColor = '#8e44ad'; //color of drag highlight
 
-    //annotations
-    this.verticals = {};
-    this.lines = {}
-    this.suppressedAnnotations = []; //list of annotation id's to not draw
-    this.binHighlights = [] //array of objects {color, height in counts}
+	//annotations
+	this.verticals = {};
+	this.lines = {}
+	this.suppressedAnnotations = []; //list of annotation id's to not draw
+	this.binHighlights = [] //array of objects {color, height in counts}
 	// mask so annotations only appear in plot area (ie don't overflow the axes)
 	this.annotationMask = new createjs.Shape();
 	this.annotationMask.graphics.mt(this.leftMargin, this.canvas.height - this.bottomMargin).lt(this.leftMargin, this.topMargin).lt(this.canvas.width - this.rightMargin, this.topMargin).lt(this.canvas.width-this.rightMargin, this.canvas.height - this.bottomMargin).closePath();
 	this.containerAnnotations.mask = this.annotationMask;
 
-    //click interactions
-    this.XMouseLimitxMin = 0; //limits selected with the cursor
-    this.XMouseLimitxMax = 0;
-    this.clickBounds = [];
-    this.shiftclickCallback = function(){}; //callback on shift+click, passed {x,y} in bins, spectrumViewer bound as this
+	//click interactions
+	this.XMouseLimitxMin = 0; //limits selected with the cursor
+	this.XMouseLimitxMax = 0;
+	this.clickBounds = [];
+	this.shiftclickCallback = function(){}; //callback on shift+click, passed {x,y} in bins, spectrumViewer bound as this
 
 	//plot repaint loop
 	this.RefreshTime = 3; //seconds to wait before a plot refresh when requested
@@ -181,11 +181,11 @@ function spectrumViewer(canvasID){
 		//Decorate x axis
 		interval = Math.log10((this.XaxisLimitMax - this.XaxisLimitMin));
 		if(interval % 1 < 0.35)
-			binsPerTick = Math.pow(10, Math.floor(interval)) / 5 ;
+		binsPerTick = Math.pow(10, Math.floor(interval)) / 5 ;
 		else if(interval % 1 < 0.6)
-			binsPerTick = Math.pow(10, Math.floor(interval)) / 2 ;
+		binsPerTick = Math.pow(10, Math.floor(interval)) / 2 ;
 		else
-			binsPerTick = Math.pow(10, Math.floor(interval)) ;
+		binsPerTick = Math.pow(10, Math.floor(interval)) ;
 		minBin = Math.ceil(this.XaxisLimitMin / binsPerTick )*binsPerTick;
 		this.nXticks = Math.floor( (this.XaxisLimitMax - minBin)) / binsPerTick;
 
@@ -219,7 +219,7 @@ function spectrumViewer(canvasID){
 		//decide how many ticks to draw on the y axis; come as close to a factor of the number of bins as possible:
 		this.nYticks = 5;
 		while( Math.floor(this.YaxisLength / this.nYticks) == Math.floor(this.YaxisLength / (this.nYticks-1)) )
-			this.nYticks--;
+		this.nYticks--;
 
 		//how many counts should each tick increment?
 		countsPerTick = Math.floor(this.YaxisLength / (this.nYticks-1));
@@ -324,9 +324,9 @@ function spectrumViewer(canvasID){
 			}
 			// Check if there is a baseline associated with this spectrum
 			if(typeof(this.baselines[thisSpec]) != 'undefined'){
-			  for(i=0; i<dataStore.baselines[thisSpec].length; i++){
-				  subtractions[thisSpec][i] += this.baselines[thisSpec][i];
-			  }
+				for(i=0; i<dataStore.baselines[thisSpec].length; i++){
+					subtractions[thisSpec][i] += this.baselines[thisSpec][i];
+				}
 			}
 
 			// Loop through the data spectrum that we have
@@ -350,9 +350,9 @@ function spectrumViewer(canvasID){
 						//draw canvas line:
 						//left side of bar
 						if(i != Math.floor(this.XaxisLimitMin))
-							histLine.graphics.lt( this.leftMargin + (i-this.XaxisLimitMin)*this.binWidth, this.canvas.height - this.bottomMargin - Math.max(0,(this.plotBuffer[thisSpec][i] - binSubtractions - this.YaxisLimitMin))*this.countHeight );
+						histLine.graphics.lt( this.leftMargin + (i-this.XaxisLimitMin)*this.binWidth, this.canvas.height - this.bottomMargin - Math.max(0,(this.plotBuffer[thisSpec][i] - binSubtractions - this.YaxisLimitMin))*this.countHeight );
 						else
-							histLine.graphics.mt( this.leftMargin + (i-this.XaxisLimitMin)*this.binWidth, this.canvas.height - this.bottomMargin - Math.max(0,(this.plotBuffer[thisSpec][i] - binSubtractions - this.YaxisLimitMin))*this.countHeight );
+						histLine.graphics.mt( this.leftMargin + (i-this.XaxisLimitMin)*this.binWidth, this.canvas.height - this.bottomMargin - Math.max(0,(this.plotBuffer[thisSpec][i] - binSubtractions - this.YaxisLimitMin))*this.countHeight );
 						//top of bar
 						histLine.graphics.lt( this.leftMargin + (i+1-this.XaxisLimitMin)*this.binWidth, this.canvas.height - this.bottomMargin - Math.max(0,(this.plotBuffer[thisSpec][i] - binSubtractions - this.YaxisLimitMin))*this.countHeight );
 					}
@@ -362,17 +362,17 @@ function spectrumViewer(canvasID){
 						if(this.plotBuffer[thisSpec][i] - binSubtractions > 0){
 							//left side of bar
 							if( i != Math.floor(this.XaxisLimitMin))
-								histLine.graphics.lt( this.leftMargin + (i-this.XaxisLimitMin)*this.binWidth, this.canvas.height - this.bottomMargin - Math.max(0, (Math.log10(this.plotBuffer[thisSpec][i] - binSubtractions) - Math.log10(this.YaxisLimitMin)))*this.countHeight );
+							histLine.graphics.lt( this.leftMargin + (i-this.XaxisLimitMin)*this.binWidth, this.canvas.height - this.bottomMargin - Math.max(0, (Math.log10(this.plotBuffer[thisSpec][i] - binSubtractions) - Math.log10(this.YaxisLimitMin)))*this.countHeight );
 							else
-								histLine.graphics.mt( this.leftMargin + (i-this.XaxisLimitMin)*this.binWidth, this.canvas.height - this.bottomMargin - Math.max(0, (Math.log10(this.plotBuffer[thisSpec][i] - binSubtractions) - Math.log10(this.YaxisLimitMin)))*this.countHeight );
+							histLine.graphics.mt( this.leftMargin + (i-this.XaxisLimitMin)*this.binWidth, this.canvas.height - this.bottomMargin - Math.max(0, (Math.log10(this.plotBuffer[thisSpec][i] - binSubtractions) - Math.log10(this.YaxisLimitMin)))*this.countHeight );
 							//top of bar
 							histLine.graphics.lt( this.leftMargin + (i+1-this.XaxisLimitMin)*this.binWidth, this.canvas.height - this.bottomMargin - Math.max(0, (Math.log10(this.plotBuffer[thisSpec][i] - binSubtractions) - Math.log10(this.YaxisLimitMin)))*this.countHeight );
 						} else {
 							//drop to the x axis
 							if( i != Math.floor(this.XaxisLimitMin) )
-								histLine.graphics.lt( this.leftMargin + (i-this.XaxisLimitMin)*this.binWidth, this.canvas.height - this.bottomMargin );
+							histLine.graphics.lt( this.leftMargin + (i-this.XaxisLimitMin)*this.binWidth, this.canvas.height - this.bottomMargin );
 							else
-								histLine.graphics.mt( this.leftMargin + (i-this.XaxisLimitMin)*this.binWidth, this.canvas.height - this.bottomMargin );
+							histLine.graphics.mt( this.leftMargin + (i-this.XaxisLimitMin)*this.binWidth, this.canvas.height - this.bottomMargin );
 							//crawl along x axis until log-able data is found:
 							histLine.graphics.lt( this.leftMargin + (i+1-this.XaxisLimitMin)*this.binWidth, this.canvas.height - this.bottomMargin );
 						}
@@ -438,7 +438,7 @@ function spectrumViewer(canvasID){
 			this.plotData();
 			this.clickBounds = [];
 		} else
-			this.ClickWindow(this.XMouseLimitxMax)
+		this.ClickWindow(this.XMouseLimitxMax)
 	};
 
 	//handle clicks on the plot
@@ -535,8 +535,8 @@ function spectrumViewer(canvasID){
 	//choose appropriate axis limits: default will fill the plot area, but can be overridden with this.demandXmin etc.
 	this.chooseLimits = function(){
 		var thisSpec, minYvalue, maxYvalue,
-			originalMinX = this.XaxisLimitMin,
-			originalMaxX = this.XaxisLimitMax;
+		originalMinX = this.XaxisLimitMin,
+		originalMaxX = this.XaxisLimitMax;
 
 		this.YaxisLimitMax=5;
 		this.XaxisLength = this.XaxisLimitMax - this.XaxisLimitMin;
@@ -581,7 +581,7 @@ function spectrumViewer(canvasID){
 		if(typeof this.demandXmax === 'number'){
 			this.XaxisLimitMax = this.demandXmax;
 			if(this.demandXmax > this.XaxisLimitAbsMax)
-				this.XaxisLimitAbsMax = this.demandXmax;
+			this.XaxisLimitAbsMax = this.demandXmax;
 		}
 
 		if(typeof this.demandYmin === 'number') this.YaxisLimitMin = this.demandYmin;
@@ -598,15 +598,15 @@ function spectrumViewer(canvasID){
 		}
 
 		if(this.AxisType==0)
-			this.YaxisLength = this.YaxisLimitMax-this.YaxisLimitMin;
+		this.YaxisLength = this.YaxisLimitMax-this.YaxisLimitMin;
 
 		if(this.AxisType==1)
-			//this.YaxisLength=Math.log10(this.YaxisLimitMax-this.YaxisLimitMin);
-			this.YaxisLength = Math.log10(this.YaxisLimitMax) - Math.log10(this.YaxisLimitMin);
+		//this.YaxisLength=Math.log10(this.YaxisLimitMax-this.YaxisLimitMin);
+		this.YaxisLength = Math.log10(this.YaxisLimitMax) - Math.log10(this.YaxisLimitMin);
 
 		//callback when x limits are changed - user fudges
 		if(originalMinX != this.XaxisLimitMin || originalMaxX != this.XaxisLimitMax)
-			this.chooseLimitsCallback();
+		this.chooseLimitsCallback();
 
 	};
 
@@ -642,35 +642,35 @@ function spectrumViewer(canvasID){
 		this.plotData();
 	};
 
-		//set up for fit mode, replaces old requestfitlimits
-		this.setupFitMode = function(){
+	//set up for fit mode, replaces old requestfitlimits
+	this.setupFitMode = function(){
 
-			this.fitModeEngage = 1;
-			this.FitLimitLower=-1;
-			this.FitLimitUpper=-1;
-		};
+		this.fitModeEngage = 1;
+		this.FitLimitLower=-1;
+		this.FitLimitUpper=-1;
+	};
 
-		//abandon fit mode without fitting
-		this.leaveFitMode = function(){
-			this.fitModeEngage = 0;
-			this.FitLimitLower=-1;
-			this.FitLimitUpper=-1;
-		};
+	//abandon fit mode without fitting
+	this.leaveFitMode = function(){
+		this.fitModeEngage = 0;
+		this.FitLimitLower=-1;
+		this.FitLimitUpper=-1;
+	};
 
-			//set up for gate mode
-			this.setupGateMode = function(){
+	//set up for gate mode
+	this.setupGateMode = function(){
 
-				this.gateModeEngage = 1;
-				this.GateLimitLower=-1;
-				this.GateLimitUpper=-1;
-			};
+		this.gateModeEngage = 1;
+		this.GateLimitLower=-1;
+		this.GateLimitUpper=-1;
+	};
 
-			//abandon gate mode without gating
-			this.leaveGateMode = function(){
-				this.gateModeEngage = 0;
-				this.GateLimitLower=-1;
-				this.GateLimitUpper=-1;
-			};
+	//abandon gate mode without gating
+	this.leaveGateMode = function(){
+		this.gateModeEngage = 0;
+		this.GateLimitLower=-1;
+		this.GateLimitUpper=-1;
+	};
 
 	//stick a gaussian on top of the spectrum fitKey between the fit limits
 	this.fitData = function(fitKey, retries){
@@ -782,7 +782,7 @@ function spectrumViewer(canvasID){
 		}
 		fitLine = this.addFitLine(this.FitLimitLower, fitdata.length, max, cent, width, estimate[0], estimate[1])
 
-/*
+		/*
 		console.log('ML fitter: (this.FitLimitLower, fitdata.length, max, cent, width, estimate[0], estimate[1])');
 		console.log(originalFitdata);
 		console.log(fitdata);
@@ -806,155 +806,155 @@ function spectrumViewer(canvasID){
 		this.fitCallback(cent, width, max, estimate[0], estimate[1]);
 	};
 
-		//initiate a projection of a 2D matrix based on the limits set in spectrum fitKey
-		this.gateData = function(gateKey){
+	//initiate a projection of a 2D matrix based on the limits set in spectrum fitKey
+	this.gateData = function(gateKey){
 
-					//suspend the refresh
-					window.clearTimeout(this.refreshHandler);
+		//suspend the refresh
+		window.clearTimeout(this.refreshHandler);
 
-          // ensure limits are sensible
-					if(this.GateLimitLower<0) this.GateLimitLower=0;
-					if(this.GateLimitUpper>this.XaxisLimitAbsMax) this.GateLimitUpper = this.XaxisLimitAbsMax;
+		// ensure limits are sensible
+		if(this.GateLimitLower<0) this.GateLimitLower=0;
+		if(this.GateLimitUpper>this.XaxisLimitAbsMax) this.GateLimitUpper = this.XaxisLimitAbsMax;
 
-					// Update the gate limit input boxes
-					document.getElementById('gateMinInput').value = this.GateLimitLower;
-          document.getElementById('gateMaxInput').value = this.GateLimitUpper;
+		// Update the gate limit input boxes
+		document.getElementById('gateMinInput').value = this.GateLimitLower;
+		document.getElementById('gateMaxInput').value = this.GateLimitUpper;
 
-					// Draw the gate limits on the spectrum
-				  this.containerPersistentOverlay.removeAllChildren();
-					this.shadeGateBins(this.gateColor,this.GateLimitLower,this.GateLimitUpper,this.gateTarget);
-					this.stage.update();
+		// Draw the gate limits on the spectrum
+		this.containerPersistentOverlay.removeAllChildren();
+		this.shadeGateBins(this.gateColor,this.GateLimitLower,this.GateLimitUpper,this.gateTarget);
+		this.stage.update();
 
-					// Remeber this gate region for redrawing later
-							this.activeGateLines[gateKey + 'Gate' + (Math.round(this.GateLimitUpper-this.GateLimitLower)+this.GateLimitLower)] = {
-								'Color': this.gateColor,
-								'LimitLower': this.GateLimitLower,
-								'LimitUpper': this.GateLimitUpper,
-								'Target': this.gateTarget,
-							}
+		// Remeber this gate region for redrawing later
+		this.activeGateLines[gateKey + 'Gate' + (Math.round(this.GateLimitUpper-this.GateLimitLower)+this.GateLimitLower)] = {
+			'Color': this.gateColor,
+			'LimitLower': this.GateLimitLower,
+			'LimitUpper': this.GateLimitUpper,
+			'Target': this.gateTarget,
+		}
 
-          // Determine the BG1 and BG2 regions
-					var gateWidth = this.GateLimitUpper - this.GateLimitLower;
-					var gateData=this.plotBuffer[gateKey];
-					var regionLimitLower = this.GateLimitLower-(6*gateWidth);
-					if(regionLimitLower<0){ regionLimitLower=0; }
-					var regionLimitUpper = this.GateLimitUpper+(6*gateWidth);
-					if(regionLimitLower>this.XaxisLimitMax){ regionLimitUpper=this.XaxisLimitMax; }
-				  gateData=gateData.slice(regionLimitLower, regionLimitUpper);
+		// Determine the BG1 and BG2 regions
+		var gateWidth = this.GateLimitUpper - this.GateLimitLower;
+		var gateData=this.plotBuffer[gateKey];
+		var regionLimitLower = this.GateLimitLower-(6*gateWidth);
+		if(regionLimitLower<0){ regionLimitLower=0; }
+		var regionLimitUpper = this.GateLimitUpper+(6*gateWidth);
+		if(regionLimitLower>this.XaxisLimitMax){ regionLimitUpper=this.XaxisLimitMax; }
+		gateData=gateData.slice(regionLimitLower, regionLimitUpper);
 
-										//prefit straight bkg
-										var x = []
-										var y = []
-										for(i=0; i<(6*gateWidth); i++){
-											x.push(regionLimitLower+i)
-											y.push(gateData[i])
-										}
-										for(i=(gateWidth*7)+1; i<gateData.length; i++){
-											x.push(regionLimitLower+i)
-											y.push(gateData[i])
-										}
-										var gateBKGfit = this.newLinearBKG(x,y); //return is [intercept, slope]
+		//prefit straight bkg
+		var x = []
+		var y = []
+		for(i=0; i<(6*gateWidth); i++){
+			x.push(regionLimitLower+i)
+			y.push(gateData[i])
+		}
+		for(i=(gateWidth*7)+1; i<gateData.length; i++){
+			x.push(regionLimitLower+i)
+			y.push(gateData[i])
+		}
+		var gateBKGfit = this.newLinearBKG(x,y); //return is [intercept, slope]
 
-					// BG1
+		// BG1
+		var BG1LimitUpper = this.GateLimitLower-3;
+		var BG1LimitLower = this.GateLimitLower-gateWidth-3;
+		pass=0;
+		while(!pass){
+			var BG1SumData = 0;
+			var BG1SumFit = 0;
+			for(var i=(BG1LimitLower); i<(BG1LimitUpper); i++){
+				BG1SumData += gateData[i-regionLimitLower];
+				BG1SumFit += (gateBKGfit[1]*i)+gateBKGfit[0];
+			}
+			var BG1ChanDiff = 1.0;
+			for(var i=(BG1LimitLower+1); i<(BG1LimitUpper); i++){
+				if(gateData[i-regionLimitLower]/gateData[i-1-regionLimitLower]>1.15 || gateData[i-regionLimitLower]/gateData[i-1-regionLimitLower]<0.85){
+					BG1ChanDiff = gateData[i-regionLimitLower]/gateData[i-1-regionLimitLower];
+				}
+			}
+			if(((BG1SumData/BG1SumFit)>0.9 && (BG1SumData/BG1SumFit)<1.1) && (BG1ChanDiff>0.85 && BG1ChanDiff<1.15)){
+				pass=1;
+			}else{
+				BG1LimitLower--;
+				BG1LimitUpper--;
+				if(BG1LimitLower == regionLimitLower){
+					// console.log('Failed to find good BG1 region. What to do?');
 					var BG1LimitUpper = this.GateLimitLower-3;
 					var BG1LimitLower = this.GateLimitLower-gateWidth-3;
-					pass=0;
-					while(!pass){
-					var BG1SumData = 0;
-					var BG1SumFit = 0;
-					for(var i=(BG1LimitLower); i<(BG1LimitUpper); i++){
-					BG1SumData += gateData[i-regionLimitLower];
-					BG1SumFit += (gateBKGfit[1]*i)+gateBKGfit[0];
-				  }
-					var BG1ChanDiff = 1.0;
-					for(var i=(BG1LimitLower+1); i<(BG1LimitUpper); i++){
-						if(gateData[i-regionLimitLower]/gateData[i-1-regionLimitLower]>1.15 || gateData[i-regionLimitLower]/gateData[i-1-regionLimitLower]<0.85){
-							BG1ChanDiff = gateData[i-regionLimitLower]/gateData[i-1-regionLimitLower];
-						}
-				  }
-          if(((BG1SumData/BG1SumFit)>0.9 && (BG1SumData/BG1SumFit)<1.1) && (BG1ChanDiff>0.85 && BG1ChanDiff<1.15)){
-           pass=1;
-				 }else{
-					 BG1LimitLower--;
-					 BG1LimitUpper--;
-					 if(BG1LimitLower == regionLimitLower){
-						// console.log('Failed to find good BG1 region. What to do?');
-	 					 var BG1LimitUpper = this.GateLimitLower-3;
-	 					 var BG1LimitLower = this.GateLimitLower-gateWidth-3;
-						 pass=1;
-					 }
-				 }
+					pass=1;
 				}
-				this.BG1LimitLower = BG1LimitLower;
-				this.BG1LimitUpper = BG1LimitUpper;
-					// BG2
+			}
+		}
+		this.BG1LimitLower = BG1LimitLower;
+		this.BG1LimitUpper = BG1LimitUpper;
+		// BG2
+		var BG2LimitLower = this.GateLimitUpper+3;
+		var BG2LimitUpper = this.GateLimitUpper+gateWidth+3;
+		pass=0;
+		while(!pass){
+			var BG2SumData = 0;
+			var BG2SumFit = 0;
+			for(var i=(BG2LimitLower); i<(BG2LimitUpper); i++){
+				BG2SumData += gateData[i-regionLimitLower];
+				BG2SumFit += (gateBKGfit[1]*i)+gateBKGfit[0];
+			}
+			var BG2ChanDiff = 1.0;
+			for(var i=(BG2LimitLower+1); i<(BG2LimitUpper); i++){
+				if(gateData[i-regionLimitLower]/gateData[i-1-regionLimitLower]>1.15 || gateData[i-regionLimitLower]/gateData[i-1-regionLimitLower]<0.85){
+					BG2ChanDiff = gateData[i-regionLimitLower]/gateData[i-1-regionLimitLower];
+				}
+			}
+			if(((BG2SumData/BG2SumFit)>0.9 && (BG2SumData/BG2SumFit)<1.1) && (BG2ChanDiff>0.85 && BG2ChanDiff<1.15)){
+				pass=1;
+			}else{
+				BG2LimitLower++;
+				BG2LimitUpper++;
+				if(BG2LimitUpper == regionLimitUpper){
+					// console.log('Failed to find good BG2 region. What to do?');
 					var BG2LimitLower = this.GateLimitUpper+3;
 					var BG2LimitUpper = this.GateLimitUpper+gateWidth+3;
-					pass=0;
-					while(!pass){
-					var BG2SumData = 0;
-					var BG2SumFit = 0;
-					for(var i=(BG2LimitLower); i<(BG2LimitUpper); i++){
-					BG2SumData += gateData[i-regionLimitLower];
-					BG2SumFit += (gateBKGfit[1]*i)+gateBKGfit[0];
-				  }
-					var BG2ChanDiff = 1.0;
-					for(var i=(BG2LimitLower+1); i<(BG2LimitUpper); i++){
-							if(gateData[i-regionLimitLower]/gateData[i-1-regionLimitLower]>1.15 || gateData[i-regionLimitLower]/gateData[i-1-regionLimitLower]<0.85){
-							BG2ChanDiff = gateData[i-regionLimitLower]/gateData[i-1-regionLimitLower];
-						}
-				  }
-          if(((BG2SumData/BG2SumFit)>0.9 && (BG2SumData/BG2SumFit)<1.1) && (BG2ChanDiff>0.85 && BG2ChanDiff<1.15)){
-           pass=1;
-				 }else{
-					 BG2LimitLower++;
-					 BG2LimitUpper++;
-					 if(BG2LimitUpper == regionLimitUpper){
-						// console.log('Failed to find good BG2 region. What to do?');
-	 					var BG2LimitLower = this.GateLimitUpper+3;
-	 					var BG2LimitUpper = this.GateLimitUpper+gateWidth+3;
-						 pass=1;
-					 }
-				 }
+					pass=1;
 				}
-				this.BG2LimitLower = BG2LimitLower;
-				this.BG2LimitUpper = BG2LimitUpper;
+			}
+		}
+		this.BG2LimitLower = BG2LimitLower;
+		this.BG2LimitUpper = BG2LimitUpper;
 
-          // Update the Background inputs
-        	document.getElementById('bg1MinInput').value = this.BG1LimitLower;
-        	document.getElementById('bg1MaxInput').value = this.BG1LimitUpper;
-        	document.getElementById('bg2MinInput').value = this.BG2LimitLower;
-        	document.getElementById('bg2MaxInput').value = this.BG2LimitUpper;
+		// Update the Background inputs
+		document.getElementById('bg1MinInput').value = this.BG1LimitLower;
+		document.getElementById('bg1MaxInput').value = this.BG1LimitUpper;
+		document.getElementById('bg2MinInput').value = this.BG2LimitLower;
+		document.getElementById('bg2MaxInput').value = this.BG2LimitUpper;
 
-					// Draw the gate BG regions on the spectrum
-					this.containerPersistentOverlay.removeAllChildren();
-					this.shadeGateBins(this.bkgColor,this.BG1LimitLower,this.BG1LimitUpper,this.gateTarget);
-					this.shadeGateBins(this.bkgColor,this.BG2LimitLower,this.BG2LimitUpper,this.gateTarget);
-					this.stage.update();
+		// Draw the gate BG regions on the spectrum
+		this.containerPersistentOverlay.removeAllChildren();
+		this.shadeGateBins(this.bkgColor,this.BG1LimitLower,this.BG1LimitUpper,this.gateTarget);
+		this.shadeGateBins(this.bkgColor,this.BG2LimitLower,this.BG2LimitUpper,this.gateTarget);
+		this.stage.update();
 
-					// Remeber these BG regions for redrawing later
-					this.activeGateLines[gateKey + 'BG1' + (Math.round(this.GateLimitUpper-this.GateLimitLower)+this.GateLimitLower)] = {
-						'Color': this.bkgColor,
-						'LimitLower': this.BG1LimitLower,
-						'LimitUpper': this.BG1LimitUpper,
-						'Target': this.gateTarget,
-					}
-					this.activeGateLines[gateKey + 'BG2' + (Math.round(this.GateLimitUpper-this.GateLimitLower)+this.GateLimitLower)] = {
-						'Color': this.bkgColor,
-						'LimitLower': this.BG2LimitLower,
-						'LimitUpper': this.BG2LimitUpper,
-						'Target': this.gateTarget,
-					}
-					// Request the gate region projection be made
-					document.getElementById('submitGateButton').click();
+		// Remeber these BG regions for redrawing later
+		this.activeGateLines[gateKey + 'BG1' + (Math.round(this.GateLimitUpper-this.GateLimitLower)+this.GateLimitLower)] = {
+			'Color': this.bkgColor,
+			'LimitLower': this.BG1LimitLower,
+			'LimitUpper': this.BG1LimitUpper,
+			'Target': this.gateTarget,
+		}
+		this.activeGateLines[gateKey + 'BG2' + (Math.round(this.GateLimitUpper-this.GateLimitLower)+this.GateLimitLower)] = {
+			'Color': this.bkgColor,
+			'LimitLower': this.BG2LimitLower,
+			'LimitUpper': this.BG2LimitUpper,
+			'Target': this.gateTarget,
+		}
+		// Request the gate region projection be made
+		document.getElementById('submitGateButton').click();
 
-					// prepare to exit Gate mode
-					this.gated=1;
-					this.gateModeEngage = 0;
+		// prepare to exit Gate mode
+		this.gated=1;
+		this.gateModeEngage = 0;
 
-          // callback
-					this.gateCallback();
-		};
+		// callback
+		this.gateCallback();
+	};
 
 	this.addFitLine = function(lowerLimit, nPoints, amplitude, center, width, intercept, slope){
 		//returns a createjs.Shape representing a background fit with the given parameters
@@ -992,28 +992,28 @@ function spectrumViewer(canvasID){
 		return fitLine;
 	}
 
-		//redraw all the fit lines in their appropriate places
-		this.redrawFitLines = function(){
-			var key, fitLine;
+	//redraw all the fit lines in their appropriate places
+	this.redrawFitLines = function(){
+		var key, fitLine;
 
-			this.containerFit.removeAllChildren();
+		this.containerFit.removeAllChildren();
 
-			for(key in this.activeFitLines){
-				fitLine = this.addFitLine(this.activeFitLines[key].min, this.activeFitLines[key].nBins, this.activeFitLines[key].amplitude, this.activeFitLines[key].center, this.activeFitLines[key].width, this.activeFitLines[key].intercept, this.activeFitLines[key].slope );
-				this.containerFit.addChild(fitLine);
-			}
+		for(key in this.activeFitLines){
+			fitLine = this.addFitLine(this.activeFitLines[key].min, this.activeFitLines[key].nBins, this.activeFitLines[key].amplitude, this.activeFitLines[key].center, this.activeFitLines[key].width, this.activeFitLines[key].intercept, this.activeFitLines[key].slope );
+			this.containerFit.addChild(fitLine);
 		}
+	}
 
-			//redraw all the gate lines in their appropriate places
-			this.redrawGateLines = function(){
-				var key, gateLine;
+	//redraw all the gate lines in their appropriate places
+	this.redrawGateLines = function(){
+		var key, gateLine;
 
-				this.containerGate.removeAllChildren();
+		this.containerGate.removeAllChildren();
 
-			  for(key in this.activeGateLines){
-				  this.shadeGateBins(this.activeGateLines[key].Color,this.activeGateLines[key].LimitLower,this.activeGateLines[key].LimitUpper,this.activeGateLines[key].Target);
-		  	}
-			}
+		for(key in this.activeGateLines){
+			this.shadeGateBins(this.activeGateLines[key].Color,this.activeGateLines[key].LimitLower,this.activeGateLines[key].LimitUpper,this.activeGateLines[key].Target);
+		}
+	}
 
 	this.bkgShape = function(x, amplitude, center, width, intercept, slope){
 		//evaluate a gaussian + linear background at x
@@ -1021,27 +1021,27 @@ function spectrumViewer(canvasID){
 		return intercept + slope*x + amplitude*Math.exp(-1*(x-center)*(x-center)/2/width/width);
 	}
 
-		//dump the fit results
-		this.clearFits = function(callback){
-			this.containerFit.removeAllChildren();
-			this.activeFitLines = {};
-			this.fitted = false;
-			this.stage.update();
+	//dump the fit results
+	this.clearFits = function(callback){
+		this.containerFit.removeAllChildren();
+		this.activeFitLines = {};
+		this.fitted = false;
+		this.stage.update();
 
-			if(callback)
-				callback();
-		}
+		if(callback)
+		callback();
+	}
 
-			//dump the gate results
-			this.clearGates = function(callback){
-				this.containerGate.removeAllChildren();
-				this.activeGateLines = {};
-				this.gated = false;
-				this.stage.update();
+	//dump the gate results
+	this.clearGates = function(callback){
+		this.containerGate.removeAllChildren();
+		this.activeGateLines = {};
+		this.gated = false;
+		this.stage.update();
 
-				if(callback)
-					callback();
-			}
+		if(callback)
+		callback();
+	}
 
 	//detect all peaks in spectrum between min and max
 	//fit them with gaussians on top of a linear background
@@ -1049,10 +1049,10 @@ function spectrumViewer(canvasID){
 	//note: gets really slow, too many spurious peaks identified blows up the parameter space
 	this.bkgFit = function(spectrum, min, max){
 		var i, concavity, width,
-			parameterGuesses = [1000,-1],  //<-- background guess is poor
-			fitter = new histofit(),
-			nPeaks = 0,
-			region = spectrum.slice(min, max)
+		parameterGuesses = [1000,-1],  //<-- background guess is poor
+		fitter = new histofit(),
+		nPeaks = 0,
+		region = spectrum.slice(min, max)
 
 		//detect peaks & estimate widths in the region of interest
 		concavity = this.concavity( region );
@@ -1066,7 +1066,7 @@ function spectrumViewer(canvasID){
 
 		//set up the fitter and do the fit
 		for(i=min; i<max; i++)
-			fitter.x[i-min] = i+0.5;
+		fitter.x[i-min] = i+0.5;
 		fitter.y = region;
 		fitter.fxn = this.multiPeak.bind(null, nPeaks);
 		fitter.guess = parameterGuesses;
@@ -1083,7 +1083,7 @@ function spectrumViewer(canvasID){
 
 		result = par[0] + x*par[1];
 		for(i=0; i<nPeaks; i++){
-		 	result += par[2+3*i]*Math.exp(-1*(((x-par[2+3*i+1])*(x-par[2+3*i+1]))/(2*par[2+3*i+2]*par[2+3*i+2])));
+			result += par[2+3*i]*Math.exp(-1*(((x-par[2+3*i+1])*(x-par[2+3*i+1]))/(2*par[2+3*i+2]*par[2+3*i+2])));
 		}
 
 		return result
@@ -1093,8 +1093,8 @@ function spectrumViewer(canvasID){
 	//detects peaks, masks them out, and return the resulting bins.
 	this.scrubPeaks = function(bins, bkg){
 		var concavity, spikePosition,
-			bkgBins = bins,
-			bkgCandidate = bkg
+		bkgBins = bins,
+		bkgCandidate = bkg
 
 
 		//detect spikes and throw away until not too spiky
@@ -1112,7 +1112,7 @@ function spectrumViewer(canvasID){
 	//do a straight line fit to the points x, y, and return the results as [intercept, slope]
 	this.linearBKG = function(x, y){
 		var slope, intercept,
-			fitter = new histofit();
+		fitter = new histofit();
 
 		//make some guesses
 		slope = (y[y.length - 1] - y[0]) / (x[x.length - 1] - x[0]);
@@ -1126,7 +1126,7 @@ function spectrumViewer(canvasID){
 
 		//if the fit fails, fall back to simple line:
 		if(!fitter.param[0] || !fitter.param[1])
-			return fitter.simpleLine(x,y)
+		return fitter.simpleLine(x,y)
 
 		return fitter.param
 	}
@@ -1223,8 +1223,8 @@ function spectrumViewer(canvasID){
 
 	//add a data series to the list to be plotted with key name and content [data]
 	//if such a series already exists, just update its data.
-    this.addData = function(name, data){
-	        var nSeries, i;
+	this.addData = function(name, data){
+		var nSeries, i;
 		//data = this.fakeData.energydata0 //fake for testing
 		//dump fits
 		this.clearFits();
@@ -1254,7 +1254,7 @@ function spectrumViewer(canvasID){
 
 		//append the data to the data buffer
 		this.plotBuffer[name] = data;
-        };
+	};
 
 	//remove a data series from the buffer
 	this.removeData = function(name){
@@ -1278,13 +1278,13 @@ function spectrumViewer(canvasID){
 		//vertical lines
 		for(key in this.verticals){
 			if(this.suppressedAnnotations.indexOf(key) == -1)
-				this.vertical(this.verticals[key].bin, this.verticals[key].color);
+			this.vertical(this.verticals[key].bin, this.verticals[key].color);
 		}
 
 		//lines
 		for(key in this.lines){
 			if(this.suppressedAnnotations.indexOf(key) == -1)
-				this.line(this.lines[key].x0, this.lines[key].y0, this.lines[key].x1, this.lines[key].y1, this.lines[key].color)
+			this.line(this.lines[key].x0, this.lines[key].y0, this.lines[key].x1, this.lines[key].y1, this.lines[key].color)
 		}
 	}
 
@@ -1319,7 +1319,7 @@ function spectrumViewer(canvasID){
 	//remove a persistent vertical
 	this.removeVertical = function(name){
 		if(this.verticals.hasOwnProperty(name))
-			delete this.verticals[name];
+		delete this.verticals[name];
 	}
 
 	//add an arbitrary line
@@ -1330,20 +1330,20 @@ function spectrumViewer(canvasID){
 	//remove an annotation line
 	this.removeLine = function(name){
 		if(this.lines.hasOwnProperty(name))
-			delete this.lines[name];
+		delete this.lines[name];
 	}
 
 	//suppress a persistent annotation without deleting it
 	this.suppressAnnotation = function(id){
 		if(this.suppressedAnnotations.indexOf(id) == -1)
-			this.suppressedAnnotations.push(id);
+		this.suppressedAnnotations.push(id);
 	}
 
 	//unsuppress a persistent annotation
 	this.unsuppressAnnotation = function(id){
 		var index = this.suppressedAnnotations.indexOf(id);
 		if(index != -1)
-			this.suppressedAnnotations.splice(index, 1);
+		this.suppressedAnnotations.splice(index, 1);
 	}
 
 	//highlight some bins
@@ -1364,8 +1364,8 @@ function spectrumViewer(canvasID){
 				}
 
 				bin = new createjs.Shape();
- 				bin.graphics.beginFill(this.binHighlights[i].color).drawRect(x0, y0, this.binWidth, this.binHighlights[i].height*this.countHeight);
- 				bin.graphics.beginStroke(this.binHighlights[i].color).drawRect(x0, y0, this.binWidth, this.binHighlights[i].height*this.countHeight);
+				bin.graphics.beginFill(this.binHighlights[i].color).drawRect(x0, y0, this.binWidth, this.binHighlights[i].height*this.countHeight);
+				bin.graphics.beginStroke(this.binHighlights[i].color).drawRect(x0, y0, this.binWidth, this.binHighlights[i].height*this.countHeight);
 				this.containerAnnotations.addChild(bin);
 			}
 		}
@@ -1435,37 +1435,37 @@ function spectrumViewer(canvasID){
 		x = coords.x;
 		y = coords.y;
 
-        if(x > this.leftMargin && x < this.canvas.width - this.rightMargin && y > this.topMargin){
-	        xBin = Math.floor((x-this.leftMargin)/this.binWidth) + this.XaxisLimitMin;
+		if(x > this.leftMargin && x < this.canvas.width - this.rightMargin && y > this.topMargin){
+			xBin = Math.floor((x-this.leftMargin)/this.binWidth) + this.XaxisLimitMin;
 
-    	    if(this.AxisType == 1){
-    	    	yBin = (this.canvas.height-this.bottomMargin - y) / this.countHeight;
-    	    	yBin = Math.floor(Math.pow(10,yBin)/10);
-    	    } else {
-    	    	yBin = Math.floor((this.canvas.height-this.bottomMargin - y) / this.countHeight);
-    	    }
+			if(this.AxisType == 1){
+				yBin = (this.canvas.height-this.bottomMargin - y) / this.countHeight;
+				yBin = Math.floor(Math.pow(10,yBin)/10);
+			} else {
+				yBin = Math.floor((this.canvas.height-this.bottomMargin - y) / this.countHeight);
+			}
 
-    	    this.cursorX = xBin.toFixed(0);
-    	    this.cursorY = yBin.toFixed(0);
-        }
-        this.mouseMoveCallback(xBin, Math.max(yBin,0) );
+			this.cursorX = xBin.toFixed(0);
+			this.cursorY = yBin.toFixed(0);
+		}
+		this.mouseMoveCallback(xBin, Math.max(yBin,0) );
 
-        //change cursor to indicate draggable region:
-        if(this.fitModeEngage || this.gateModeEngage){
-        	if( y < (this.canvas.height - this.bottomMargin) )
-	        	document.body.style.cursor = 's-resize';
-	        else
-	        	document.body.style.cursor = 'n-resize';
-	    }
-        else if(y>this.canvas.height-this.bottomMargin)
-        	document.body.style.cursor = 'pointer';
-        else
-        	document.body.style.cursor = 'default';
+		//change cursor to indicate draggable region:
+		if(this.fitModeEngage || this.gateModeEngage){
+			if( y < (this.canvas.height - this.bottomMargin) )
+			document.body.style.cursor = 's-resize';
+			else
+			document.body.style.cursor = 'n-resize';
+		}
+		else if(y>this.canvas.height-this.bottomMargin)
+		document.body.style.cursor = 'pointer';
+		else
+		document.body.style.cursor = 'default';
 
-        //draw crosshairs
-        this.containerOverlay.removeAllChildren();
-        if(x > this.leftMargin && x < this.canvas.width - this.rightMargin && y > this.topMargin && y<this.canvas.height-this.bottomMargin){
-        	if(this.clickBounds.length!=1){  //normal crosshairs
+		//draw crosshairs
+		this.containerOverlay.removeAllChildren();
+		if(x > this.leftMargin && x < this.canvas.width - this.rightMargin && y > this.topMargin && y<this.canvas.height-this.bottomMargin){
+			if(this.clickBounds.length!=1){  //normal crosshairs
 				crosshairs = new createjs.Shape();
 				crosshairs.graphics.ss(this.axisLineWidth).s(this.axisColor);
 				crosshairs.graphics.mt(this.leftMargin, y);
@@ -1516,11 +1516,11 @@ function spectrumViewer(canvasID){
 	}.bind(this);
 
 	this.canvas.onmouseup = function(event){
-			if(event.button == 0 && !event.shiftKey){
-				this.highlightStart = -1;
-				this.XMouseLimitxMax = this.xpix2bin(this.canvas.relMouseCoords(event).x);
-				this.DragWindow();
-			}
+		if(event.button == 0 && !event.shiftKey){
+			this.highlightStart = -1;
+			this.XMouseLimitxMax = this.xpix2bin(this.canvas.relMouseCoords(event).x);
+			this.DragWindow();
+		}
 	}.bind(this);
 
 	this.canvas.ondblclick = function(event){
@@ -1545,35 +1545,35 @@ function spectrumViewer(canvasID){
 
 //stick a coordinate tracker on the canvas prototype:
 function relMouseCoords(event){
-    var totalOffsetX = 0,
-    totalOffsetY = 0,
-    canvasX = 0,
-    canvasY = 0,
-    currentElement = this,
-    test = [],
-    elts = [];
+	var totalOffsetX = 0,
+	totalOffsetY = 0,
+	canvasX = 0,
+	canvasY = 0,
+	currentElement = this,
+	test = [],
+	elts = [];
 
 	if (event.offsetX !== undefined && event.offsetY !== undefined) { return {x:event.offsetX, y:event.offsetY}; }
 	//if (event.layerX !== undefined && event.layerY !== undefined) { return {x:event.layerX, y:event.layerY}; }
 
-    do{
-        totalOffsetX += currentElement.offsetLeft - currentElement.scrollLeft;
-        totalOffsetY += currentElement.offsetTop - currentElement.scrollTop;
-        //test[test.length] = currentElement.offsetLeft - currentElement.scrollLeft
-        //elts[elts.length] = currentElement
-    }
-    while(currentElement = currentElement.offsetParent)
+	do{
+		totalOffsetX += currentElement.offsetLeft - currentElement.scrollLeft;
+		totalOffsetY += currentElement.offsetTop - currentElement.scrollTop;
+		//test[test.length] = currentElement.offsetLeft - currentElement.scrollLeft
+		//elts[elts.length] = currentElement
+	}
+	while(currentElement = currentElement.offsetParent)
 
-    canvasX = event.pageX - totalOffsetX;
-    canvasY = event.pageY - totalOffsetY;
+	canvasX = event.pageX - totalOffsetX;
+	canvasY = event.pageY - totalOffsetY;
 
-    //hack to deal with FF scroll, better solution TBD:
-    if(event.offsetX == undefined){
-    	canvasX -= document.body.scrollLeft;
-    	canvasY -= document.body.scrollTop;
-    }
+	//hack to deal with FF scroll, better solution TBD:
+	if(event.offsetX == undefined){
+		canvasX -= document.body.scrollLeft;
+		canvasY -= document.body.scrollTop;
+	}
 
-    return {x:canvasX, y:canvasY}
+	return {x:canvasX, y:canvasY}
 }
 HTMLCanvasElement.prototype.relMouseCoords = relMouseCoords;
 

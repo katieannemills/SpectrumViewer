@@ -111,376 +111,376 @@ function setupDataStore(){
   dataStore.sourceType = '';                                          // Source type that has been selected
   dataStore.sourceInfo = {                                            // Source information and settings
     'HPGe': [
-    {"name":  "Co-60", "title":  "60Co", "lowEnergy":  74.97, "midEnergy": 1173.23, "highEnergy": 1332.49, "vhiEnergy": 2614.52, "energies": [74.97,1173.23,1332.49,2614.52], "maxXValue":2650 },
-    {"name":  "Co-56L", "title":  "56Co Low En", "lowEnergy": 122.06, "midEnergy":  846.77, "highEnergy": 1238.29, "vhiEnergy": 2598.50, "energies": [122.06,846.77,1238.29,2598.50], "maxXValue":2650 },
-    {"name":  "Co-56H", "title":  "56Co Hi En", "lowEnergy": 122.06, "midEnergy":  846.77, "highEnergy": 2598.50, "vhiEnergy": 3253.40, "energies": [122.06,846.77,2598.50,3253.40], "maxXValue":3800 },
-    {"name": "Ba-133", "title": "133Ba", "lowEnergy":  81.00, "midEnergy":  356.01, "highEnergy": 1460.85, "vhiEnergy": 2614.52, "energies": [81.00,356.01,1460.85,2614.52], "maxXValue":2650 },
-    {"name": "Cs-137", "title": "137Cs", "lowEnergy":  74.97, "midEnergy":  511.00, "highEnergy":  661.66, "vhiEnergy": 1460.85, "energies": [74.97,511.00,661.66,2614.52], "maxXValue":2000 },
-    {"name": "Eu-152", "title": "152Eu", "lowEnergy":  39.91, "midEnergy":  121.78, "highEnergy":  344.28, "vhiEnergy": 1408.00, "energies": [39.91,121.78,344.28,1408.00], "maxXValue":2000 },
-    {"name": "Bi-207", "title": "207Bi", "lowEnergy":  74.97, "midEnergy":  569.70, "highEnergy": 1063.66, "vhiEnergy": 1770.23, "energies": [74.97,569.70,1063.66,1770.23], "maxXValue":2000 },
-    {"name":  "Sr-90", "title":  "90Sr", "lowEnergy":  59.32, "midEnergy":  511.00, "highEnergy": 1460.85, "vhiEnergy": 2614.52, "energies": [59.32,511.00,1460.85,2614.52], "maxXValue":2650 },
-    {"name":   "A224", "title": "A=224", "lowEnergy": 131.61, "midEnergy":  215.98, "highEnergy":  837.03, "vhiEnergy": 2614.52, "energies": [131.61,215.98,837.03,2614.52], "maxXValue":2650 },
-    {"name":  "Be-11", "title":  "11Be", "lowEnergy": 511.00, "midEnergy": 2124.69, "highEnergy": 4665.90, "vhiEnergy": 6789.81, "energies": [511.00,2124.69,4665.90,6789.81], "maxXValue":8150 },
-    {"name": "Na-22", "title": "22Na", "lowEnergy":  74.97, "midEnergy":  511.00, "highEnergy": 1274.537, "vhiEnergy": 1785.537, "energies": [74.97,511.00,1274.537,1785.537], "maxXValue":2650 },
-    {"name": "Na-26", "title": "26Na", "lowEnergy":  74.97, "midEnergy":  511.00, "highEnergy": 1808.71, "vhiEnergy": 4834.3, "energies": [74.97,511.00,1808.71,4834.3], "maxXValue":5000 },
-    {"name": "Background", "title": "Background", "lowEnergy":  74.97, "midEnergy":  511.00, "highEnergy": 1460.85, "vhiEnergy": 2614.52, "energies": [74.97,511.00,1460.85,2614.52], "maxXValue":2650 }
-  ],
-            'PACES':
-              [
-                {"name": "PACES207Bi",  "title": "PACES 207Bi", "lowEnergy":  74.97, "midEnergy":  481.69, "highEnergy":  975.65, "vhiEnergy": 1682.22, "energies": [74.97,481.69,975.65,1682.22], "maxXValue":2000 },
-                {"name":  "PACESA146",  "title": "PACES A=146", "lowEnergy":  82.28, "midEnergy":  101.78, "highEnergy":  142.14, "vhiEnergy": 218.13, "energies": [82.28,101.78,142.14,218.13], "maxXValue":450 }
-              ],
-            'LaBr3':
-              [
-                {"name": "LBL22Na", "title":  "22Na", "lowEnergy":  511.00, "midEnergy": 1274.53, "highEnergy": 1435.8, "vhiEnergy": 1785.53, "energies": [511.00,1274.53,1435.8,1785.53], "maxXValue":2000 },
-                {"name":  "LBL60Co", "title":  "60Co", "lowEnergy":  74.97, "midEnergy": 1173.23, "highEnergy": 1332.49, "vhiEnergy": 2614.52, "energies": [32.1,1173.23,1332.49,2614.52], "maxXValue":2650 },
-                  {"name": "LBL207Bi", "title":  "207Bi", "lowEnergy":  74.97, "midEnergy":  569.70, "highEnergy": 1063.66, "vhiEnergy": 1770.23, "energies": [74.97,569.70,1063.66,1770.23], "maxXValue":2000 },
-                {"name": "LBLA224",  "title":  "A=224", "lowEnergy": 131.61, "midEnergy":  215.98, "highEnergy":  837.03, "vhiEnergy": 2614.52, "energies": [131.61,215.98,837.03,2614.52], "maxXValue":2650 }
-              ],
-            'RCMP':
-              [
-                {"name": "RCSalpha", "title":  "Triple", "lowEnergy": 5156.59, "midEnergy": 5485.56, "highEnergy": 5804.77, "vhiEnergy": null, "energies": [5156.59,5485.56,5804.77], "maxXValue":6500 }
-              ],
-            'ARIES':
-              [
-                {"name": "ARTspec", "title":  "ARIES Energy", "lowEnergy": 1, "midEnergy": 2, "highEnergy": 3, "vhiEnergy": null, "energies": [1,2,3], "maxXValue":1000 }
-              ]
+      {"name":  "Co-60", "title":  "60Co", "lowEnergy":  74.97, "midEnergy": 1173.23, "highEnergy": 1332.49, "vhiEnergy": 2614.52, "energies": [74.97,1173.23,1332.49,2614.52], "maxXValue":2650 },
+      {"name":  "Co-56L", "title":  "56Co Low En", "lowEnergy": 122.06, "midEnergy":  846.77, "highEnergy": 1238.29, "vhiEnergy": 2598.50, "energies": [122.06,846.77,1238.29,2598.50], "maxXValue":2650 },
+      {"name":  "Co-56H", "title":  "56Co Hi En", "lowEnergy": 122.06, "midEnergy":  846.77, "highEnergy": 2598.50, "vhiEnergy": 3253.40, "energies": [122.06,846.77,2598.50,3253.40], "maxXValue":3800 },
+      {"name": "Ba-133", "title": "133Ba", "lowEnergy":  81.00, "midEnergy":  356.01, "highEnergy": 1460.85, "vhiEnergy": 2614.52, "energies": [81.00,356.01,1460.85,2614.52], "maxXValue":2650 },
+      {"name": "Cs-137", "title": "137Cs", "lowEnergy":  74.97, "midEnergy":  511.00, "highEnergy":  661.66, "vhiEnergy": 1460.85, "energies": [74.97,511.00,661.66,2614.52], "maxXValue":2000 },
+      {"name": "Eu-152", "title": "152Eu", "lowEnergy":  39.91, "midEnergy":  121.78, "highEnergy":  344.28, "vhiEnergy": 1408.00, "energies": [39.91,121.78,344.28,1408.00], "maxXValue":2000 },
+      {"name": "Bi-207", "title": "207Bi", "lowEnergy":  74.97, "midEnergy":  569.70, "highEnergy": 1063.66, "vhiEnergy": 1770.23, "energies": [74.97,569.70,1063.66,1770.23], "maxXValue":2000 },
+      {"name":  "Sr-90", "title":  "90Sr", "lowEnergy":  59.32, "midEnergy":  511.00, "highEnergy": 1460.85, "vhiEnergy": 2614.52, "energies": [59.32,511.00,1460.85,2614.52], "maxXValue":2650 },
+      {"name":   "A224", "title": "A=224", "lowEnergy": 131.61, "midEnergy":  215.98, "highEnergy":  837.03, "vhiEnergy": 2614.52, "energies": [131.61,215.98,837.03,2614.52], "maxXValue":2650 },
+      {"name":  "Be-11", "title":  "11Be", "lowEnergy": 511.00, "midEnergy": 2124.69, "highEnergy": 4665.90, "vhiEnergy": 6789.81, "energies": [511.00,2124.69,4665.90,6789.81], "maxXValue":8150 },
+      {"name": "Na-22", "title": "22Na", "lowEnergy":  74.97, "midEnergy":  511.00, "highEnergy": 1274.537, "vhiEnergy": 1785.537, "energies": [74.97,511.00,1274.537,1785.537], "maxXValue":2650 },
+      {"name": "Na-26", "title": "26Na", "lowEnergy":  74.97, "midEnergy":  511.00, "highEnergy": 1808.71, "vhiEnergy": 4834.3, "energies": [74.97,511.00,1808.71,4834.3], "maxXValue":5000 },
+      {"name": "Background", "title": "Background", "lowEnergy":  74.97, "midEnergy":  511.00, "highEnergy": 1460.85, "vhiEnergy": 2614.52, "energies": [74.97,511.00,1460.85,2614.52], "maxXValue":2650 }
+    ],
+    'PACES':
+    [
+      {"name": "PACES207Bi",  "title": "PACES 207Bi", "lowEnergy":  74.97, "midEnergy":  481.69, "highEnergy":  975.65, "vhiEnergy": 1682.22, "energies": [74.97,481.69,975.65,1682.22], "maxXValue":2000 },
+      {"name":  "PACESA146",  "title": "PACES A=146", "lowEnergy":  82.28, "midEnergy":  101.78, "highEnergy":  142.14, "vhiEnergy": 218.13, "energies": [82.28,101.78,142.14,218.13], "maxXValue":450 }
+    ],
+    'LaBr3':
+    [
+      {"name": "LBL22Na", "title":  "22Na", "lowEnergy":  511.00, "midEnergy": 1274.53, "highEnergy": 1435.8, "vhiEnergy": 1785.53, "energies": [511.00,1274.53,1435.8,1785.53], "maxXValue":2000 },
+      {"name":  "LBL60Co", "title":  "60Co", "lowEnergy":  74.97, "midEnergy": 1173.23, "highEnergy": 1332.49, "vhiEnergy": 2614.52, "energies": [32.1,1173.23,1332.49,2614.52], "maxXValue":2650 },
+      {"name": "LBL207Bi", "title":  "207Bi", "lowEnergy":  74.97, "midEnergy":  569.70, "highEnergy": 1063.66, "vhiEnergy": 1770.23, "energies": [74.97,569.70,1063.66,1770.23], "maxXValue":2000 },
+      {"name": "LBLA224",  "title":  "A=224", "lowEnergy": 131.61, "midEnergy":  215.98, "highEnergy":  837.03, "vhiEnergy": 2614.52, "energies": [131.61,215.98,837.03,2614.52], "maxXValue":2650 }
+    ],
+    'RCMP':
+    [
+      {"name": "RCSalpha", "title":  "Triple", "lowEnergy": 5156.59, "midEnergy": 5485.56, "highEnergy": 5804.77, "vhiEnergy": null, "energies": [5156.59,5485.56,5804.77], "maxXValue":6500 }
+    ],
+    'ARIES':
+    [
+      {"name": "ARTspec", "title":  "ARIES Energy", "lowEnergy": 1, "midEnergy": 2, "highEnergy": 3, "vhiEnergy": null, "energies": [1,2,3], "maxXValue":1000 }
+    ]
 
 
   };
   /*
   dataStore.sourceInfoPACES = [
-    {"name": "PACES207Bi",  "title": "PACES 207Bi", "lowEnergy":  74.97, "midEnergy":  481.69, "highEnergy":  975.65, "vhiEnergy": 1682.22, "maxXValue":2000 },
-    {"name":  "PACESA146",  "title": "PACES A=146", "lowEnergy":  82.28, "midEnergy":  101.78, "highEnergy":  142.14, "vhiEnergy": 218.13, "maxXValue":450 }
-  ];
-  dataStore.sourceInfoLaBr3 = [
-    {"name": "LBL207Bi", "title":  "207Bi", "lowEnergy":  74.97, "midEnergy":  569.70, "highEnergy": 1063.66, "vhiEnergy": 1770.23, "maxXValue":2000 },
-    {"name": "LBLA224",  "title":  "A=224", "lowEnergy": 131.61, "midEnergy":  215.98, "highEnergy":  837.03, "vhiEnergy": 2614.52, "maxXValue":2650 }
-  ];
-  dataStore.sourceInfoRCMP = [
-    {"name": "RCSalpha", "title":  "Triple", "lowEnergy": 5156.59, "midEnergy": 5485.56, "highEnergy": 5804.77, "vhiEnergy": null, "maxXValue":5500 }
-  ];
-  */
+  {"name": "PACES207Bi",  "title": "PACES 207Bi", "lowEnergy":  74.97, "midEnergy":  481.69, "highEnergy":  975.65, "vhiEnergy": 1682.22, "maxXValue":2000 },
+  {"name":  "PACESA146",  "title": "PACES A=146", "lowEnergy":  82.28, "midEnergy":  101.78, "highEnergy":  142.14, "vhiEnergy": 218.13, "maxXValue":450 }
+];
+dataStore.sourceInfoLaBr3 = [
+{"name": "LBL207Bi", "title":  "207Bi", "lowEnergy":  74.97, "midEnergy":  569.70, "highEnergy": 1063.66, "vhiEnergy": 1770.23, "maxXValue":2000 },
+{"name": "LBLA224",  "title":  "A=224", "lowEnergy": 131.61, "midEnergy":  215.98, "highEnergy":  837.03, "vhiEnergy": 2614.52, "maxXValue":2650 }
+];
+dataStore.sourceInfoRCMP = [
+{"name": "RCSalpha", "title":  "Triple", "lowEnergy": 5156.59, "midEnergy": 5485.56, "highEnergy": 5804.77, "vhiEnergy": null, "maxXValue":5500 }
+];
+*/
 
-  dataStore.THESEdetectors = [];                                    //10-char codes of all possible griffin/paces detectors. Contents based on detectorChoice
+dataStore.THESEdetectors = [];                                    //10-char codes of all possible griffin/paces detectors. Contents based on detectorChoice
 
-  dataStore.cellIndex = dataStore.plots.length;
+dataStore.cellIndex = dataStore.plots.length;
 
-  //resolution plot
-  dataStore.plotInitData = [];
-  dataStore.plotInitData[0] = [[0,0,0,0,0], [1,0,0,0,0], [2,0,0,0,0], [3,0,0,0,0], [4,0,0,0,0], [5,0,0,0,0], [6,0,0,0,0], [7,0,0,0,0], [8,0,0,0,0]];      //initial dummy data
-  dataStore.plotInitData[1] = [[0,0], [1,0], [2,0], [3,0], [4,0]];      //initial dummy data
-  dataStore.plotInitData[2] = [[0,0], [1,0], [2,0], [3,0], [4,0]];      //initial dummy data
-  dataStore.plotInitData[3] = [[0,0], [1,0], [2,0], [3,0], [4,0]];      //initial dummy data
-  dataStore.plotInitData[4] = [[0,0], [1,0], [2,0], [3,0], [4,0]];      //initial dummy data
-  dataStore.plotInitData[5] = [[0,0], [1,0], [2,0], [3,0], [4,0]];      //initial dummy data
-  dataStore.plotInitData[6] = [[0,0], [1,0], [2,0], [3,0], [4,0]];      //initial dummy data
-  dataStore.plotInitData[7] = [[0,0], [1,0], [2,0], [3,0], [4,0]];      //initial dummy data
-  dataStore.plotInitData[8] = [[0,0], [1,0], [2,0], [3,0], [4,0]];      //initial dummy data
-  dataStore.dataplotData = [];                                       // place for dataplot data
-  dataStore.dataplotData[0] = [];                                       // place for dataplot data
-  dataStore.dataplotData[1] = [];                                       // place for dataplot data
-  dataStore.dataplotData[2] = [];                                       // place for dataplot data
-  dataStore.dataplotData[3] = [];                                       // place for dataplot data
-  dataStore.dataplotData[4] = [];                                       // place for dataplot data
-  dataStore.dataplotData[5] = [];                                       // place for dataplot data
-  dataStore.dataplotData[6] = [];                                       // place for dataplot data
-  dataStore.dataplotData[7] = [];                                       // place for dataplot data
-  dataStore.dataplotData[8] = [];                                       // place for dataplot data
-  dataStore.plotStyle = [];
-  dataStore.plotStyle[0] = {                                              //dygraphs style object
-    labels: ["channel", "Peak1 Width", "Peak2 Width", "Peak3 Width", "Peak4 Width"],
-    title: 'Per-Crystal Resolution',
-    axisLabelColor: '#FFFFFF',
-    colors: ["#AAE66A", "#EFB2F0", "#B2D1F0", "#F0DBB2"],
-    labelsDiv: 'resolutionLegend',
-    drawPoints: 'true',
-    pointSize: '5',
-    strokeWidth: '0',
-    legend: 'always',
-    valueFormatter: function(num, opts, seriesName, dygraph, row, col){
+//resolution plot
+dataStore.plotInitData = [];
+dataStore.plotInitData[0] = [[0,0,0,0,0], [1,0,0,0,0], [2,0,0,0,0], [3,0,0,0,0], [4,0,0,0,0], [5,0,0,0,0], [6,0,0,0,0], [7,0,0,0,0], [8,0,0,0,0]];      //initial dummy data
+dataStore.plotInitData[1] = [[0,0], [1,0], [2,0], [3,0], [4,0]];      //initial dummy data
+dataStore.plotInitData[2] = [[0,0], [1,0], [2,0], [3,0], [4,0]];      //initial dummy data
+dataStore.plotInitData[3] = [[0,0], [1,0], [2,0], [3,0], [4,0]];      //initial dummy data
+dataStore.plotInitData[4] = [[0,0], [1,0], [2,0], [3,0], [4,0]];      //initial dummy data
+dataStore.plotInitData[5] = [[0,0], [1,0], [2,0], [3,0], [4,0]];      //initial dummy data
+dataStore.plotInitData[6] = [[0,0], [1,0], [2,0], [3,0], [4,0]];      //initial dummy data
+dataStore.plotInitData[7] = [[0,0], [1,0], [2,0], [3,0], [4,0]];      //initial dummy data
+dataStore.plotInitData[8] = [[0,0], [1,0], [2,0], [3,0], [4,0]];      //initial dummy data
+dataStore.dataplotData = [];                                       // place for dataplot data
+dataStore.dataplotData[0] = [];                                       // place for dataplot data
+dataStore.dataplotData[1] = [];                                       // place for dataplot data
+dataStore.dataplotData[2] = [];                                       // place for dataplot data
+dataStore.dataplotData[3] = [];                                       // place for dataplot data
+dataStore.dataplotData[4] = [];                                       // place for dataplot data
+dataStore.dataplotData[5] = [];                                       // place for dataplot data
+dataStore.dataplotData[6] = [];                                       // place for dataplot data
+dataStore.dataplotData[7] = [];                                       // place for dataplot data
+dataStore.dataplotData[8] = [];                                       // place for dataplot data
+dataStore.plotStyle = [];
+dataStore.plotStyle[0] = {                                              //dygraphs style object
+  labels: ["channel", "Peak1 Width", "Peak2 Width", "Peak3 Width", "Peak4 Width"],
+  title: 'Per-Crystal Resolution',
+  axisLabelColor: '#FFFFFF',
+  colors: ["#AAE66A", "#EFB2F0", "#B2D1F0", "#F0DBB2"],
+  labelsDiv: 'resolutionLegend',
+  drawPoints: 'true',
+  pointSize: '5',
+  strokeWidth: '0',
+  legend: 'always',
+  valueFormatter: function(num, opts, seriesName, dygraph, row, col){
 
-      if(col == 0)
-      return dataStore.THESEdetectors[num]
-      else
-      return num.toFixed(3)
+    if(col == 0)
+    return dataStore.THESEdetectors[num]
+    else
+    return num.toFixed(3)
+  },
+  axes: {
+    x: {
+      axisLabelFormatter: function(number, granularity, opts, dygraph){
+        if(number < dataStore.THESEdetectors.length)
+        return dataStore.THESEdetectors[number].slice(3,6);
+        else
+        return number
+
+      }
     },
-    axes: {
-      x: {
-        axisLabelFormatter: function(number, granularity, opts, dygraph){
-          if(number < dataStore.THESEdetectors.length)
-          return dataStore.THESEdetectors[number].slice(3,6);
-          else
-          return number
 
-        }
-      },
+    y : {
+      valueRange: [0,10]
+    }
+  }
+}
+dataStore.plotStyle[1] = {                                              //dygraphs style object
+  labels: ["channel", "Residual (keV)"],
+  title: 'Per-Crystal Residuals Peak1',
+  axisLabelColor: '#FFFFFF',
+  colors: ["#AAE66A"],
+  labelsDiv: 'residualP1newLegend',
+  drawPoints: 'true',
+  pointSize: '5',
+  strokeWidth: 0,
+  legend: 'always',
+  valueFormatter: function(num, opts, seriesName, dygraph, row, col){
 
-      y : {
-        valueRange: [0,10]
+    if(col == 0)
+    return dataStore.THESEdetectors[num]
+    else
+    return num.toFixed(3)
+  },
+  axes: {
+    x: {
+      axisLabelFormatter: function(number, granularity, opts, dygraph){
+        if(number < dataStore.THESEdetectors.length)
+        return dataStore.THESEdetectors[number].slice(3,6);
+        else
+        return number
+
+      }
+    },
+
+    y : {
+      valueRange: [-5,5]
+    }
+  }
+}
+dataStore.plotStyle[2] = {                                              //dygraphs style object
+  labels: ["channel", "Residual (keV)"],
+  title: 'Per-Crystal Residuals Peak2',
+  axisLabelColor: '#FFFFFF',
+  colors: ["#EFB2F0"],
+  labelsDiv: 'residualP2newLegend',
+  drawPoints: 'true',
+  pointSize: '5',
+  strokeWidth: 0,
+  legend: 'always',
+  valueFormatter: function(num, opts, seriesName, dygraph, row, col){
+
+    if(col == 0)
+    return dataStore.THESEdetectors[num]
+    else
+    return num.toFixed(3)
+  },
+  axes: {
+    x: {
+      axisLabelFormatter: function(number, granularity, opts, dygraph){
+        if(number < dataStore.THESEdetectors.length)
+        return dataStore.THESEdetectors[number].slice(3,6);
+        else
+        return number
+
+      }
+    },
+
+    y : {
+      valueRange: [-5,5]
+    }
+  }
+}
+dataStore.plotStyle[3] = {                                              //dygraphs style object
+  labels: ["channel", "Residual (keV)"],
+  title: 'Per-Crystal Residuals Peak3',
+  axisLabelColor: '#FFFFFF',
+  colors: ["#B2D1F0"],
+  labelsDiv: 'residualP3newLegend',
+  drawPoints: 'true',
+  pointSize: '5',
+  strokeWidth: 0,
+  legend: 'always',
+  valueFormatter: function(num, opts, seriesName, dygraph, row, col){
+
+    if(col == 0)
+    return dataStore.THESEdetectors[num]
+    else
+    return num.toFixed(3)
+  },
+  axes: {
+    x: {
+      axisLabelFormatter: function(number, granularity, opts, dygraph){
+        if(number < dataStore.THESEdetectors.length)
+        return dataStore.THESEdetectors[number].slice(3,6);
+        else
+        return number
+
+      }
+    },
+
+    y : {
+      valueRange: [-5,5]
+    }
+  }
+}
+dataStore.plotStyle[4] = {                                              //dygraphs style object
+  labels: ["channel", "Residual (keV)"],
+  title: 'Per-Crystal Residuals Peak4',
+  axisLabelColor: '#FFFFFF',
+  colors: ["#F0DBB2"],
+  labelsDiv: 'residualP4newLegend',
+  drawPoints: 'true',
+  pointSize: '5',
+  strokeWidth: 0,
+  legend: 'always',
+  valueFormatter: function(num, opts, seriesName, dygraph, row, col){
+
+    if(col == 0)
+    return dataStore.THESEdetectors[num]
+    else
+    return num.toFixed(3)
+  },
+  axes: {
+    x: {
+      axisLabelFormatter: function(number, granularity, opts, dygraph){
+        if(number < dataStore.THESEdetectors.length)
+        return dataStore.THESEdetectors[number].slice(3,6);
+        else
+        return number
+
       }
     }
   }
-  dataStore.plotStyle[1] = {                                              //dygraphs style object
-    labels: ["channel", "Residual (keV)"],
-    title: 'Per-Crystal Residuals Peak1',
-    axisLabelColor: '#FFFFFF',
-    colors: ["#AAE66A"],
-    labelsDiv: 'residualP1newLegend',
-    drawPoints: 'true',
-    pointSize: '5',
-    strokeWidth: 0,
-    legend: 'always',
-    valueFormatter: function(num, opts, seriesName, dygraph, row, col){
+}
+dataStore.plotStyle[5] = {                                              //dygraphs style object
+  labels: ["channel", "Residual (keV)"],
+  title: 'Per-Crystal Residuals Peak1',
+  axisLabelColor: '#FFFFFF',
+  colors: ["#AAE66A"],
+  labelsDiv: 'residualP1midLegend',
+  drawPoints: 'true',
+  pointSize: '5',
+  strokeWidth: 0,
+  legend: 'always',
+  valueFormatter: function(num, opts, seriesName, dygraph, row, col){
 
-      if(col == 0)
-      return dataStore.THESEdetectors[num]
-      else
-      return num.toFixed(3)
+    if(col == 0)
+    return dataStore.THESEdetectors[num]
+    else
+    return num.toFixed(3)
+  },
+  axes: {
+    x: {
+      axisLabelFormatter: function(number, granularity, opts, dygraph){
+        if(number < dataStore.THESEdetectors.length)
+        return dataStore.THESEdetectors[number].slice(3,6);
+        else
+        return number
+
+      }
     },
-    axes: {
-      x: {
-        axisLabelFormatter: function(number, granularity, opts, dygraph){
-          if(number < dataStore.THESEdetectors.length)
-          return dataStore.THESEdetectors[number].slice(3,6);
-          else
-          return number
 
-        }
-      },
+    y : {
+      valueRange: [-5,5]
+    }
+  }
+}
+dataStore.plotStyle[6] = {                                              //dygraphs style object
+  labels: ["channel", "Residual (keV)"],
+  title: 'Per-Crystal Residuals Peak2',
+  axisLabelColor: '#FFFFFF',
+  colors: ["#EFB2F0"],
+  labelsDiv: 'residualP2midLegend',
+  drawPoints: 'true',
+  pointSize: '5',
+  strokeWidth: 0,
+  legend: 'always',
+  valueFormatter: function(num, opts, seriesName, dygraph, row, col){
 
-      y : {
-        valueRange: [-5,5]
+    if(col == 0)
+    return dataStore.THESEdetectors[num]
+    else
+    return num.toFixed(3)
+  },
+  axes: {
+    x: {
+      axisLabelFormatter: function(number, granularity, opts, dygraph){
+        if(number < dataStore.THESEdetectors.length)
+        return dataStore.THESEdetectors[number].slice(3,6);
+        else
+        return number
+
+      }
+    },
+
+    y : {
+      valueRange: [-5,5]
+    }
+  }
+}
+dataStore.plotStyle[7] = {                                              //dygraphs style object
+  labels: ["channel", "Residual (keV)"],
+  title: 'Per-Crystal Residuals Peak3',
+  axisLabelColor: '#FFFFFF',
+  colors: ["#B2D1F0"],
+  labelsDiv: 'residualP3midLegend',
+  drawPoints: 'true',
+  pointSize: '5',
+  strokeWidth: 0,
+  legend: 'always',
+  valueFormatter: function(num, opts, seriesName, dygraph, row, col){
+
+    if(col == 0)
+    return dataStore.THESEdetectors[num]
+    else
+    return num.toFixed(3)
+  },
+  axes: {
+    x: {
+      axisLabelFormatter: function(number, granularity, opts, dygraph){
+        if(number < dataStore.THESEdetectors.length)
+        return dataStore.THESEdetectors[number].slice(3,6);
+        else
+        return number
+
+      }
+    },
+
+    y : {
+      valueRange: [-5,5]
+    }
+  }
+}
+dataStore.plotStyle[8] = {                                              //dygraphs style object
+  labels: ["channel", "Residual (keV)"],
+  title: 'Per-Crystal Residuals Peak4',
+  axisLabelColor: '#FFFFFF',
+  colors: ["#F0DBB2"],
+  labelsDiv: 'residualP4midLegend',
+  drawPoints: 'true',
+  pointSize: '5',
+  strokeWidth: 0,
+  legend: 'always',
+  valueFormatter: function(num, opts, seriesName, dygraph, row, col){
+
+    if(col == 0)
+    return dataStore.THESEdetectors[num]
+    else
+    return num.toFixed(3)
+  },
+  axes: {
+    x: {
+      axisLabelFormatter: function(number, granularity, opts, dygraph){
+        if(number < dataStore.THESEdetectors.length)
+        return dataStore.THESEdetectors[number].slice(3,6);
+        else
+        return number
+
       }
     }
   }
-  dataStore.plotStyle[2] = {                                              //dygraphs style object
-    labels: ["channel", "Residual (keV)"],
-    title: 'Per-Crystal Residuals Peak2',
-    axisLabelColor: '#FFFFFF',
-    colors: ["#EFB2F0"],
-    labelsDiv: 'residualP2newLegend',
-    drawPoints: 'true',
-    pointSize: '5',
-    strokeWidth: 0,
-    legend: 'always',
-    valueFormatter: function(num, opts, seriesName, dygraph, row, col){
-
-      if(col == 0)
-      return dataStore.THESEdetectors[num]
-      else
-      return num.toFixed(3)
-    },
-    axes: {
-      x: {
-        axisLabelFormatter: function(number, granularity, opts, dygraph){
-          if(number < dataStore.THESEdetectors.length)
-          return dataStore.THESEdetectors[number].slice(3,6);
-          else
-          return number
-
-        }
-      },
-
-      y : {
-        valueRange: [-5,5]
-      }
-    }
-  }
-  dataStore.plotStyle[3] = {                                              //dygraphs style object
-    labels: ["channel", "Residual (keV)"],
-    title: 'Per-Crystal Residuals Peak3',
-    axisLabelColor: '#FFFFFF',
-    colors: ["#B2D1F0"],
-    labelsDiv: 'residualP3newLegend',
-    drawPoints: 'true',
-    pointSize: '5',
-    strokeWidth: 0,
-    legend: 'always',
-    valueFormatter: function(num, opts, seriesName, dygraph, row, col){
-
-      if(col == 0)
-      return dataStore.THESEdetectors[num]
-      else
-      return num.toFixed(3)
-    },
-    axes: {
-      x: {
-        axisLabelFormatter: function(number, granularity, opts, dygraph){
-          if(number < dataStore.THESEdetectors.length)
-          return dataStore.THESEdetectors[number].slice(3,6);
-          else
-          return number
-
-        }
-      },
-
-      y : {
-        valueRange: [-5,5]
-      }
-    }
-  }
-  dataStore.plotStyle[4] = {                                              //dygraphs style object
-    labels: ["channel", "Residual (keV)"],
-    title: 'Per-Crystal Residuals Peak4',
-    axisLabelColor: '#FFFFFF',
-    colors: ["#F0DBB2"],
-    labelsDiv: 'residualP4newLegend',
-    drawPoints: 'true',
-    pointSize: '5',
-    strokeWidth: 0,
-    legend: 'always',
-    valueFormatter: function(num, opts, seriesName, dygraph, row, col){
-
-      if(col == 0)
-      return dataStore.THESEdetectors[num]
-      else
-      return num.toFixed(3)
-    },
-    axes: {
-      x: {
-        axisLabelFormatter: function(number, granularity, opts, dygraph){
-          if(number < dataStore.THESEdetectors.length)
-          return dataStore.THESEdetectors[number].slice(3,6);
-          else
-          return number
-
-        }
-      }
-    }
-  }
-  dataStore.plotStyle[5] = {                                              //dygraphs style object
-    labels: ["channel", "Residual (keV)"],
-    title: 'Per-Crystal Residuals Peak1',
-    axisLabelColor: '#FFFFFF',
-    colors: ["#AAE66A"],
-    labelsDiv: 'residualP1midLegend',
-    drawPoints: 'true',
-    pointSize: '5',
-    strokeWidth: 0,
-    legend: 'always',
-    valueFormatter: function(num, opts, seriesName, dygraph, row, col){
-
-      if(col == 0)
-      return dataStore.THESEdetectors[num]
-      else
-      return num.toFixed(3)
-    },
-    axes: {
-      x: {
-        axisLabelFormatter: function(number, granularity, opts, dygraph){
-          if(number < dataStore.THESEdetectors.length)
-          return dataStore.THESEdetectors[number].slice(3,6);
-          else
-          return number
-
-        }
-      },
-
-      y : {
-        valueRange: [-5,5]
-      }
-    }
-  }
-  dataStore.plotStyle[6] = {                                              //dygraphs style object
-    labels: ["channel", "Residual (keV)"],
-    title: 'Per-Crystal Residuals Peak2',
-    axisLabelColor: '#FFFFFF',
-    colors: ["#EFB2F0"],
-    labelsDiv: 'residualP2midLegend',
-    drawPoints: 'true',
-    pointSize: '5',
-    strokeWidth: 0,
-    legend: 'always',
-    valueFormatter: function(num, opts, seriesName, dygraph, row, col){
-
-      if(col == 0)
-      return dataStore.THESEdetectors[num]
-      else
-      return num.toFixed(3)
-    },
-    axes: {
-      x: {
-        axisLabelFormatter: function(number, granularity, opts, dygraph){
-          if(number < dataStore.THESEdetectors.length)
-          return dataStore.THESEdetectors[number].slice(3,6);
-          else
-          return number
-
-        }
-      },
-
-      y : {
-        valueRange: [-5,5]
-      }
-    }
-  }
-  dataStore.plotStyle[7] = {                                              //dygraphs style object
-    labels: ["channel", "Residual (keV)"],
-    title: 'Per-Crystal Residuals Peak3',
-    axisLabelColor: '#FFFFFF',
-    colors: ["#B2D1F0"],
-    labelsDiv: 'residualP3midLegend',
-    drawPoints: 'true',
-    pointSize: '5',
-    strokeWidth: 0,
-    legend: 'always',
-    valueFormatter: function(num, opts, seriesName, dygraph, row, col){
-
-      if(col == 0)
-      return dataStore.THESEdetectors[num]
-      else
-      return num.toFixed(3)
-    },
-    axes: {
-      x: {
-        axisLabelFormatter: function(number, granularity, opts, dygraph){
-          if(number < dataStore.THESEdetectors.length)
-          return dataStore.THESEdetectors[number].slice(3,6);
-          else
-          return number
-
-        }
-      },
-
-      y : {
-        valueRange: [-5,5]
-      }
-    }
-  }
-  dataStore.plotStyle[8] = {                                              //dygraphs style object
-    labels: ["channel", "Residual (keV)"],
-    title: 'Per-Crystal Residuals Peak4',
-    axisLabelColor: '#FFFFFF',
-    colors: ["#F0DBB2"],
-    labelsDiv: 'residualP4midLegend',
-    drawPoints: 'true',
-    pointSize: '5',
-    strokeWidth: 0,
-    legend: 'always',
-    valueFormatter: function(num, opts, seriesName, dygraph, row, col){
-
-      if(col == 0)
-      return dataStore.THESEdetectors[num]
-      else
-      return num.toFixed(3)
-    },
-    axes: {
-      x: {
-        axisLabelFormatter: function(number, granularity, opts, dygraph){
-          if(number < dataStore.THESEdetectors.length)
-          return dataStore.THESEdetectors[number].slice(3,6);
-          else
-          return number
-
-        }
-      }
-    }
-  }
-  dataStore.YAxisMinValue = [[0,0], [-0.1,-1], [-0.1,-1], [-0.1,-1], [-0.1,-1], [-0.1,-1], [-0.1,-1], [-0.1,-1], [-0.1,-1]];  // used in updateData function. First number is y axis, second value is y2 axis
-  dataStore.YAxisMaxValue = [[3,3], [0.1,1], [0.1,1], [0.1,1], [0.1,1], [0.1,1], [0.1,1], [0.1,1], [0.1,1]];          // used in updateData function. First number is y axis, second value is y2 axis
-  dataStore.annotations = [0,0];
-  dataStore._dataplot = [];                 // Place for all dataplot objects to be created as an array. This makes them indexable and iteratable
+}
+dataStore.YAxisMinValue = [[0,0], [-0.1,-1], [-0.1,-1], [-0.1,-1], [-0.1,-1], [-0.1,-1], [-0.1,-1], [-0.1,-1], [-0.1,-1]];  // used in updateData function. First number is y axis, second value is y2 axis
+dataStore.YAxisMaxValue = [[3,3], [0.1,1], [0.1,1], [0.1,1], [0.1,1], [0.1,1], [0.1,1], [0.1,1], [0.1,1]];          // used in updateData function. First number is y axis, second value is y2 axis
+dataStore.annotations = [0,0];
+dataStore._dataplot = [];                 // Place for all dataplot objects to be created as an array. This makes them indexable and iteratable
 
 }
 setupDataStore();
@@ -621,249 +621,249 @@ function setupMenusFromDetectorChoice(detectorType){
   if(detectorType == 'RCMP'){
     dataStore.YAxisMaxValue[0][0] = 100;
   }
-/*
+  /*
   if(detectorType == 'PACES' || detectorType == 'LaBr3' || detectorType == 'RCMP'){
-    // Delete the HPGe source buttons and generate only the required buttons
-    const thisNode = document.getElementById('decisionBarAuto');
-    while (thisNode.firstChild) {
-      thisNode.removeChild(thisNode.lastChild);
-    }
-    */
-    for(var i=0; i<dataStore.sourceInfo[detectorType].length; i++){
-      // Create Auto calibrate source Submit button
-      newButton = document.createElement('button');
-      newButton.setAttribute('id', 'automaticCalibration-'+dataStore.sourceInfo[detectorType][i].name);
-      newButton.setAttribute('class', 'btn btn-default');
-      newButton.setAttribute('engaged', '0');
-      newButton.value = dataStore.sourceInfo[detectorType][i].name;
-      newButton.innerHTML = '<span id=\'autoCalibBadge-'+dataStore.sourceInfo[detectorType][i].name+'\' class=\'glyphicon glyphicon-equalizer\' aria-hidden=\'true\'></span><span id=\'autoText\'>Calibrate '+dataStore.sourceInfo[detectorType][i].title+'</span>';
-      newButton.onclick = function(){
-        setupAutomaticCalibration(this.value);
-      }.bind(newButton);
-      document.getElementById('decisionBarAuto').appendChild(newButton);
-    }
-    /*
-  }
+  // Delete the HPGe source buttons and generate only the required buttons
+  const thisNode = document.getElementById('decisionBarAuto');
+  while (thisNode.firstChild) {
+  thisNode.removeChild(thisNode.lastChild);
+}
+*/
+for(var i=0; i<dataStore.sourceInfo[detectorType].length; i++){
+  // Create Auto calibrate source Submit button
+  newButton = document.createElement('button');
+  newButton.setAttribute('id', 'automaticCalibration-'+dataStore.sourceInfo[detectorType][i].name);
+  newButton.setAttribute('class', 'btn btn-default');
+  newButton.setAttribute('engaged', '0');
+  newButton.value = dataStore.sourceInfo[detectorType][i].name;
+  newButton.innerHTML = '<span id=\'autoCalibBadge-'+dataStore.sourceInfo[detectorType][i].name+'\' class=\'glyphicon glyphicon-equalizer\' aria-hidden=\'true\'></span><span id=\'autoText\'>Calibrate '+dataStore.sourceInfo[detectorType][i].title+'</span>';
+  newButton.onclick = function(){
+    setupAutomaticCalibration(this.value);
+  }.bind(newButton);
+  document.getElementById('decisionBarAuto').appendChild(newButton);
+}
+/*
+}
 */
 
-  // setup the dataStore for this choice of detectorType
-  var i, num=0, groups = [];
-  var histoName = '';
+// setup the dataStore for this choice of detectorType
+var i, num=0, groups = [];
+var histoName = '';
 
-  //generate the histoFileName for the spectrum names groups for plot selector
-  if(dataStore.histoFileName.length>0){
-    histoName = dataStore.histoFileName.split('.')[0]+':';
-  }
+//generate the histoFileName for the spectrum names groups for plot selector
+if(dataStore.histoFileName.length>0){
+  histoName = dataStore.histoFileName.split('.')[0]+':';
+}
 
-  // Save the lists of spectrum names to the dataStore for this detectorType
-  if(detectorType == 'HPGe'){
-    // Set up GRIFFIN detectors
+// Save the lists of spectrum names to the dataStore for this detectorType
+if(detectorType == 'HPGe'){
+  // Set up GRIFFIN detectors
 
-    var crystals = ["B","G","R","W"];
-    var letter = ["A","B"];
-    for(j=0; j<letter.length; j++){
-      for(i=1; i<(dataStore.numberOfClovers+1); i++){
-        for(k=0; k<4; k++){
-          dataStore.THESEdetectors[num] = 'GRG'+alwaysThisLong(i, 2)+crystals[k]+'N00'+letter[j];
-          num++;
-        }
-      }
-    }
-
-    //generate the groups for plot selector
+  var crystals = ["B","G","R","W"];
+  var letter = ["A","B"];
+  for(j=0; j<letter.length; j++){
     for(i=1; i<(dataStore.numberOfClovers+1); i++){
-      groups.push({
-        "groupID": 'GRG' + alwaysThisLong(i, 2),
-        "groupTitle": 'GRIFFIN ' + alwaysThisLong(i, 2),
-        "plots": [
-          {
-            "plotID": histoName+'GRG' + alwaysThisLong(i, 2) + 'BN00A_Pulse_Height',
-            "title": 'GRG' + alwaysThisLong(i, 2) + 'BN00A'
-          },
-          {
-            "plotID": histoName+'GRG' + alwaysThisLong(i, 2) + 'GN00A_Pulse_Height',
-            "title": 'GRG' + alwaysThisLong(i, 2) + 'GN00A'
-          },
-          {
-            "plotID": histoName+'GRG' + alwaysThisLong(i, 2) + 'RN00A_Pulse_Height',
-            "title": 'GRG' + alwaysThisLong(i, 2) + 'RN00A'
-          },
-          {
-            "plotID": histoName+'GRG' + alwaysThisLong(i, 2) + 'WN00A_Pulse_Height',
-            "title": 'GRG' + alwaysThisLong(i, 2) + 'WN00A'
-          },
-          {
-            "plotID": histoName+'GRG' + alwaysThisLong(i, 2) + 'BN00B_Pulse_Height',
-            "title": 'GRG' + alwaysThisLong(i, 2) + 'BN00B'
-          },
-          {
-            "plotID": histoName+'GRG' + alwaysThisLong(i, 2) + 'GN00B_Pulse_Height',
-            "title": 'GRG' + alwaysThisLong(i, 2) + 'GN00B'
-          },
-          {
-            "plotID": histoName+'GRG' + alwaysThisLong(i, 2) + 'RN00B_Pulse_Height',
-            "title": 'GRG' + alwaysThisLong(i, 2) + 'RN00B'
-          },
-          {
-            "plotID": histoName+'GRG' + alwaysThisLong(i, 2) + 'WN00B_Pulse_Height',
-            "title": 'GRG' + alwaysThisLong(i, 2) + 'WN00B'
-          }
-        ]
-      })
-    }
-  }else if(detectorType == 'PACES'){
-
-    dataStore.THESEdetectors = [                                      //10-char codes of all possible griffin detectors.
-      'PAC01XN00A',
-      'PAC02XN00A',
-      'PAC03XN00A',
-      'PAC04XN00A',
-      'PAC05XN00A'
-    ];
-
-
-    //generate groups for plot selector
-    groups.push({
-      "groupID": 'PAC',
-      "groupTitle": 'PACES',
-      "plots": [
-        {
-          "plotID": histoName+'PAC01XN00A_Pulse_Height',
-          "title": 'PAC01XN00A'
-        },
-        {
-          "plotID": histoName+'PAC02XN00A_Pulse_Height',
-          "title": 'PAC02XN00A'
-        },
-        {
-          "plotID": histoName+'PAC03XN00A_Pulse_Height',
-          "title": 'PAC03XN00A'
-        },
-        {
-          "plotID": histoName+'PAC04XN00A_Pulse_Height',
-          "title": 'PAC04XN00A'
-        },
-        {
-          "plotID": histoName+'PAC05XN00A_Pulse_Height',
-          "title": 'PAC05XN00A'
-        }
-      ]
-    })
-
-  }else if(detectorType == 'LaBr3'){
-
-    dataStore.THESEdetectors = [                                      //10-char codes of all possible griffin detectors.
-      'LBL01XN00X',
-      'LBL02XN00X',
-      'LBL03XN00X',
-      'LBL04XN00X',
-      'LBL05XN00X',
-      'LBL06XN00X',
-      'LBL07XN00X',
-      'LBL08XN00X'
-    ];
-
-
-    //generate groups for plot selector
-    groups.push({
-      "groupID": 'LBL',
-      "groupTitle": 'LaBr3',
-      "plots": [
-        {
-          "plotID": histoName+'LBL01XN00X_Pulse_Height',
-          "title": 'LBL01XN00X'
-        },
-        {
-          "plotID": histoName+'LBL02XN00X_Pulse_Height',
-          "title": 'LBL02XN00X'
-        },
-        {
-          "plotID": histoName+'LBL03XN00X_Pulse_Height',
-          "title": 'LBL03XN00X'
-        },
-        {
-          "plotID": histoName+'LBL04XN00X_Pulse_Height',
-          "title": 'LBL04XN00X'
-        },
-        {
-          "plotID": histoName+'LBL05XN00X_Pulse_Height',
-          "title": 'LBL05XN00X'
-        },
-        {
-          "plotID": histoName+'LBL06XN00X_Pulse_Height',
-          "title": 'LBL06XN00X'
-        },
-        {
-          "plotID": histoName+'LBL07XN00X_Pulse_Height',
-          "title": 'LBL07XN00X'
-        },
-        {
-          "plotID": histoName+'LBL08XN00X_Pulse_Height',
-          "title": 'LBL08XN00X'
-        }
-      ]
-    })
-
-  }else if(detectorType == 'RCMP'){
-    // Set up RCMP detectors
-
-    var RCSPlots = [[],[],[],[],[],[]];
-    var letter = ["P","N"];
-    for(i=1; i<(dataStore.numberOfRCMP+1); i++){
-      for(j=0; j<letter.length; j++){
-        for(k=0; k<dataStore.numberOfRCMPStrips; k++){
-          dataStore.THESEdetectors[num] = 'RCS'+alwaysThisLong(i, 2)+'X'+letter[j]+alwaysThisLong(k, 2)+'X';
-          RCSPlots[i-1].push({
-            "plotID": histoName+dataStore.THESEdetectors[num]+'_Pulse_Height',
-            "title": dataStore.THESEdetectors[num]
-          });
-          num++;
-        }
+      for(k=0; k<4; k++){
+        dataStore.THESEdetectors[num] = 'GRG'+alwaysThisLong(i, 2)+crystals[k]+'N00'+letter[j];
+        num++;
       }
     }
-
-    //generate the groups for plot selector
-    for(i=1; i<(dataStore.numberOfRCMP+1); i++){
-      groups.push({
-        "groupID": 'RCS' + alwaysThisLong(i, 2),
-        "groupTitle": 'RCS' + alwaysThisLong(i, 2),
-        "plots": RCSPlots[i-1]
-      })
-    }
-  }else if(detectorType == 'ARIES'){
-    // Set up ARIES detectors
-
-    var ARIESPlots = [];
-    for(i=1; i<(dataStore.numberOfARIES+1); i++){
-      dataStore.THESEdetectors[num] = 'ART'+alwaysThisLong(i, 2)+'XS00X';
-      ARIESPlots.push({
-        "plotID": histoName+dataStore.THESEdetectors[num]+'_Pulse_Height',
-        "title": dataStore.THESEdetectors[num]
-      });
-      num++;
-    }
-
-    //generate the groups for plot selector
-    groups.push({
-      "groupID": 'ARIES',
-      "groupTitle": 'ARIES',
-      "plots": ARIESPlots
-    })
   }
 
-  dataStore.plotGroups = groups;     //groups to arrange detectors into for dropdowns
+  //generate the groups for plot selector
+  for(i=1; i<(dataStore.numberOfClovers+1); i++){
+    groups.push({
+      "groupID": 'GRG' + alwaysThisLong(i, 2),
+      "groupTitle": 'GRIFFIN ' + alwaysThisLong(i, 2),
+      "plots": [
+        {
+          "plotID": histoName+'GRG' + alwaysThisLong(i, 2) + 'BN00A_Pulse_Height',
+          "title": 'GRG' + alwaysThisLong(i, 2) + 'BN00A'
+        },
+        {
+          "plotID": histoName+'GRG' + alwaysThisLong(i, 2) + 'GN00A_Pulse_Height',
+          "title": 'GRG' + alwaysThisLong(i, 2) + 'GN00A'
+        },
+        {
+          "plotID": histoName+'GRG' + alwaysThisLong(i, 2) + 'RN00A_Pulse_Height',
+          "title": 'GRG' + alwaysThisLong(i, 2) + 'RN00A'
+        },
+        {
+          "plotID": histoName+'GRG' + alwaysThisLong(i, 2) + 'WN00A_Pulse_Height',
+          "title": 'GRG' + alwaysThisLong(i, 2) + 'WN00A'
+        },
+        {
+          "plotID": histoName+'GRG' + alwaysThisLong(i, 2) + 'BN00B_Pulse_Height',
+          "title": 'GRG' + alwaysThisLong(i, 2) + 'BN00B'
+        },
+        {
+          "plotID": histoName+'GRG' + alwaysThisLong(i, 2) + 'GN00B_Pulse_Height',
+          "title": 'GRG' + alwaysThisLong(i, 2) + 'GN00B'
+        },
+        {
+          "plotID": histoName+'GRG' + alwaysThisLong(i, 2) + 'RN00B_Pulse_Height',
+          "title": 'GRG' + alwaysThisLong(i, 2) + 'RN00B'
+        },
+        {
+          "plotID": histoName+'GRG' + alwaysThisLong(i, 2) + 'WN00B_Pulse_Height',
+          "title": 'GRG' + alwaysThisLong(i, 2) + 'WN00B'
+        }
+      ]
+    })
+  }
+}else if(detectorType == 'PACES'){
 
-  // Generate the spectrum lists based on the list of detectors
-  dataStore._plotListLite = new plotListLite('plotList');
-  dataStore._plotListLite.setup();
+  dataStore.THESEdetectors = [                                      //10-char codes of all possible griffin detectors.
+    'PAC01XN00A',
+    'PAC02XN00A',
+    'PAC03XN00A',
+    'PAC04XN00A',
+    'PAC05XN00A'
+  ];
 
-  // Generate the gain match report table based on the list of detectors
-  dataStore._gainMatchReport = new gainMatchReport('gainMatcher', 'setupBar');
-  dataStore._gainMatchReport.setup();
 
-  //user guidance
-  deleteNode('detectorMessage');
-  document.getElementById('decisionMessage').classList.remove('hidden');
+  //generate groups for plot selector
+  groups.push({
+    "groupID": 'PAC',
+    "groupTitle": 'PACES',
+    "plots": [
+      {
+        "plotID": histoName+'PAC01XN00A_Pulse_Height',
+        "title": 'PAC01XN00A'
+      },
+      {
+        "plotID": histoName+'PAC02XN00A_Pulse_Height',
+        "title": 'PAC02XN00A'
+      },
+      {
+        "plotID": histoName+'PAC03XN00A_Pulse_Height',
+        "title": 'PAC03XN00A'
+      },
+      {
+        "plotID": histoName+'PAC04XN00A_Pulse_Height',
+        "title": 'PAC04XN00A'
+      },
+      {
+        "plotID": histoName+'PAC05XN00A_Pulse_Height',
+        "title": 'PAC05XN00A'
+      }
+    ]
+  })
+
+}else if(detectorType == 'LaBr3'){
+
+  dataStore.THESEdetectors = [                                      //10-char codes of all possible griffin detectors.
+    'LBL01XN00X',
+    'LBL02XN00X',
+    'LBL03XN00X',
+    'LBL04XN00X',
+    'LBL05XN00X',
+    'LBL06XN00X',
+    'LBL07XN00X',
+    'LBL08XN00X'
+  ];
+
+
+  //generate groups for plot selector
+  groups.push({
+    "groupID": 'LBL',
+    "groupTitle": 'LaBr3',
+    "plots": [
+      {
+        "plotID": histoName+'LBL01XN00X_Pulse_Height',
+        "title": 'LBL01XN00X'
+      },
+      {
+        "plotID": histoName+'LBL02XN00X_Pulse_Height',
+        "title": 'LBL02XN00X'
+      },
+      {
+        "plotID": histoName+'LBL03XN00X_Pulse_Height',
+        "title": 'LBL03XN00X'
+      },
+      {
+        "plotID": histoName+'LBL04XN00X_Pulse_Height',
+        "title": 'LBL04XN00X'
+      },
+      {
+        "plotID": histoName+'LBL05XN00X_Pulse_Height',
+        "title": 'LBL05XN00X'
+      },
+      {
+        "plotID": histoName+'LBL06XN00X_Pulse_Height',
+        "title": 'LBL06XN00X'
+      },
+      {
+        "plotID": histoName+'LBL07XN00X_Pulse_Height',
+        "title": 'LBL07XN00X'
+      },
+      {
+        "plotID": histoName+'LBL08XN00X_Pulse_Height',
+        "title": 'LBL08XN00X'
+      }
+    ]
+  })
+
+}else if(detectorType == 'RCMP'){
+  // Set up RCMP detectors
+
+  var RCSPlots = [[],[],[],[],[],[]];
+  var letter = ["P","N"];
+  for(i=1; i<(dataStore.numberOfRCMP+1); i++){
+    for(j=0; j<letter.length; j++){
+      for(k=0; k<dataStore.numberOfRCMPStrips; k++){
+        dataStore.THESEdetectors[num] = 'RCS'+alwaysThisLong(i, 2)+'X'+letter[j]+alwaysThisLong(k, 2)+'X';
+        RCSPlots[i-1].push({
+          "plotID": histoName+dataStore.THESEdetectors[num]+'_Pulse_Height',
+          "title": dataStore.THESEdetectors[num]
+        });
+        num++;
+      }
+    }
+  }
+
+  //generate the groups for plot selector
+  for(i=1; i<(dataStore.numberOfRCMP+1); i++){
+    groups.push({
+      "groupID": 'RCS' + alwaysThisLong(i, 2),
+      "groupTitle": 'RCS' + alwaysThisLong(i, 2),
+      "plots": RCSPlots[i-1]
+    })
+  }
+}else if(detectorType == 'ARIES'){
+  // Set up ARIES detectors
+
+  var ARIESPlots = [];
+  for(i=1; i<(dataStore.numberOfARIES+1); i++){
+    dataStore.THESEdetectors[num] = 'ART'+alwaysThisLong(i, 2)+'XS00X';
+    ARIESPlots.push({
+      "plotID": histoName+dataStore.THESEdetectors[num]+'_Pulse_Height',
+      "title": dataStore.THESEdetectors[num]
+    });
+    num++;
+  }
+
+  //generate the groups for plot selector
+  groups.push({
+    "groupID": 'ARIES',
+    "groupTitle": 'ARIES',
+    "plots": ARIESPlots
+  })
+}
+
+dataStore.plotGroups = groups;     //groups to arrange detectors into for dropdowns
+
+// Generate the spectrum lists based on the list of detectors
+dataStore._plotListLite = new plotListLite('plotList');
+dataStore._plotListLite.setup();
+
+// Generate the gain match report table based on the list of detectors
+dataStore._gainMatchReport = new gainMatchReport('gainMatcher', 'setupBar');
+dataStore._gainMatchReport.setup();
+
+//user guidance
+deleteNode('detectorMessage');
+document.getElementById('decisionMessage').classList.remove('hidden');
 }
 
 
@@ -915,9 +915,9 @@ function loadData(DAQ){
     document.getElementById('saveCalname').value = 'PACES-Cal-File-Run'+dataStore.RunNumber+'.cal';
   }else if(dataStore.THESEdetectors[0].includes('LBL')){
     document.getElementById('saveCalname').value = 'LaBr3-Cal-File-Run'+dataStore.RunNumber+'.cal';
-}else if(dataStore.THESEdetectors[0].includes('RCS')){
-  document.getElementById('saveCalname').value = 'RCMP-Cal-File-Run'+dataStore.RunNumber+'.cal';
-}
+  }else if(dataStore.THESEdetectors[0].includes('RCS')){
+    document.getElementById('saveCalname').value = 'RCMP-Cal-File-Run'+dataStore.RunNumber+'.cal';
+  }
 
   // Trigger the saving of this new filename
   document.getElementById('saveCalname').onchange();
@@ -979,20 +979,20 @@ function updateAnalyzer(){
         urls[num] += '&channelName'+j+'='+dataStore.THESEdetectors[i]+'&quad'+j+'='+quad[i]+'&gain'+j+'='+gain[i]+'&offset'+j+'='+offset[i];
         j++;
 
-    }else if((dataStore.detectorType == 'PACES') || (dataStore.detectorType == 'LaBr3')){
+      }else if((dataStore.detectorType == 'PACES') || (dataStore.detectorType == 'LaBr3')){
 
-      urls[num] += '&channelName'+j+'='+dataStore.THESEdetectors[i]+'&quad'+j+'='+quad[i]+'&gain'+j+'='+gain[i]+'&offset'+j+'='+offset[i];
-      j++;
+        urls[num] += '&channelName'+j+'='+dataStore.THESEdetectors[i]+'&quad'+j+'='+quad[i]+'&gain'+j+'='+gain[i]+'&offset'+j+'='+offset[i];
+        j++;
 
-  }else{
-      // Set some values rather than have these entries undefined for unchecked channels
-      // Channels that did not produce good coefficients are not included in the URLs
-      quad[i] = 0;
-      gain[i] = 1;
-      offset[i] = 0;
+      }else{
+        // Set some values rather than have these entries undefined for unchecked channels
+        // Channels that did not produce good coefficients are not included in the URLs
+        quad[i] = 0;
+        gain[i] = 1;
+        offset[i] = 0;
+      }
     }
   }
-}
 
 
   //send requests
@@ -1170,7 +1170,7 @@ function setupAutomaticCalibration(sourceType){
   deleteNode('regionMessage');
   deleteNode('pickerMessage');
 
-console.log(dataStore);
+  console.log(dataStore);
 }
 
 function autoPeakSearchLimits(sourceType){
@@ -1179,20 +1179,20 @@ function autoPeakSearchLimits(sourceType){
   console.log(sourceType)
 
   // Set the peak energies for this source
-    // Find the index number for the source information for this sourceType and detectorType
-    var index = dataStore.sourceInfo[dataStore.detectorType].map(function(e) { return e.name; }).indexOf(sourceType);
-    var lowEnergy  = dataStore.sourceInfo[dataStore.detectorType][index].lowEnergy;
-    var midEnergy  = dataStore.sourceInfo[dataStore.detectorType][index].midEnergy;
-    var highEnergy = dataStore.sourceInfo[dataStore.detectorType][index].highEnergy;
-    var vhiEnergy  = dataStore.sourceInfo[dataStore.detectorType][index].vhiEnergy;
-    var LowerLimitFactor = dataStore.LimitFactors[dataStore.detectorType].Lower;
-    var UpperLimitFactor = dataStore.LimitFactors[dataStore.detectorType].Upper;
-if(dataStore.THESEdetectors[0].includes('RCS')){
-  document.getElementById('peak4').classList.add('hidden');
+  // Find the index number for the source information for this sourceType and detectorType
+  var index = dataStore.sourceInfo[dataStore.detectorType].map(function(e) { return e.name; }).indexOf(sourceType);
+  var lowEnergy  = dataStore.sourceInfo[dataStore.detectorType][index].lowEnergy;
+  var midEnergy  = dataStore.sourceInfo[dataStore.detectorType][index].midEnergy;
+  var highEnergy = dataStore.sourceInfo[dataStore.detectorType][index].highEnergy;
+  var vhiEnergy  = dataStore.sourceInfo[dataStore.detectorType][index].vhiEnergy;
+  var LowerLimitFactor = dataStore.LimitFactors[dataStore.detectorType].Lower;
+  var UpperLimitFactor = dataStore.LimitFactors[dataStore.detectorType].Upper;
+  if(dataStore.THESEdetectors[0].includes('RCS')){
+    document.getElementById('peak4').classList.add('hidden');
     document.getElementById('peak4label').classList.add('hidden');
     document.getElementById('peak4position').classList.add('hidden');
     document.getElementById('peak4positionlabel').classList.add('hidden');
-}
+  }
 
   // Configure the axis settings
   document.getElementById('logY').onclick();
@@ -1210,14 +1210,14 @@ if(dataStore.THESEdetectors[0].includes('RCS')){
 
   for(i=0; i<dataStore.sourceInfo[dataStore.detectorType][index].energies.length; i++){
 
-      // Set the source details on the page
-      document.getElementById('peak'+(i+1)).value = dataStore.sourceInfo[dataStore.detectorType][index].energies[i];
+    // Set the source details on the page
+    document.getElementById('peak'+(i+1)).value = dataStore.sourceInfo[dataStore.detectorType][index].energies[i];
 
-        // Set the limits for the peak searches automatically instead of getting shift-click input from user
-  dataStore.searchRegion[i] = [];
-  dataStore.searchRegion[i][0] = Math.floor(dataStore.sourceInfo[dataStore.detectorType][index].energies[i] * LowerLimitFactor);
-  dataStore.searchRegion[i][1] = Math.floor(dataStore.sourceInfo[dataStore.detectorType][index].energies[i] * UpperLimitFactor);
-  dataStore.searchRegion[i][2] = 10;
+    // Set the limits for the peak searches automatically instead of getting shift-click input from user
+    dataStore.searchRegion[i] = [];
+    dataStore.searchRegion[i][0] = Math.floor(dataStore.sourceInfo[dataStore.detectorType][index].energies[i] * LowerLimitFactor);
+    dataStore.searchRegion[i][1] = Math.floor(dataStore.sourceInfo[dataStore.detectorType][index].energies[i] * UpperLimitFactor);
+    dataStore.searchRegion[i][2] = 10;
   }
 
   dataStore.searchRegionP1[0] = Math.floor(lowEnergy * LowerLimitFactor);
