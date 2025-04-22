@@ -815,6 +815,10 @@ function setupDataStore(){
           if(!keys[i].includes(document.getElementById('HistoListSelectTimeCalibrator').value.split(".")[0])){
             continue;
           }
+          // Only use TAC histograms in the 60Co run
+          if(!keys[i].includes("LBT")){
+            continue;
+          }
 
           // We expect to find 5 or 6 peaks within the TAC range in a 16834 channel spectrum
           // The 1st peak is around channel zero and is unreliable so we will ignore it
