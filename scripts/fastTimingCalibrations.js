@@ -117,30 +117,6 @@ function setupDataStore(){
 
   // Declare the peakFitterScript object
   dataStore.peakFitterScript = {};                                       // This object contains the files, histograms, projections and peaks that dictate the tasks in the workflow
-  dataStore.peakFitterScriptTemplate = {};
-  dataStore.peakFitterScriptTemplate = {
-    'histogramFileNames' : [],                                // List of all the histogram files
-    'spectrumList1d' : [
-      'LBT01XT00X_Pulse_Height','LBT02XT00X_Pulse_Height','LBT03XT00X_Pulse_Height','LBT04XT00X_Pulse_Height',
-      'LBT05XT00X_Pulse_Height','LBT06XT00X_Pulse_Height','LBT07XT00X_Pulse_Height','LBT08XT00X_Pulse_Height',
-      'LBT09XT00X_Pulse_Height','LBT10XT00X_Pulse_Height','LBT11XT00X_Pulse_Height','LBT12XT00X_Pulse_Height',
-      'TAC_00_01', 'TAC_00_02', 'TAC_00_03', 'TAC_00_04', 'TAC_00_05', 'TAC_00_06', 'TAC_00_07',
-      'TAC_01_02', 'TAC_01_03', 'TAC_01_04', 'TAC_01_05', 'TAC_01_06', 'TAC_01_07',
-      'TAC_02_03', 'TAC_02_04', 'TAC_02_05', 'TAC_02_06', 'TAC_02_07',
-      'TAC_03_04', 'TAC_03_05', 'TAC_03_06', 'TAC_03_07',
-      'TAC_04_05', 'TAC_04_06', 'TAC_04_07',
-      'TAC_05_06', 'TAC_05_07',
-      'TAC_06_07',
-      'TAC_01_00'
-    ],                                    // Names of all the 1d spectra
-    'spectrumList1dPeaks' : {
-      'All':[2650,5670,8660,11600,14450]
-    },                               // List of all peak centroids to be fitted in the 1d spectra
-    'spectrumList2d' : [],                                    // Names of all the 2d spectra
-    'spectrumListGates' : [],                                 // List of all the gate limits to make projections from the 2d spectra,
-    // Format for gates: 'matrixname': [[axis,gateMin,gateMax,BG1SF,BG1Min,BG1Max,BG2SF,BG2Min,BG2Max], [], ...]
-    'spectrumListProjectionsPeaks' : {'All':[]}                       // List of all peak centroids to be fitted in the projected 1d spectra from the 2d spectra
-  };
 
   dataStore.peakFitterScriptTemplate = {};
   dataStore.peakFitterScriptTemplate = {
@@ -152,14 +128,14 @@ function setupDataStore(){
       'spectrumList2d' : [], 'spectrumListGates' : [], 'spectrumListProjectionsPeaks' : {'All':[]}
     },
     '60Co' : {'spectrumList1d' : [
-      'TAC_00_01', 'TAC_00_02', 'TAC_00_03', 'TAC_00_04', 'TAC_00_05', 'TAC_00_06', 'TAC_00_07',
-      'TAC_01_02', 'TAC_01_03', 'TAC_01_04', 'TAC_01_05', 'TAC_01_06', 'TAC_01_07',
-      'TAC_02_03', 'TAC_02_04', 'TAC_02_05', 'TAC_02_06', 'TAC_02_07',
-      'TAC_03_04', 'TAC_03_05', 'TAC_03_06', 'TAC_03_07',
-      'TAC_04_05', 'TAC_04_06', 'TAC_04_07',
-      'TAC_05_06', 'TAC_05_07',
-      'TAC_06_07',
-      'TAC_01_00',
+      'uncalibrated_TAC_00_01', 'uncalibrated_TAC_00_02', 'uncalibrated_TAC_00_03', 'uncalibrated_TAC_00_04', 'uncalibrated_TAC_00_05', 'uncalibrated_TAC_00_06', 'uncalibrated_TAC_00_07',
+      'uncalibrated_TAC_01_02', 'uncalibrated_TAC_01_03', 'uncalibrated_TAC_01_04', 'uncalibrated_TAC_01_05', 'uncalibrated_TAC_01_06', 'uncalibrated_TAC_01_07',
+      'uncalibrated_TAC_02_03', 'uncalibrated_TAC_02_04', 'uncalibrated_TAC_02_05', 'uncalibrated_TAC_02_06', 'uncalibrated_TAC_02_07',
+      'uncalibrated_TAC_03_04', 'uncalibrated_TAC_03_05', 'uncalibrated_TAC_03_06', 'uncalibrated_TAC_03_07',
+      'uncalibrated_TAC_04_05', 'uncalibrated_TAC_04_06', 'uncalibrated_TAC_04_07',
+      'uncalibrated_TAC_05_06', 'uncalibrated_TAC_05_07',
+      'uncalibrated_TAC_06_07',
+      'uncalibrated_TAC_01_00',
       'LBL01XN00X_Pulse_Height','LBL02XN00X_Pulse_Height','LBL03XN00X_Pulse_Height','LBL04XN00X_Pulse_Height',
       'LBL05XN00X_Pulse_Height','LBL06XN00X_Pulse_Height','LBL07XN00X_Pulse_Height','LBL08XN00X_Pulse_Height'
     ], 'spectrumList1dPeaks' : { 'All':[] }, 'histogramFileNames' : [],
@@ -173,9 +149,12 @@ function setupDataStore(){
     // graphSection = plot of per detector the PH vs Lit en with Fit and a residuals pane
     // graphSection = plot of all the residuals for specific peak
     // Variables for Pagination menu buttons
-    dataStore.buttonNames = ["Spectra", "Peak-Fitting Results", "per Crystal k-dependance fits", "per Crystal 1st-Hit-dependance fits"];  // Names to appear on the buttons
-    dataStore.buttonIDs = ["plotRegionMenuButton", "graphRegionMenuButton", "crystalKRegionMenuButton", "crystal1stHitRegionMenuButton"];    // IDs for the buttons
-    dataStore.buttonPages = ["plotRegion", "resultsTableRegion", "crystalKReportRegion", "crystal1stHitReportRegion"];                 // Pages (div IDs) to be associated with the buttons
+    //dataStore.buttonNames = ["Spectra", "Peak-Fitting Results", "per Crystal k-dependance fits", "per Crystal 1st-Hit-dependance fits"];  // Names to appear on the buttons
+    //  dataStore.buttonIDs = ["plotRegionMenuButton", "graphRegionMenuButton", "crystalKRegionMenuButton", "crystal1stHitRegionMenuButton"];    // IDs for the buttons
+    //dataStore.buttonPages = ["plotRegion", "resultsTableRegion", "crystalKReportRegion", "crystal1stHitReportRegion"];                 // Pages (div IDs) to be associated with the buttons
+    dataStore.buttonNames = ["Spectra"];  // Names to appear on the buttons
+    dataStore.buttonIDs = ["plotRegionMenuButton"];    // IDs for the buttons
+    dataStore.buttonPages = ["plotRegion"];                 // Pages (div IDs) to be associated with the buttons
 
     // Generate THESEdetectors object. Used for building the coefficients table
     dataStore.numberOfClovers = 16;
@@ -736,17 +715,13 @@ function setupDataStore(){
         }else{
           console.log('All fitting is complete. Now put it together.');
         }
-
       }
 
       function fittingCallback(){
         // All fitting has now been completed
-        console.log(dataStore);
-        console.log("fittingCallback");
 
         // We now have gain and have found the peak centroids for the TACs.
         // Use peak centroid to calculate the offset values for each LBL-LBL combination.
-        console.log("Now calculate offsets");
 
         var histoName = dataStore.currentHistoFileName.split(".")[0];
         var specList = dataStore.peakFitterScriptTemplate["60Co"].spectrumList1d;
@@ -764,14 +739,11 @@ function setupDataStore(){
         }
         string += "};";
 
-        console.log(dataStore);
-        console.log(string);
-
         // Now we are done.
         // Reveal the download buttons
         document.getElementById('saveCalDiv').classList.remove('hidden');
-        document.getElementById('saveCSVDiv').classList.remove('hidden');
-        document.getElementById('saveScriptDiv').classList.remove('hidden');
+        //  document.getElementById('saveCSVDiv').classList.remove('hidden');
+        //  document.getElementById('saveScriptDiv').classList.remove('hidden');
 
         // change information message
         document.getElementById('fittingProjectionsMessage').classList.add('hidden');
@@ -805,7 +777,6 @@ function setupDataStore(){
       }
 
       function findTacCalibration(){
-        console.log("Function findTacCalibration");
         // The time calibrator produces a picket fence of peaks in the spectrum at well-known time differences.
         // Here we will first find the 5 peaks, then perform the linear calibration to 10 picoseconds per channel
 
@@ -832,9 +803,6 @@ function setupDataStore(){
             var thisUpperLimit = thisLowerLimit+sectionLength;
             var thisSectionData = dataStore.rawData[keys[i]].slice(thisLowerLimit,thisUpperLimit);
 
-            console.log("Section/lower/upper: "+section+","+thisLowerLimit+","+thisUpperLimit);
-            console.log(thisSectionData);
-
             if(!dataStore.timeCalibratorPeaks[keys[i]]){ dataStore.timeCalibratorPeaks[keys[i]] = []; }
             //dataStore.timeCalibratorPeaks[keys[i]].push(thisSectionData.indexOf(Math.max(thisSectionData)));
             var maxValue = 0; var index=-1;
@@ -846,9 +814,7 @@ function setupDataStore(){
             dataStore.timeCalibratorPeaks[keys[i]].push(index);
           }
 
-          console.log(dataStore.timeCalibratorPeaks[keys[i]]);
           var gain = (dataStore.timeCalibratorPeaks[keys[i]][dataStore.timeCalibratorPeaks[keys[i]].length-1] - dataStore.timeCalibratorPeaks[keys[i]][0]) / ((dataStore.timeCalibratorPeaks[keys[i]].length-1)*dataStore.timeCalibratorPeriod);
-          console.log(gain);
 
           if(!dataStore.tacCalibration[keys[i]]){ dataStore.tacCalibration[keys[i]] = []; }
           dataStore.tacCalibration[keys[i]][0] = gain;
@@ -857,13 +823,9 @@ function setupDataStore(){
           dataStore.tacGain[thisTAC] = gain;
         }
 
-
-        console.log(dataStore);
-
       }
 
       function findTacOffsets(){
-        console.log("Function findTacOffsets");
         var spectrumList = [];
         var peaksList = {};
 
@@ -891,8 +853,11 @@ function setupDataStore(){
           dataStore.rawData[keys[i]] = calibratedSpectrum; // Change the raw spectrum to the calibrated spectrum
 
           // We expect to find 1 peak within the TAC range for each LBL-LBL combo
+          // There is often a spike at the overflow channel which needs to be excluded
           var thisLowerLimit = 15;
-          var thisUpperLimit = 4000;
+          j=calibratedSpectrum.length-1;
+          while(j>0 && calibratedSpectrum[j]<1){ j--; }
+          if(j>3000){ var thisUpperLimit = j-100; }else{ var thisUpperLimit = 3000; };
           var thisSectionData = calibratedSpectrum.slice(thisLowerLimit,thisUpperLimit);
 
           if(!dataStore.rawTACPeaks[keys[i]]){ dataStore.rawTACPeaks[keys[i]] = []; }
@@ -927,12 +892,7 @@ function setupDataStore(){
           var mean = sumProducts / sum;
 
           dataStore.rawTACPeaks[keys[i]].push(mean);
-
-          console.log(dataStore.rawTACPeaks[keys[i]]);
         }
-
-        console.log(dataStore);
-        console.log(spectrumList);
 
         // Now do fitting of these TAC Peaks
 
@@ -946,8 +906,6 @@ function setupDataStore(){
       }
 
       function gainMatchLBL(){
-
-        console.log("Function gainMatchLBL");
         var peaksList = {};
 
         var keys = Object.keys(dataStore.rawData);
@@ -960,7 +918,6 @@ function setupDataStore(){
           if(!keys[i].includes("LBL")){
             continue;
           }
-          console.log(keys[i]);
 
           // Create the empty spectrum that will be a starting point for each interation
           var testSpectrumLength = 3000;
@@ -973,7 +930,7 @@ function setupDataStore(){
           var referenceSpectrum = dataStore.referenceSpectrum["LBL"].slice(0,testSpectrumLength);
 
           // Set the parameters for the chi-square sweep
-          var gainLowerLimit = 1.2;
+          var gainLowerLimit = 0.7;
           var gainUpperLimit = 2.2;
           var gainStepSize = 0.001;
           var minChiSquare = 100000000;
@@ -981,7 +938,6 @@ function setupDataStore(){
           var optimalGain = 1.0;
           // Scan through gain values
           for(gain=gainLowerLimit; gain<gainUpperLimit; gain+=gainStepSize){
-            if(gain == 1.9){ console.log("breakpoint at gain 1.9"); }
             testSpectrum = [];
             errorSpectrum = [];
             testSpectrum.fillN(0,testSpectrumLength); // For LBL we will try and match between zero and 3MeV
@@ -1001,14 +957,8 @@ function setupDataStore(){
             // Decide if this is the best fit and save it if it is
             if(thisChiSquare<minChiSquare){ minChiSquare = thisChiSquare; optimalGain = gain; }
           }
-
-          console.log(chiSquareSeries);
           dataStore.LBLgains.push(optimalGain);
-
         }
-
-        console.log(dataStore);
-
       }
 
       function buildCSVfile(){
@@ -1225,8 +1175,6 @@ function setupDataStore(){
 
           num++; // move to next url, one for each crystal
         } // end of Ge loop
-
-        console.log(urls);
 
         //send requests
         for(i=0; i<urls.length; i++){

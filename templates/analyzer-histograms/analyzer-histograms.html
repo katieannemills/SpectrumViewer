@@ -1,146 +1,146 @@
 <link rel="stylesheet" href="analyzer-histograms.css">
 
 <template id='analyzer-histograms'>
-<div class='col-md-12 pan' id=loadConfigButtonDiv><br></div>
+  <div class='col-md-12 pan' id=loadConfigButtonDiv><br></div>
 
-    <div class='section-wrapper'>
-        <div class='col-md-12 pan' id='Histograms-Global'>
-            <h2 id='globalHeader'>Global Conditions</h2>
-	<div id='GlobalConditions' class='hidden'>
-            <div id='globals-wrap'></div>
-	    <button type='button' class='btn btn-info' data-toggle='modal' data-target='#globalModal'>Add a new Global condition</button>
-	</div>
+  <div class='section-wrapper'>
+    <div class='col-md-12 pan' id='Histograms-Global'>
+      <h2 id='globalHeader'>Global Conditions</h2>
+      <div id='GlobalConditions' class='hidden'>
+        <div id='globals-wrap'></div>
+        <button type='button' class='btn btn-info' data-toggle='modal' data-target='#globalModal'>Add a new Global condition</button>
+      </div>
+    </div>
+  </div>
+
+  <div class='section-wrapper'>
+    <div class='col-md-12 pan' id='Histograms-Gates'>
+      <h2 id='gateHeader'>Gating Conditions</h2>
+      <div id='GateConditions' class='hidden'>
+        <div id='gates-wrap'></div>
+        <button type='button' class='btn btn-info' data-toggle='modal' data-target='#gateModal'>Add a new Gate condition</button>
+      </div>
+    </div>
+  </div>
+
+  <div class='section-wrapper'>
+    <div class='col-md-12 pan' id='Histograms-Histograms'>
+      <h2 id='histogramHeader'>Histogram Definitions</h2>
+      <div id='HistogramDefinitions' class='hidden'>
+        <div id='histograms-wrap'></div>
+        <button type='button' class='btn btn-info' data-toggle='modal' data-target='#histogramModal'>Add a new Histogram definition</button>
+      </div>
+    </div>
+  </div>
+
+  
+  <!-- Modals -->
+  <div id="globalModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Create a New Global Condition</h4>
         </div>
-    </div>
-
-    <div class='section-wrapper'>
-        <div class='col-md-12 pan' id='Histograms-Gates'>
-            <h2 id='gateHeader'>Gating Conditions</h2>
-	<div id='GateConditions' class='hidden'>
-            <div id='gates-wrap'></div>
-	    <button type='button' class='btn btn-info' data-toggle='modal' data-target='#gateModal'>Add a new Gate condition</button>
-	</div>
+        <div class="modal-body">
+          <p>Please enter a unique name for the new global.</p>
+          <input type="text" class="analyzer-input-text" id="globalModalInput" oninput='enterUniqueGlobalName();' placeholder="Enter global name">
         </div>
-    </div>
-
-    <div class='section-wrapper'>
-        <div class='col-md-12 pan' id='Histograms-Histograms'>
-            <h2 id='histogramHeader'>Histogram Definitions</h2>
-	<div id='HistogramDefinitions' class='hidden'>
-	<div id='histograms-wrap'></div>
-	<button type='button' class='btn btn-info' data-toggle='modal' data-target='#histogramModal'>Add a new Histogram definition</button>
-	</div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" id='globalModalButton' onclick='addNewGlobal();' disabled>Create Global</button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
         </div>
+      </div>
+
     </div>
-
-
-<!-- Modals -->
-<div id="globalModal" class="modal fade" role="dialog">
-  <div class="modal-dialog">
-
-    <!-- Modal content-->
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Create a New Global Condition</h4>
-      </div>
-      <div class="modal-body">
-        <p>Please enter a unique name for the new global.</p>
-	<input type="text" class="analyzer-input-text" id="globalModalInput" oninput='enterUniqueGlobalName();' placeholder="Enter global name">
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" id='globalModalButton' onclick='addNewGlobal();' disabled>Create Global</button>
-        <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
-      </div>
-    </div>
-
   </div>
-</div>
 
-<div id="gateModal" class="modal fade" role="dialog">
-  <div class="modal-dialog">
+  <div id="gateModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
 
-    <!-- Modal content-->
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Create a New Gate Condition</h4>
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Create a New Gate Condition</h4>
+        </div>
+        <div class="modal-body">
+          <p>Please enter a unique name for the new gate.</p>
+          <input type="text" class="analyzer-input-text" id="gateModalInput" oninput='enterUniqueGateName();' placeholder="Enter gate name">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" id='gateModalButton' onclick='addNewGate();' disabled>Create Gate</button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+        </div>
       </div>
-      <div class="modal-body">
-        <p>Please enter a unique name for the new gate.</p>
-	<input type="text" class="analyzer-input-text" id="gateModalInput" oninput='enterUniqueGateName();' placeholder="Enter gate name">
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" id='gateModalButton' onclick='addNewGate();' disabled>Create Gate</button>
-        <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
-      </div>
+
     </div>
-
   </div>
-</div>
 
-<div id="histogramModal" class="modal fade" role="dialog">
-  <div class="modal-dialog">
+  <div id="histogramModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
 
-    <!-- Modal content-->
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Create a New Histogram Definition</h4>
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Create a New Histogram Definition</h4>
+        </div>
+        <div class="modal-body">
+          <p>Please enter a unique name for the new histogram.</p>
+          <input type="text" class="analyzer-input-text" id="histogramModalInput" oninput='enterUniqueHistogramName();' placeholder="Enter histogram name">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" id='histogramModalButton' onclick='addNewHistogram();' disabled>Create Histogram</button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+        </div>
       </div>
-      <div class="modal-body">
-        <p>Please enter a unique name for the new histogram.</p>
-	<input type="text" class="analyzer-input-text" id="histogramModalInput" oninput='enterUniqueHistogramName();' placeholder="Enter histogram name">
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" id='histogramModalButton' onclick='addNewHistogram();' disabled>Create Histogram</button>
-        <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
-      </div>
+
     </div>
-
   </div>
-</div>
 
-<div id="alertModal" class="modal fade" role="dialog">
-  <div class="modal-dialog">
+  <div id="alertModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
 
-    <!-- Modal content-->
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Warning</h4>
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Warning</h4>
+        </div>
+        <div class="modal-body">
+          <p>Numerical values must be between -2,147,483,648 and +2,147,483,647.</p>
+          <p>The values for the Range option are limited to between −32,768 and +32,767.</p>
+          <p>The following characters are not permitted in names or titles; &, =, {, }, ?, !</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-warning" data-dismiss="modal">Close</button>
+        </div>
       </div>
-      <div class="modal-body">
-        <p>Numerical values must be between -2,147,483,648 and +2,147,483,647.</p>
-	<p>The values for the Range option are limited to between −32,768 and +32,767.</p>
-        <p>The following characters are not permitted in names or titles; &, =, {, }, ?, !</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-warning" data-dismiss="modal">Close</button>
-      </div>
+
     </div>
-
   </div>
-</div>
 
-<button type='button' class='btn invisible' id='alertModalButton' data-toggle='modal' data-target='#alertModal'>Info</button>
+  <button type='button' class='btn invisible' id='alertModalButton' data-toggle='modal' data-target='#alertModal'>Info</button>
 
 </template>
 
 <script>
-    function setupAnalyzerHistograms(wrapperID){
-        document.getElementById(wrapperID).innerHTML = "";
-        document.getElementById(wrapperID).innerHTML = Mustache.to_html(dataStore.templates['analyzer-histograms'], {});
+  function setupAnalyzerHistograms(wrapperID){
+    document.getElementById(wrapperID).innerHTML = "";
+    document.getElementById(wrapperID).innerHTML = Mustache.to_html(dataStore.templates['analyzer-histograms'], {});
 
-				    // Create the reload config button
-				    newButton = document.createElement('button');
-				    newButton.setAttribute('id', 'loadConfigButton');
-				    newButton.setAttribute('class', 'btn btn-default btn-md');
-				    newButton.innerHTML = 'Reload Config file from Server';
-				    newButton.onclick = function(){
-					getConfigFileFromServer();
-				    }.bind(newButton);
-				    document.getElementById('loadConfigButtonDiv').appendChild(newButton);
+    // Create the reload config button
+    newButton = document.createElement('button');
+    newButton.setAttribute('id', 'loadConfigButton');
+    newButton.setAttribute('class', 'btn btn-default btn-md');
+    newButton.innerHTML = 'Reload Config file from Server';
+    newButton.onclick = function(){
+      getConfigFileFromServer();
+    }.bind(newButton);
+    document.getElementById('loadConfigButtonDiv').appendChild(newButton);
 
     // Create the expand buttons for each section
     newButton = document.createElement('button');
@@ -148,7 +148,7 @@
     newButton.setAttribute('class', 'btn-expand-large');
     newButton.innerHTML = '<p>+</p>';
     newButton.onclick = function(){
-	expandGlobalList();
+      expandGlobalList();
     }.bind(newButton);
     document.getElementById('globalHeader').appendChild(newButton);
 
@@ -157,7 +157,7 @@
     newButton.setAttribute('class', 'btn-expand-large');
     newButton.innerHTML = '<p>+</p>';
     newButton.onclick = function(){
-	expandGateList();
+      expandGateList();
     }.bind(newButton);
     document.getElementById('gateHeader').appendChild(newButton);
 
@@ -166,15 +166,15 @@
     newButton.setAttribute('class', 'btn-expand-large');
     newButton.innerHTML = '<p>+</p>';
     newButton.onclick = function(){
-	expandHistogramList();
+      expandHistogramList();
     }.bind(newButton);
     document.getElementById('histogramHeader').appendChild(newButton);
 
-        // set up event listeners
-        listener(wrapperID, 'requestHistogramsRefresh', setupHistogramsContent);
+    // set up event listeners
+    listener(wrapperID, 'requestHistogramsRefresh', setupHistogramsContent);
 
-        // initial setup of the subpage
-        setupHistogramsContent();
+    // initial setup of the subpage
+    setupHistogramsContent();
 
-    }
+  }
 </script>

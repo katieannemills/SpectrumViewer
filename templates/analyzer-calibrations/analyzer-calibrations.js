@@ -105,15 +105,28 @@ function processDropFile(file){
       thisArrStr = arrStr[i].split('\n');
       for(var j=0; j<thisArrStr.length; j++){
         if(thisArrStr[j].includes("Name")){
-          thisName = thisArrStr[j].split(/\t| /)[1];
+          //thisName = thisArrStr[j].split(/\t| /)[1];
+          thisName = thisArrStr[j].split(":")[1].trim();
         }
-        if(thisArrStr[j].includes("EngCoeff")){
+        if(thisArrStr[j].includes("EngCoeff") || thisArrStr[j].includes("ENGCoeff")){
           thisArray = thisArrStr[j].split(/\t| /);
           thisArray = thisArray.filter(String);
           thisOffset = parseFloat(thisArray[1]);
           thisGain = parseFloat(thisArray[2]);
           thisQuad = parseFloat(thisArray[3]);
           //  console.log("Using thisArray: "+thisName+': '+ thisQuad+','+ thisGain+','+ thisOffset);
+        }
+        if(thisArrStr[j].includes("TimeOffset") && thisName.includes("LBT")){
+          // This is a LBT/TAC timestamp offset which will be added as a Global not a Calibration
+          // http://localhost:9093/?cmd=addGlobal&globalname=TAC-Offset-01-04&globalmin=-100&globalmax=-731
+          thisArray = thisArrStr[j].split(/\t| /);
+          thisArray = thisArray.filter(String);
+          var thisTSOffset = parseFloat(thisArray[1]);
+          var thisNum = thisName.split("LBT")[1].split("X")[0];
+          var thisGlobalName = "Timestamp-offset-LBT" + alwaysThisLong(parseInt(thisNum),2);
+          var thisURLString = spectrumServer + '?cmd=addGlobal&globalname=' + thisGlobalName + "&globalmin=0&globalmax=" + thisTSOffset;
+          globalsURLs.push(thisURLString);
+          outputString += thisName+': '+ thisGlobalName+','+ thisTSOffset + "<br>";
         }
       }
       if(thisName.includes("TAC_")){
