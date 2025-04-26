@@ -162,10 +162,11 @@ function setupDataStore(){
       "errorMessage": ''
     };
     dataStore.heartbeatInterval = 1000;                   // ms between data updates
-    dataStore.heartbeatIntervalDEFAULTvalue = 1000;          // default interval
+    dataStore.heartbeatIntervalDEFAULTvalue = 1000;       // default interval
     dataStore.heartbeatIntervalBUSYvalue = 1000;          // default Busy interval
+    dataStore.heartbeatIntervalSUMMINGvalue = 2000;       // default SUMMING interval
     dataStore.heartbeatIntervalIDLEvalue = 5000;          // default IDLE interval
-    dataStore.heartbeatIntervalERRORvalue = 15000;         // default interval if error connecting to server
+    dataStore.heartbeatIntervalERRORvalue = 15000;        // default interval if error connecting to server
     dataStore.heartbeatTimer = '';                        // the TimeOut object so that it can be terminated with a clearTimeout call
     dataStore.waitCounter = 0;
 
@@ -388,7 +389,22 @@ function processSortStatus(payload){
     document.getElementById('progress').setAttribute('style', 'width:' + 100 + '%' );
     document.getElementById('progress').innerHTML = 'Analyzer is idle, ready for files to be submitted.';
     document.getElementById("sortStatusDisplay").innerHTML = 'Analyzer is idle, ready for files to be submitted.';
-    //console.log('End of processSortStatus: Lock='+dataStore.SortStatusRequestLock+', count='+dataStore.sortStatusRequestBlockCount);
+    return;
+  }else if(strncmp(payload,'SUMMING',7)){
+
+    // Check the timestamp of the most recent config file saved on the server
+    checkConfigTimestamps(payload.split(' ')[2]);
+
+    dataStore.previousSortStatus = 'SUMMING';
+
+    // Set the heartbeat frequency
+    dataStore.heartbeatInterval = dataStore.heartbeatIntervalSUMMINGvalue;
+
+    // Update the progress bar
+    document.getElementById('progress').className = 'progress-bar progress-bar-success progress-bar-striped';
+    document.getElementById('progress').setAttribute('style', 'width:' + 100 + '%' );
+    document.getElementById('progress').innerHTML = 'Summing histogram files...';
+    document.getElementById("sortStatusDisplay").innerHTML = 'Summing histogram files together.';
     return;
   }else{
     // Set the heartbeat frequency
