@@ -92,8 +92,9 @@
     newSelect.onchange = function(){
     dataStore.CalibrationSource = this.value;
     }.bind(newSelect);
-    newSelect.add( new Option('ODB values stored in midas file', 'midas') );
-    newSelect.add( new Option('New values in current config file', 'config') );
+    newSelect.add( new Option('ODB values stored in each midas file as written at the time of data collection.', 'midas') );
+    newSelect.add( new Option('New values presently in the analyzer config file.', 'config') );
+    newSelect.add( new Option('Values from run-specific config files (.json) stored in the MIDAS Data File Directory.', 'file') );
     document.getElementById('CalibrationSourceInputDiv').appendChild(newSelect);
 
     // Create Submit files button
