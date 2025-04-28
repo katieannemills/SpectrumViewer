@@ -1,661 +1,441 @@
 <link rel="stylesheet" href="energyCalibratorReport.css"/>
 
 <template id='energyCalibratorDetectorReport'>
-    <div class='sectionWrapper item'>
-        <div class='col-md-12'>
-            <table id='{{id}}energyCalibratorDetectorResults' class='table energyCalibratorTable'></table>
+<div class='sectionWrapper item'>
+<div class='col-md-12'>
+<table id='{{id}}energyCalibratorDetectorResults' class='table energyCalibratorTable'></table>
 
-            <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myAnalyzerModal">
-                <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Write calibration to Analyzer
-            </button>
-            <br>
-            <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myODBModal">
-                <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Write calibration to ODB
-            </button>
-            <br>
-            <button type="button" class="btn btn-primary btn-lg"  id='saveCal'>
-                <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Save Cal file
-            </button>
-            <input id='saveCalname' type='text' value='GRIFFIN-Cal-File.cal' width='500px'></input>
+<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myAnalyzerModal">
+<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Write calibration to Analyzer
+</button>
+<br>
+<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myODBModal">
+<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Write calibration to ODB
+</button>
+<br>
+<button type="button" class="btn btn-primary btn-lg"  id='saveCal'>
+<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Save Cal file
+</button>
+<input id='saveCalname' type='text' value='GRIFFIN-Cal-File.cal' width='500px'></input>
 
-        </div>
-    </div>
+</div>
+</div>
 
-    <!--are you sure modal for Analyzer write-->
-    <div class="modal fade" id="myAnalyzerModal" tabindex="-1" role="dialog" aria-labelledby="myAnalyzerModalLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myAnalyzerModalLabel">Change values in Analyzer Config file?</h4>
-                </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to change the quadratic, gain and offset values for all selected detectors in the Analyzer? There is no undo.</p>
-                    <input type='checkbox' id='{{id}}yesDefinitelyWriteAnalyzer'></input>
-                    <label for='{{id}}yesDefinitelyWriteAnalyzer'>I'm very sure.</label>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal" id='dismissAnalyzermodal'>
-                        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Abort
-                    </button>
-                    <button type="button" class="btn btn-default" id='{{id}}writeToAnalyzer' disabled>
-                        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Write
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+<!--are you sure modal for Analyzer write-->
+<div class="modal fade" id="myAnalyzerModal" tabindex="-1" role="dialog" aria-labelledby="myAnalyzerModalLabel">
+<div class="modal-dialog" role="document">
+<div class="modal-content">
+<div class="modal-header">
+<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+<h4 class="modal-title" id="myAnalyzerModalLabel">Change values in Analyzer Config file?</h4>
+</div>
+<div class="modal-body">
+<p>Are you sure you want to change the quadratic, gain and offset values for all selected detectors in the Analyzer? There is no undo.</p>
+<input type='checkbox' id='{{id}}yesDefinitelyWriteAnalyzer'></input>
+<label for='{{id}}yesDefinitelyWriteAnalyzer'>I'm very sure.</label>
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-default" data-dismiss="modal" id='dismissAnalyzermodal'>
+<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Abort
+</button>
+<button type="button" class="btn btn-default" id='{{id}}writeToAnalyzer' disabled>
+<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Write
+</button>
+</div>
+</div>
+</div>
+</div>
 
-    <!--are you sure modal for ODB write-->
-    <div class="modal fade" id="myODBModal" tabindex="-1" role="dialog" aria-labelledby="myODBModalLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myODBModalLabel">Change values in ODB?</h4>
-                </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to change the quadratic, gain and offset values for all selected detectors in the ODB? There is no undo.</p>
-                    <input type='checkbox' id='{{id}}yesDefinitelyWriteODB'></input>
-                    <label for='{{id}}yesDefinitelyWriteODB'>I'm very sure.</label>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal" id='dismissODBmodal'>
-                        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Abort
-                    </button>
-                    <button type="button" class="btn btn-default" id='{{id}}writeToODB' disabled>
-                        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Write
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+<!--are you sure modal for ODB write-->
+<div class="modal fade" id="myODBModal" tabindex="-1" role="dialog" aria-labelledby="myODBModalLabel">
+<div class="modal-dialog" role="document">
+<div class="modal-content">
+<div class="modal-header">
+<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+<h4 class="modal-title" id="myODBModalLabel">Change values in ODB?</h4>
+</div>
+<div class="modal-body">
+<p>Are you sure you want to change the quadratic, gain and offset values for all selected detectors in the ODB? There is no undo.</p>
+<input type='checkbox' id='{{id}}yesDefinitelyWriteODB'></input>
+<label for='{{id}}yesDefinitelyWriteODB'>I'm very sure.</label>
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-default" data-dismiss="modal" id='dismissODBmodal'>
+<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Abort
+</button>
+<button type="button" class="btn btn-default" id='{{id}}writeToODB' disabled>
+<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Write
+</button>
+</div>
+</div>
+</div>
+</div>
 </template>
 
 
 <template id='energyCalibratorCoefficienctsReport'>
-    <div class='sectionWrapper item'>
-        <div class='col-md-12'>
-            <table id='{{id}}energyCalibratorCoefficienctsResults' class='table energyCalibratorTable'></table>
-        </div>
-    </div>
+<div class='sectionWrapper item'>
+<div class='col-md-12'>
+<table id='{{id}}energyCalibratorCoefficienctsResults' class='table energyCalibratorTable'></table>
+</div>
+</div>
 </template>
 
 
 <script>
-    function energyCalibratorReport(wrapID1,wrapID2){
+function energyCalibratorReport(wrapID1,wrapID2){
 
-        this.wrapID = wrapID1;
-        this.wrap = document.getElementById(wrapID1);
+  this.wrapID = wrapID1;
+  this.wrap = document.getElementById(wrapID1);
 
-        this.wrapID2 = wrapID2;
-        this.wrap2 = document.getElementById(wrapID2);
+  this.wrapID2 = wrapID2;
+  this.wrap2 = document.getElementById(wrapID2);
 
-        this.setup = function(){
+  this.setup = function(){
 
-// Setup the Detector subpage
-            //inject templates
-          this.wrap.innerHTML = Mustache.to_html(
-            dataStore.templates.energyCalibratorDetectorReport,
-            {
-                'id': this.wrapID,
-            }
-            );
-            // table has to be done as a separate template, since templates and tables don't play too nice together
-    // Build the list of rows for the table. Loop through each peak of each source
-          var peaks =[];
-          for(var i=0; i<dataStore.THESEcalibrations[0].y.length; i++){
-                peaks.push(dataStore.THESEcalibrations[0].y[i]);
-        }
-        document.getElementById(this.wrapID + 'energyCalibratorDetectorResults').innerHTML= Mustache.to_html(
-            dataStore.templates.energyCalibratorDetectorReportTable,
-            content = {
-                'id': this.wrapID,
-                'peaks': peaks
-            }
-            );
-
-                      // Build Table select for selecting which detector data is displayed
-                      	// Add the title text
-                      	var newLabel = document.createElement("label");
-                      	newLabel.for = 'tableMenuSelect';
-                      	newLabel.id = 'tableMenuSelectLabel';
-                      	newLabel.innerHTML = 'Detector: ';
-                      	document.getElementById('tableMenuDiv').appendChild(newLabel);
-
-                      	// Create a select input for the histo file list
-                      	var newSelect = document.createElement("select");
-                      	newSelect.id = 'tableMenuSelect';
-                      	newSelect.name = 'tableMenuSelect';
-                      	newSelect.onchange = function(){
-                      	   dataStore._energyCalibratorReport.refreshDetectorTableData(this.value);
-                      	}.bind(newSelect);
-                      	document.getElementById('tableMenuDiv').appendChild(newSelect);
-
-                      	// Add the list of detectors as the options
-                      	thisSelect = document.getElementById('tableMenuSelect');
-                      	for(var j=0; j<dataStore.THESEdetectors.length; j++){
-                      	    thisSelect.add( new Option(dataStore.THESEdetectors[j], j) );
-                      	}
-
-                        // Create the previous Detector button
-                        newButton = document.createElement('button');
-                        newButton.setAttribute('id', 'previousDetButton');
-                        newButton.setAttribute('class', 'btn btn-default btn-sm');
-                        newButton.innerHTML = "Previous Detector";
-                        newButton.style.padding = '4px';
-                        newButton.onclick = function(){
-                          var currentValue = parseInt(document.getElementById('tableMenuSelect').value);
-                          if(currentValue==0){ currentValue=1;}
-                          document.getElementById('tableMenuSelect').value = (currentValue-1);
-                          dataStore._energyCalibratorReport.refreshDetectorTableData(currentValue-1);
-                        }.bind(newButton);
-                        document.getElementById('tableMenuDiv').appendChild(newButton);
-
-                        // Create the next Detector button
-                        newButton = document.createElement('button');
-                        newButton.setAttribute('id', 'nextDetButton');
-                        newButton.setAttribute('class', 'btn btn-default btn-sm');
-                        newButton.innerHTML = "Next Detector";
-                        newButton.style.padding = '4px';
-                        newButton.onclick = function(){
-                          var currentValue = parseInt(document.getElementById('tableMenuSelect').value);
-                          if(currentValue==document.getElementById('tableMenuSelect').options.length-1){ currentValue=parseInt(document.getElementById('tableMenuSelect').options.length)-2;
-                        }
-                          document.getElementById('tableMenuSelect').value = (currentValue+1);
-                          dataStore._energyCalibratorReport.refreshDetectorTableData(currentValue+1);
-                        }.bind(newButton);
-                        document.getElementById('tableMenuDiv').appendChild(newButton);
-
-            //make sure the file name for Cal file download gets passed around:
-        document.getElementById('saveCalname').onchange = function(){
-            //set the filename to whatever the user has requested:
-           document.getElementById('saveCal').download = this.value;
-       }
-
-            // Set up the Cal file button
-       document.getElementById('saveCal').onclick = function(){ buildCalfile(); }
-
-            //set up fit callbacks
-       dataStore.viewers[dataStore.plots[0]].fitCallback = this.fitCallback.bind(this);
-
-         //plug in special fit controls
-         document.getElementById('refitButton').onclick = this.toggleFitMode;
-
-            //plug in the allow Analyzer write switch
-       document.getElementById(this.wrapID + 'yesDefinitelyWriteAnalyzer').onchange = this.toggleAnalyzerwrite.bind(this);
-
-            //plug in write to Analyzer button
-       document.getElementById(this.wrapID + 'writeToAnalyzer').onclick = function(){
-                //bail out if there's no fit yet
-        if(Object.keys(dataStore.fitResults).length == 0){
-            window.alert('You need to perform the gain match (see button at top of page) before writing results to the Analyzer.');
-            document.getElementById('dismissAnalyzermodal').click();
-        }
-        updateAnalyzer();
-    }
-
-            //plug in the allow ODB write switch
-    document.getElementById(this.wrapID + 'yesDefinitelyWriteODB').onchange = this.toggleODBwrite.bind(this);
-
-            //plug in write to odb button
-    document.getElementById(this.wrapID + 'writeToODB').onclick = function(){
-                //bail out if there's no fit yet
-        if(Object.keys(dataStore.fitResults).length == 0){
-            window.alert('You need to perform the gain match (see button at top of page) before writing results to the ODB.');
-            document.getElementById('dismissODBmodal').click();
-        }
-        promiseScript(dataStore.ODBrequests[0]);
-    }
-
-    // Setup the Coefficiencts Results subpage
+    // Setup the Detector subpage
     //inject templates
-    this.wrap2.innerHTML = Mustache.to_html(
+    this.wrap.innerHTML = Mustache.to_html(
+      dataStore.templates.energyCalibratorDetectorReport,
+      {
+        'id': this.wrapID,
+      }
+    );
+    // table has to be done as a separate template, since templates and tables don't play too nice together
+    // Build the list of rows for the table. Loop through each peak of each source
+    var peaks =[];
+    for(var i=0; i<dataStore.THESEcalibrations[0].y.length; i++){
+      peaks.push(dataStore.THESEcalibrations[0].y[i]);
+    }
+    document.getElementById(this.wrapID + 'energyCalibratorDetectorResults').innerHTML= Mustache.to_html(
+      dataStore.templates.energyCalibratorDetectorReportTable,
+      content = {
+        'id': this.wrapID,
+        'peaks': peaks
+      }
+    );
+
+    // Build Table select for selecting which detector data is displayed
+    // Add the title text
+    var newLabel = document.createElement("label");
+    newLabel.for = 'tableMenuSelect';
+    newLabel.id = 'tableMenuSelectLabel';
+    newLabel.innerHTML = 'Detector: ';
+    document.getElementById('tableMenuDiv').appendChild(newLabel);
+
+    // Create a select input for the histo file list
+    var newSelect = document.createElement("select");
+    newSelect.id = 'tableMenuSelect';
+    newSelect.name = 'tableMenuSelect';
+    newSelect.onchange = function(){
+      dataStore._energyCalibratorReport.refreshDetectorTableData(this.value);
+    }.bind(newSelect);
+    document.getElementById('tableMenuDiv').appendChild(newSelect);
+
+    // Add the list of detectors as the options
+    thisSelect = document.getElementById('tableMenuSelect');
+    for(var j=0; j<dataStore.THESEdetectors.length; j++){
+      thisSelect.add( new Option(dataStore.THESEdetectors[j], j) );
+    }
+
+    // Create the previous Detector button
+    newButton = document.createElement('button');
+    newButton.setAttribute('id', 'previousDetButton');
+    newButton.setAttribute('class', 'btn btn-default btn-sm');
+    newButton.innerHTML = "Previous Detector";
+    newButton.style.padding = '4px';
+    newButton.onclick = function(){
+      var currentValue = parseInt(document.getElementById('tableMenuSelect').value);
+      if(currentValue==0){ currentValue=1;}
+      document.getElementById('tableMenuSelect').value = (currentValue-1);
+      dataStore._energyCalibratorReport.refreshDetectorTableData(currentValue-1);
+    }.bind(newButton);
+    document.getElementById('tableMenuDiv').appendChild(newButton);
+
+    // Create the next Detector button
+    newButton = document.createElement('button');
+    newButton.setAttribute('id', 'nextDetButton');
+    newButton.setAttribute('class', 'btn btn-default btn-sm');
+    newButton.innerHTML = "Next Detector";
+    newButton.style.padding = '4px';
+    newButton.onclick = function(){
+      var currentValue = parseInt(document.getElementById('tableMenuSelect').value);
+      if(currentValue==document.getElementById('tableMenuSelect').options.length-1){ currentValue=parseInt(document.getElementById('tableMenuSelect').options.length)-2;
+    }
+    document.getElementById('tableMenuSelect').value = (currentValue+1);
+    dataStore._energyCalibratorReport.refreshDetectorTableData(currentValue+1);
+  }.bind(newButton);
+  document.getElementById('tableMenuDiv').appendChild(newButton);
+
+  //make sure the file name for Cal file download gets passed around:
+  document.getElementById('saveCalname').onchange = function(){
+    //set the filename to whatever the user has requested:
+    document.getElementById('saveCal').download = this.value;
+  }
+
+  // Set up the Cal file button
+  document.getElementById('saveCal').onclick = function(){ buildCalfile(); }
+
+  //set up fit callbacks
+  dataStore.viewers[dataStore.plots[0]].fitCallback = this.fitCallback.bind(this);
+
+  //plug in special fit controls
+  document.getElementById('refitButton').onclick = this.toggleFitMode;
+
+  //plug in the allow Analyzer write switch
+  document.getElementById(this.wrapID + 'yesDefinitelyWriteAnalyzer').onchange = this.toggleAnalyzerwrite.bind(this);
+
+  //plug in write to Analyzer button
+  document.getElementById(this.wrapID + 'writeToAnalyzer').onclick = function(){
+    //bail out if there's no fit yet
+    if(Object.keys(dataStore.fitResults).length == 0){
+      window.alert('You need to perform the gain match (see button at top of page) before writing results to the Analyzer.');
+      document.getElementById('dismissAnalyzermodal').click();
+    }
+    updateAnalyzer();
+  }
+
+  //plug in the allow ODB write switch
+  document.getElementById(this.wrapID + 'yesDefinitelyWriteODB').onchange = this.toggleODBwrite.bind(this);
+
+  //plug in write to odb button
+  document.getElementById(this.wrapID + 'writeToODB').onclick = function(){
+    //bail out if there's no fit yet
+    if(Object.keys(dataStore.fitResults).length == 0){
+      window.alert('You need to perform the gain match (see button at top of page) before writing results to the ODB.');
+      document.getElementById('dismissODBmodal').click();
+    }
+    promiseScript(dataStore.ODBrequests[0]);
+  }
+
+  // Setup the Coefficiencts Results subpage
+  //inject templates
+  this.wrap2.innerHTML = Mustache.to_html(
     dataStore.templates.energyCalibratorCoefficienctsReport,
     {
       'id': this.wrapID2,
     }
-    );
-    // table has to be done as a separate template, since templates and tables don't play too nice together
-    // Build the list of rows for the table. Loop through each peak of each source
-    var detectors =[];
-    for(var i=0; i<dataStore.THESEdetectors.length; i++){
-      detectors.push(dataStore.THESEdetectors[i]);
-    }
-    document.getElementById(this.wrapID2 + 'energyCalibratorCoefficienctsResults').innerHTML= Mustache.to_html(
+  );
+  // table has to be done as a separate template, since templates and tables don't play too nice together
+  // Build the list of rows for the table. Loop through each peak of each source
+  var detectors =[];
+  for(var i=0; i<dataStore.THESEdetectors.length; i++){
+    detectors.push(dataStore.THESEdetectors[i]);
+  }
+  document.getElementById(this.wrapID2 + 'energyCalibratorCoefficienctsResults').innerHTML= Mustache.to_html(
     dataStore.templates.energyCalibratorCoefficientsReportTable,
     content = {
       'id': this.wrapID2,
       'detectors': detectors
     }
-    );
+  );
 
 },
 
 this.refreshCoefficientsTableData = function(){
 
- for(var i=0; i<dataStore.THESEcalibrations.length; i++){
-   var thisID = 'energyCalibratorResults'+dataStore.THESEcalibrations[i].name;
-   document.getElementById(thisID+'quad').innerHTML = dataStore.THESEcalibrations[i].fit.quad.toPrecision(6);
-   document.getElementById(thisID+'gain').innerHTML = dataStore.THESEcalibrations[i].fit.gain.toFixed(8);
-   document.getElementById(thisID+'offset').innerHTML = dataStore.THESEcalibrations[i].fit.offset.toFixed(8);
-   document.getElementById(thisID+'r2').innerHTML = dataStore.THESEcalibrations[i].fit.r2.toPrecision(10);
-   document.getElementById(thisID+'residual').innerHTML = dataStore.THESEcalibrations[i].residualMean.toFixed(3);
- }
+  for(var i=0; i<dataStore.THESEcalibrations.length; i++){
+    var thisID = 'energyCalibratorResults'+dataStore.THESEcalibrations[i].name;
+    document.getElementById(thisID+'quad').innerHTML = dataStore.THESEcalibrations[i].fit.quad.toPrecision(6);
+    document.getElementById(thisID+'gain').innerHTML = dataStore.THESEcalibrations[i].fit.gain.toFixed(8);
+    document.getElementById(thisID+'offset').innerHTML = dataStore.THESEcalibrations[i].fit.offset.toFixed(8);
+    document.getElementById(thisID+'r2').innerHTML = dataStore.THESEcalibrations[i].fit.r2.toPrecision(10);
+    document.getElementById(thisID+'residual').innerHTML = dataStore.THESEcalibrations[i].residualMean.toFixed(3);
+  }
 
 },
 
 this.refreshDetectorTableData = function(thisDetectorIndex){
 
- for(var i=0; i<dataStore.THESEcalibrations[thisDetectorIndex].y.length; i++){
-   var thisID = 'energyCalibratorDetector'+dataStore.THESEcalibrations[thisDetectorIndex].y[i];
-   document.getElementById(thisID+'pulseHeightCentroid').innerHTML = dataStore.THESEcalibrations[thisDetectorIndex].xPH[i].toFixed(2);
-   document.getElementById(thisID+'energyCentroid').innerHTML = dataStore.THESEcalibrations[thisDetectorIndex].xEn[i].toFixed(2);
-   document.getElementById(thisID+'residual').innerHTML = dataStore.THESEcalibrations[thisDetectorIndex].residual[i].toFixed(4);
- }
- document.getElementById('reportCardDiv').innerHTML = "Mean of residuals = "+ dataStore.THESEcalibrations[thisDetectorIndex].residualMean.toFixed(2) +
- "keV, Variance of residuals = "+ dataStore.THESEcalibrations[thisDetectorIndex].residualVar.toFixed(2)+"keV";
+  for(var i=0; i<dataStore.THESEcalibrations[thisDetectorIndex].y.length; i++){
+    var thisID = 'energyCalibratorDetector'+dataStore.THESEcalibrations[thisDetectorIndex].y[i];
+    document.getElementById(thisID+'pulseHeightCentroid').innerHTML = dataStore.THESEcalibrations[thisDetectorIndex].xPH[i].toFixed(2);
+    document.getElementById(thisID+'energyCentroid').innerHTML = dataStore.THESEcalibrations[thisDetectorIndex].xEn[i].toFixed(2);
+    document.getElementById(thisID+'residual').innerHTML = dataStore.THESEcalibrations[thisDetectorIndex].residual[i].toFixed(4);
+  }
+  document.getElementById('reportCardDiv').innerHTML = "Mean of residuals = "+ dataStore.THESEcalibrations[thisDetectorIndex].residualMean.toFixed(2) +
+  "keV, Variance of residuals = "+ dataStore.THESEcalibrations[thisDetectorIndex].residualVar.toFixed(2)+"keV";
 
-// Now also refresh the plot with the data from this Detector
- this.refreshDetectorPlotData(thisDetectorIndex);
+  // Now also refresh the plot with the data from this Detector
+  this.refreshDetectorPlotData(thisDetectorIndex);
 },
 
 this.fitAllSinglesPeaks = function(){
-            //fit all spectra to the peaks defined.
-            //this: efficiencyFitterReport object
+  //fit all spectra to the peaks defined.
+  //this: efficiencyFitterReport object
 
-    var i, keys = Object.keys(dataStore.spectrumListSingles);
-    var buffer = dataStore.currentPlot; //keep track of whatever was originally plotted so we can return to it
+  var i, keys = Object.keys(dataStore.spectrumListSingles);
+  var buffer = dataStore.currentPlot; //keep track of whatever was originally plotted so we can return to it
 
-          //dump data so there is one displayed at a time
-          dataStore.viewers[dataStore.plots[0]].removeData(dataStore.currentPlot);
+  //dump data so there is one displayed at a time
+  dataStore.viewers[dataStore.plots[0]].removeData(dataStore.currentPlot);
 
-                releaser(
-                    function(i){
-                        var keys = Object.keys(dataStore.spectrumListSingles);
-                        this.fitSpectra(keys[i])
-                    }.bind(this),
-
-                    function(){
-                        var evt;
-                    //set up fit line re-drawing
-                        dataStore.viewers[dataStore.plots[0]].drawCallback = this.addFitLines;
+  releaser(
+    function(i){
+      var keys = Object.keys(dataStore.spectrumListSingles);
+      this.fitSpectra(keys[i])
+    }.bind(this),
 
-                    //comunicate with the user
-                        deleteNode('fittingSinglesMessage');
-                        document.getElementById('reviewMessage').classList.remove('hidden');
+    function(){
+      var evt;
+      //set up fit line re-drawing
+      dataStore.viewers[dataStore.plots[0]].drawCallback = this.addFitLines;
 
-                    //leave the viewer pointing at the first spectrum for fitting
-                        dispatcher({target: buffer}, 'fitAllComplete')
+      //comunicate with the user
+      deleteNode('fittingSinglesMessage');
+      document.getElementById('reviewMessage').classList.remove('hidden');
 
-                    // Set the current task to keep track of our progress
-                        dataStore.currentTask = 'Review';
-
-                        // Go to the post-fitting tasks
-                        this.postFittingTasks();
-
-                    }.bind(this),
-
-                    keys.length-1
-                    )
-            },
-
-            this.fitSpectra = function(spectrum){
-              //redo the fits for the named spectrum.
-              //<spectrum>: string; name of spectrum, per names from analyzer
-              //this: efficiencyFitterReport object
-
-              var viewerName = dataStore.plots[0];
-
-              //set up fitting for this spectrum/source
-              dataStore.currentPlot = spectrum;
-              dataStore.viewers[viewerName].plotData() //kludge to update limits, could be nicer
-              dataStore.viewers[viewerName].fitTarget = spectrum;
-              dataStore._plotListLite.exclusivePlot(spectrum, dataStore.viewers[dataStore.plots[0]]);
-
-              // Set the current Source for this spectrum
-              dataStore.currentSource = Object.keys(dataStore.sourceInfo).find(key => dataStore.sourceInfo[key].histoFileName.split('.')[0] === spectrum.split(':')[0])
-
-              //set the x axis valueRange
-              document.getElementById('maxX').value = dataStore.sourceInfo[dataStore.currentSource].maxXValue;
-              document.getElementById('maxX').onchange();
-
-              // Set the current detector name (crystalIndex) for this spectrum
-              dataStore.currentDetector = dataStore.THESEdetectors.indexOf(dataStore.currentPlot.split(':')[1].split('_')[0]);
-
-              // fitting singles
-
-              //set up the spectrum data for fitting
-              dataStore.viewers[viewerName].addData(spectrum, JSON.parse(JSON.stringify(dataStore.rawData[spectrum])) );
-
-              // Loop through all literature peaks for this source
-              for(var i=0; i<dataStore.sourceInfo[dataStore.currentSource].literaturePeaks.length; i++){
-
-                //set up peak fit
-                dataStore.currentPeak = i;
-                dataStore.viewers[viewerName].FitLimitLower = dataStore.ROI[dataStore.currentSource][dataStore.currentDetector][dataStore.currentPeak][0];
-                dataStore.viewers[viewerName].FitLimitUpper = dataStore.ROI[dataStore.currentSource][dataStore.currentDetector][dataStore.currentPeak][1];
-                dataStore.viewers[viewerName].fitData(spectrum, 0);
-              }
+      //leave the viewer pointing at the first spectrum for fitting
+      dispatcher({target: buffer}, 'fitAllComplete')
 
-              //dump data so it doesn't stack up
-              dataStore.viewers[viewerName].removeData(spectrum);
-            },
-
-            this.addFitLines = function(){
-              //add current fits to the plot
-
-              var fitLines = [];
-              var lower, upper, middle
-              viewerName = dataStore.plots[0];
-
-              dataStore.viewers[viewerName].containerFit.removeAllChildren();
-
-              // Set the current Source for this spectrum
-              dataStore.currentSource = Object.keys(dataStore.sourceInfo).find(key => dataStore.sourceInfo[key].histoFileName.split('.')[0] === dataStore.currentPlot.split(':')[0]);
-
-              // Set the current detector name (crystalIndex) for this spectrum
-              dataStore.currentDetector = dataStore.THESEdetectors.indexOf(dataStore.currentPlot.split(':')[1].split('_')[0]);
-
-                // Set up the drop-down list of peaks available to refit
-                var thisSelect = document.getElementById('refitSelect');
-                thisSelect.removeAttribute('disabled');
-                // Remove all options from the select
-                thisSelect.innerHTML = "";
-
-                // Loop through all peaks for this source
-                for(var i=0; i<dataStore.sourceInfo[dataStore.currentSource].literaturePeaks.length; i++){
-                  //add fit lines
-                  fitLines[i] = dataStore.viewers[viewerName].addFitLine(
-                  dataStore.ROI[dataStore.currentSource][dataStore.currentDetector][i][0],
-                  dataStore.ROI[dataStore.currentSource][dataStore.currentDetector][i][1] - dataStore.ROI[dataStore.currentSource][dataStore.currentDetector][i][0],
-                  dataStore.fitResults[dataStore.currentPlot][i][0],
-                  dataStore.fitResults[dataStore.currentPlot][i][1],
-                  dataStore.fitResults[dataStore.currentPlot][i][2],
-                  dataStore.fitResults[dataStore.currentPlot][i][3],
-                  dataStore.fitResults[dataStore.currentPlot][i][4]
-                  );
-
-                  // Add this fitline to the canvas
-                  dataStore.viewers[viewerName].containerFit.addChild(fitLines[i]);
-
-                  //add this peak as an option to the refit select
-                  var newSelect = document.createElement("select");
-                  thisSelect.add( new Option("Peak "+i+", "+dataStore.sourceInfo[dataStore.currentSource].literaturePeaks[i]+"keV", i) );
-                }
-
-              dataStore.viewers[viewerName].stage.update();
-        },
-
-        this.fitCallback = function(center, width, amplitude, intercept, slope){
-            //after fitting, log the fit results, as well as any modification made to the ROI by the fitting algortihm
-            //also update table
-            //<center>: number; center of gaussian peak
-            //<width>: number; width of peak
-            //<amplitude>: number; amplitude of peak
-            //<intercept>: number; intercept of linear background beneath peak
-            //<slope>: number; slope of linear background
-            //this: gainMatchReport object
-
-            var viewerName = dataStore.plots[0];
-
-            // update the progress bar
-            dataStore.progressBarTasksCompleted++;
-            document.getElementById('progress').setAttribute('style', 'width:' + (100*(dataStore.progressBarTasksCompleted / dataStore.progressBarNumberTasks)) + '%' );
-
-// fitting singles
-
-            //keep track of fit results
-                if(!dataStore.fitResults[dataStore.currentPlot]) dataStore.fitResults[dataStore.currentPlot] = [];
-                dataStore.fitResults[dataStore.currentPlot][dataStore.currentPeak] = [amplitude, center, width, intercept, slope];
-
-            // Update the ROI in case they were modified by the fitting routine
-                dataStore.ROI[dataStore.currentSource][dataStore.currentDetector][dataStore.currentPeak][0] = dataStore.viewers[viewerName].FitLimitLower;
-                dataStore.ROI[dataStore.currentSource][dataStore.currentDetector][dataStore.currentPeak][1] = dataStore.viewers[viewerName].FitLimitUpper;
-
-            //remember resolution data here
-                dataStore.sourceInfo[dataStore.currentSource].FWHM[dataStore.currentPeak] = (width*2.35).toFixed(2);
-
-            // Remember the data points here
-// Calculate the Pulse Height from this Energy centroid
-var thisCalibrationIndex = dataStore.sourceInfo[dataStore.currentSource].Config.map(function(e) { return e.name; }).indexOf(dataStore.THESEdetectors[dataStore.currentDetector]);
-var a = dataStore.sourceInfo[dataStore.currentSource].Config[thisCalibrationIndex].quad;
-var b = dataStore.sourceInfo[dataStore.currentSource].Config[thisCalibrationIndex].gain;
-var c = dataStore.sourceInfo[dataStore.currentSource].Config[thisCalibrationIndex].offset;
-c -= center;
-var thisPulseHeight = (-1.0*b + Math.sqrt(b*b - (4*a*c))) / (2.0*a);
-
-var thisPeakIndex = dataStore.THESEcalibrations[dataStore.currentDetector].y.indexOf(dataStore.sourceInfo[dataStore.currentSource].literaturePeaks[dataStore.currentPeak]);
-dataStore.THESEcalibrations[dataStore.currentDetector].xPH[thisPeakIndex] = thisPulseHeight;
-
-            //update table
-              //  this.updateTable(dataStore.currentPlot);
-
-            //update data plots for the individual sources
-              //  this.reconstructSourceEfficiencyData();
-
-            return;
-
-/*
-            //disengage fit mode buttons
-            if( parseInt(lowPeak.getAttribute('engaged'),10) == 1)
-                lowPeak.onclick();
-            if( parseInt(midPeak.getAttribute('engaged'),10) == 1)
-                midPeak.onclick();
-            if( parseInt(highPeak.getAttribute('engaged'),10) == 1)
-                highPeak.onclick();
-            if( parseInt(vhiPeak.getAttribute('engaged'),10) == 1)
-                vhiPeak.onclick();
-*/
-
-        },
-
-        this.updateTable = function(spectrum){
-            //update the report table with whatever is currently in the dataStore
-            //recall dataStore.fitResults[plotTitle] = [[amplitude, center, width, slope, intercept],[...]], for [low energy, high energy].
-            //<spectrumName>: string; name of spectrum, per names from analyzer
-            //this: efficiencyFitterReport object
-return;
-            var calibration, thisID;
-
-            // define the ID for the HTML elements
-            thisID = this.wrapID + dataStore.currentSource + '-P' + dataStore.currentPeak;
-
-// Update the literature parts of the table
-            if(dataStore.currentPeak == 0)
-                document.getElementById(thisID+ 'title').innerHTML = dataStore.sourceInfo[dataStore.currentSource].title;
-            document.getElementById(thisID+ 'energy').innerHTML = dataStore.sourceInfo[dataStore.currentSource].literaturePeaks[dataStore.currentPeak];
-            document.getElementById(thisID+ 'intensity').innerHTML = dataStore.sourceInfo[dataStore.currentSource].literatureIntensity[dataStore.currentPeak]+'('+dataStore.sourceInfo[dataStore.currentSource].literatureIntensityUnc[dataStore.currentPeak]+')';
-
-// update the measured and calculated items in the table
-            if(dataStore.sourceInfo[dataStore.currentSource].FWHM[dataStore.currentPeak])
-                document.getElementById(thisID+ 'FWHM').innerHTML = dataStore.sourceInfo[dataStore.currentSource].FWHM[dataStore.currentPeak];
-            if(dataStore.sourceInfo[dataStore.currentSource].uncorrectedArea[dataStore.currentPeak]){
-                document.getElementById(thisID+'uncorrectedArea').innerHTML =
-                dataStore.sourceInfo[dataStore.currentSource].uncorrectedArea[dataStore.currentPeak]+'('+Math.sqrt(dataStore.sourceInfo[dataStore.currentSource].uncorrectedArea[dataStore.currentPeak]).toFixed(0)+')';
-//formatNumberAndUncertaintyString(dataStore.sourceInfo[dataStore.currentSource].uncorrectedArea[dataStore.currentPeak], Math.sqrt(dataStore.sourceInfo[dataStore.currentSource].uncorrectedArea[dataStore.currentPeak]).toFixed(0));
-
-// Add the summing-out counts to the table
-                document.getElementById(thisID+'summingOut').innerHTML = dataStore.sourceInfo[dataStore.currentSource].summingOutCorrectionCounts[dataStore.currentPeak];
-
-// Calculate the raw efficiency here
-                dataStore.sourceInfo[dataStore.currentSource].rawEfficiency[dataStore.currentPeak] = (dataStore.sourceInfo[dataStore.currentSource].uncorrectedArea[dataStore.currentPeak]/dataStore.sourceInfo[dataStore.currentSource].literatureIntensity[dataStore.currentPeak]).toFixed(2);
-
-// Display in the table as a placeholder before summing corrections are done.
-                document.getElementById(thisID+'relativeEfficiency').innerHTML = dataStore.sourceInfo[dataStore.currentSource].rawEfficiency[dataStore.currentPeak];
-            }
-
-        },
-
-        this.calculateLine = function(lowBin, highBin){
-            //given the positions of the low bin and high bin, return [intercept, slope] defining
-            //a striaght calibration line using the energies reported in the input.
-            //lowBin: number; center of low energy peak in bins
-            //highBin: number; center of high energy peak in bins
-            //this: gainMatchReport object
-
-            var lowEnergy = document.getElementById('peak1').value
-            var highEnergy = document.getElementById('peak2').value
-            var slope, intercept;
-
-            slope = (lowEnergy - highEnergy) / (lowBin - highBin);
-            intercept = lowEnergy - slope*lowBin
-
-            return [intercept, slope]
-
-        },
-
-this.reconstructMidasResidualsData = function(currentSpectrum,currentDetNum){
-            // First determine the residuals by applying the calibration coefficients from the server to the fitted centroid, then comparing it to the literature energy.
-            // Save the residuals data to the dataStore, then
-            //arrange the latest residual info for representation in the dygraph.
-
-   var thisOffset = dataStore.midasCalibration[currentSpectrum][0];
-   var thisGain = dataStore.midasCalibration[currentSpectrum][1];
-   var thisQuadratic = dataStore.midasCalibration[currentSpectrum][2];
-
-   for(currentPeak=0; currentPeak<4; currentPeak++){
-     var peakIndex = currentPeak+1;
-     var literatureEnergy = document.getElementById('peak'+peakIndex).value;
-     peakIndex +=4;
-
-               // Save the data for the residuals plots
-     thisCentroid = dataStore.fitResults[currentSpectrum][currentPeak][1];
-     dataStore.residualsData[peakIndex][currentDetNum] = literatureEnergy - ( thisOffset  + (thisGain*thisCentroid) + (thisQuadratic*thisCentroid*thisCentroid) );
-
-     var i, evt, detectorIndex = [],
-     flags = [];
-     flags.fillN(0, dataStore.THESEdetectors.length)
-
-     for(i=0; i<dataStore.THESEdetectors.length; i++){
-      detectorIndex[i] = i;
+      // Set the current task to keep track of our progress
+      dataStore.currentTask = 'Review';
+
+      // Go to the post-fitting tasks
+      this.postFittingTasks();
+
+    }.bind(this),
+
+    keys.length-1
+  )
+},
+
+this.fitSpectra = function(spectrum){
+  //redo the fits for the named spectrum.
+  //<spectrum>: string; name of spectrum, per names from analyzer
+  //this: efficiencyFitterReport object
+
+  var viewerName = dataStore.plots[0];
+
+  //set up fitting for this spectrum/source
+  dataStore.currentPlot = spectrum;
+  dataStore.viewers[viewerName].plotData() //kludge to update limits, could be nicer
+  dataStore.viewers[viewerName].fitTarget = spectrum;
+  dataStore._plotListLite.exclusivePlot(spectrum, dataStore.viewers[dataStore.plots[0]]);
+
+  // Set the current Source for this spectrum
+  dataStore.currentSource = Object.keys(dataStore.sourceInfo).find(key => dataStore.sourceInfo[key].histoFileName.split('.')[0] === spectrum.split(':')[0])
+
+  //set the x axis valueRange
+  document.getElementById('maxX').value = dataStore.sourceInfo[dataStore.currentSource].maxXValue;
+  document.getElementById('maxX').onchange();
+
+  // Set the current detector name (crystalIndex) for this spectrum
+  dataStore.currentDetector = dataStore.THESEdetectors.indexOf(dataStore.currentPlot.split(':')[1].split('_')[0]);
+
+  // fitting singles
+
+  //set up the spectrum data for fitting
+  dataStore.viewers[viewerName].addData(spectrum, JSON.parse(JSON.stringify(dataStore.rawData[spectrum])) );
+
+  // Loop through all literature peaks for this source
+  for(var i=0; i<dataStore.sourceInfo[dataStore.currentSource].literaturePeaks.length; i++){
+
+    //set up peak fit
+    dataStore.currentPeak = i;
+    dataStore.viewers[viewerName].FitLimitLower = dataStore.ROI[dataStore.currentSource][dataStore.currentDetector][dataStore.currentPeak][0];
+    dataStore.viewers[viewerName].FitLimitUpper = dataStore.ROI[dataStore.currentSource][dataStore.currentDetector][dataStore.currentPeak][1];
+    dataStore.viewers[viewerName].fitData(spectrum, 0);
   }
 
-               // Update the Y axis scale if needed
-  if(dataStore.residualsData[peakIndex][currentDetNum] < (0.75 * dataStore.YAxisMinValue[peakIndex][0])){
-   var newYAxisMinValue = dataStore.residualsData[peakIndex][currentDetNum] * 1.33;
-   dataStore.YAxisMinValue[5][0] = dataStore.YAxisMinValue[6][0] = dataStore.YAxisMinValue[7][0] = dataStore.YAxisMinValue[8][0] = newYAxisMinValue;
-}
-if(dataStore.residualsData[peakIndex][currentDetNum] > (0.75 * dataStore.YAxisMaxValue[peakIndex][0])){
-   var newYAxisMaxValue = dataStore.residualsData[peakIndex][currentDetNum] * 1.33;
-   dataStore.YAxisMaxValue[5][0] = dataStore.YAxisMaxValue[6][0] = dataStore.YAxisMaxValue[7][0] = dataStore.YAxisMaxValue[8][0] = newYAxisMaxValue;
-}
-
-dataStore.dataplotData[peakIndex] = arrangePoints(detectorIndex, [dataStore.residualsData[peakIndex]], flags );
-var eventString = 'updateDyData'+peakIndex;
-dispatcher({ 'data': dataStore.dataplotData[peakIndex] }, eventString);
-}
-
-            // Update the mean and standard deviation of the dataset
-this.calculateMidasResidualsSD();
+  //dump data so it doesn't stack up
+  dataStore.viewers[viewerName].removeData(spectrum);
 },
 
-this.calculateResidualsSD = function(){
-            //identifies the mean and SD of the residuals across all detectors
+this.addFitLines = function(){
+  //add current fits to the plot
 
-    var i, meanP1 = 0, sqMeanP1 = 0, meanP2 = 0, sqMeanP2 = 0, meanP3 = 0, sqMeanP3 = 0, meanP4 = 0, sqMeanP4 = 0,
-    numP1 = 0, numP2 = 0, numP3 = 0, numP4 = 0;
+  var fitLines = [];
+  var lower, upper, middle
+  viewerName = dataStore.plots[0];
 
-    for(i=0; i<dataStore.residualsData.length; i++){
-        if(dataStore.residualsData[1][i]){
-            meanP1 += dataStore.residualsData[1][i];
-            sqMeanP1 += Math.pow(dataStore.residualsData[1][i],2);
-            numP1++;
-        }
-        if(dataStore.residualsData[2][i]){
-            meanP2 += dataStore.residualsData[2][i];
-            sqMeanP2 += Math.pow(dataStore.residualsData[2][i],2);
-            numP2++;
-        }
-        if(dataStore.residualsData[3][i]){
-            meanP3 += dataStore.residualsData[3][i];
-            sqMeanP3 += Math.pow(dataStore.residualsData[3][i],2);
-            numP3++;
-        }
-        if(dataStore.residualsData[4][i]){
-            meanP4 += dataStore.residualsData[4][i];
-            sqMeanP4 += Math.pow(dataStore.residualsData[4][i],2);
-            numP4++;
-        }
-    }
+  dataStore.viewers[viewerName].containerFit.removeAllChildren();
 
-    meanP1 /= numP1;
-    meanP2 /= numP2;
-    meanP3 /= numP3;
-    meanP4 /= numP4;
+  // Set the current Source for this spectrum
+  dataStore.currentSource = Object.keys(dataStore.sourceInfo).find(key => dataStore.sourceInfo[key].histoFileName.split('.')[0] === dataStore.currentPlot.split(':')[0]);
 
-    sqMeanP1 /= numP1;
-    sqMeanP2 /= numP2;
-    sqMeanP3 /= numP3;
-    sqMeanP4 /= numP4;
+  // Set the current detector name (crystalIndex) for this spectrum
+  dataStore.currentDetector = dataStore.THESEdetectors.indexOf(dataStore.currentPlot.split(':')[1].split('_')[0]);
 
+  // Set up the drop-down list of peaks available to refit
+  var thisSelect = document.getElementById('refitSelect');
+  thisSelect.removeAttribute('disabled');
+  // Remove all options from the select
+  thisSelect.innerHTML = "";
 
-    sdMeanP1 = Math.sqrt(sqMeanP1 - Math.pow(meanP1,2));
-    sdMeanP2 = Math.sqrt(sqMeanP2 - Math.pow(meanP2,2));
-    sdMeanP3 = Math.sqrt(sqMeanP3 - Math.pow(meanP3,2));
-    sdMeanP4 = Math.sqrt(sqMeanP4 - Math.pow(meanP4,2));
+  // Loop through all peaks for this source
+  for(var i=0; i<dataStore.sourceInfo[dataStore.currentSource].literaturePeaks.length; i++){
+    //add fit lines
+    fitLines[i] = dataStore.viewers[viewerName].addFitLine(
+      dataStore.ROI[dataStore.currentSource][dataStore.currentDetector][i][0],
+      dataStore.ROI[dataStore.currentSource][dataStore.currentDetector][i][1] - dataStore.ROI[dataStore.currentSource][dataStore.currentDetector][i][0],
+      dataStore.fitResults[dataStore.currentPlot][i][0],
+      dataStore.fitResults[dataStore.currentPlot][i][1],
+      dataStore.fitResults[dataStore.currentPlot][i][2],
+      dataStore.fitResults[dataStore.currentPlot][i][3],
+      dataStore.fitResults[dataStore.currentPlot][i][4]
+    );
 
-    dataStore.residualsDataMean = [0, meanP1, meanP2, meanP3, meanP4];
-    dataStore.residualsDataSD = [0, sqMeanP1, sqMeanP2, sqMeanP3, sqMeanP4];
+    // Add this fitline to the canvas
+    dataStore.viewers[viewerName].containerFit.addChild(fitLines[i]);
 
-    document.getElementById('residualP1newText').innerHTML  = 'Peak1 residuals: Mean: '+meanP1.toFixed(3)+', Standard Deviation: '+sdMeanP1.toFixed(3)+' keV';
-    document.getElementById('residualP2newText').innerHTML  = 'Peak2 residuals: Mean: '+meanP2.toFixed(3)+', Standard Deviation: '+sdMeanP2.toFixed(3)+' keV';
-    document.getElementById('residualP3newText').innerHTML  = 'Peak3 residuals: Mean: '+meanP3.toFixed(3)+', Standard Deviation: '+sdMeanP3.toFixed(3)+' keV';
-    document.getElementById('residualP4newText').innerHTML  = 'Peak4 residuals: Mean: '+meanP4.toFixed(3)+', Standard Deviation: '+sdMeanP4.toFixed(3)+' keV';
+    //add this peak as an option to the refit select
+    var newSelect = document.createElement("select");
+    thisSelect.add( new Option("Peak "+i+", "+dataStore.sourceInfo[dataStore.currentSource].literaturePeaks[i]+"keV", i) );
+  }
+
+  dataStore.viewers[viewerName].stage.update();
 },
 
-this.calculateMidasResidualsSD = function(){
-            //identifies the mean and SD of the residuals across all detectors
+this.fitCallback = function(center, width, amplitude, intercept, slope){
+  //after fitting, log the fit results, as well as any modification made to the ROI by the fitting algortihm
+  //also update table
+  //<center>: number; center of gaussian peak
+  //<width>: number; width of peak
+  //<amplitude>: number; amplitude of peak
+  //<intercept>: number; intercept of linear background beneath peak
+  //<slope>: number; slope of linear background
+  //this: gainMatchReport object
 
-    var i, meanP1 = 0, sqMeanP1 = 0, meanP2 = 0, sqMeanP2 = 0, meanP3 = 0, sqMeanP3 = 0, meanP4 = 0, sqMeanP4 = 0,
-    numP1 = 0, numP2 = 0, numP3 = 0, numP4 = 0;
+  var viewerName = dataStore.plots[0];
 
-    for(i=0; i<dataStore.residualsData.length; i++){
-        if(dataStore.residualsData[5][i]){
-            meanP1 += dataStore.residualsData[5][i];
-            sqMeanP1 += Math.pow(dataStore.residualsData[5][i],2);
-            numP1++;
-        }
-        if(dataStore.residualsData[6][i]){
-            meanP2 += dataStore.residualsData[6][i];
-            sqMeanP2 += Math.pow(dataStore.residualsData[6][i],2);
-            numP2++;
-        }
-        if(dataStore.residualsData[7][i]){
-            meanP3 += dataStore.residualsData[7][i];
-            sqMeanP3 += Math.pow(dataStore.residualsData[7][i],2);
-            numP3++;
-        }
-        if(dataStore.residualsData[8][i]){
-            meanP4 += dataStore.residualsData[8][i];
-            sqMeanP4 += Math.pow(dataStore.residualsData[8][i],2);
-            numP4++;
-        }
-    }
+  // update the progress bar
+  dataStore.progressBarTasksCompleted++;
+  document.getElementById('progress').setAttribute('style', 'width:' + (100*(dataStore.progressBarTasksCompleted / dataStore.progressBarNumberTasks)) + '%' );
 
-    meanP1 /= numP1;
-    meanP2 /= numP2;
-    meanP3 /= numP3;
-    meanP4 /= numP4;
+  // fitting singles
 
-    sqMeanP1 /= numP1;
-    sqMeanP2 /= numP2;
-    sqMeanP3 /= numP3;
-    sqMeanP4 /= numP4;
+  //keep track of fit results
+  if(!dataStore.fitResults[dataStore.currentPlot]) dataStore.fitResults[dataStore.currentPlot] = [];
+  dataStore.fitResults[dataStore.currentPlot][dataStore.currentPeak] = [amplitude, center, width, intercept, slope];
 
+  // Update the ROI in case they were modified by the fitting routine
+  dataStore.ROI[dataStore.currentSource][dataStore.currentDetector][dataStore.currentPeak][0] = dataStore.viewers[viewerName].FitLimitLower;
+  dataStore.ROI[dataStore.currentSource][dataStore.currentDetector][dataStore.currentPeak][1] = dataStore.viewers[viewerName].FitLimitUpper;
 
-    sdMeanP1 = Math.sqrt(sqMeanP1 - Math.pow(meanP1,2));
-    sdMeanP2 = Math.sqrt(sqMeanP2 - Math.pow(meanP2,2));
-    sdMeanP3 = Math.sqrt(sqMeanP3 - Math.pow(meanP3,2));
-    sdMeanP4 = Math.sqrt(sqMeanP4 - Math.pow(meanP4,2));
+  //remember resolution data here
+  dataStore.sourceInfo[dataStore.currentSource].FWHM[dataStore.currentPeak] = (width*2.35).toFixed(2);
 
-    dataStore.residualsDataMean = [0, meanP1, meanP2, meanP3, meanP4];
-    dataStore.residualsDataSD = [0, sqMeanP1, sqMeanP2, sqMeanP3, sqMeanP4];
+  // Remember the data points here
+  // Calculate the Pulse Height from this Energy centroid
+  var thisCalibrationIndex = dataStore.sourceInfo[dataStore.currentSource].Config.map(function(e) { return e.name; }).indexOf(dataStore.THESEdetectors[dataStore.currentDetector]);
+  var a = dataStore.sourceInfo[dataStore.currentSource].Config[thisCalibrationIndex].quad;
+  var b = dataStore.sourceInfo[dataStore.currentSource].Config[thisCalibrationIndex].gain;
+  var c = dataStore.sourceInfo[dataStore.currentSource].Config[thisCalibrationIndex].offset;
+  c -= center;
+  var thisPulseHeight = (-1.0*b + Math.sqrt(b*b - (4*a*c))) / (2.0*a);
 
-    document.getElementById('residualP1midText').innerHTML  = 'Peak1 residuals: Mean: '+meanP1.toFixed(3)+', Standard Deviation: '+sdMeanP1.toFixed(3)+' keV';
-    document.getElementById('residualP2midText').innerHTML  = 'Peak2 residuals: Mean: '+meanP2.toFixed(3)+', Standard Deviation: '+sdMeanP2.toFixed(3)+' keV';
-    document.getElementById('residualP3midText').innerHTML  = 'Peak3 residuals: Mean: '+meanP3.toFixed(3)+', Standard Deviation: '+sdMeanP3.toFixed(3)+' keV';
-    document.getElementById('residualP4midText').innerHTML  = 'Peak4 residuals: Mean: '+meanP4.toFixed(3)+', Standard Deviation: '+sdMeanP4.toFixed(3)+' keV';
+  var thisPeakIndex = dataStore.THESEcalibrations[dataStore.currentDetector].y.indexOf(dataStore.sourceInfo[dataStore.currentSource].literaturePeaks[dataStore.currentPeak]);
+  dataStore.THESEcalibrations[dataStore.currentDetector].xPH[thisPeakIndex] = thisPulseHeight;
+
+  if(dataStore.currentTask == "Finished"){
+    // This is a refit of a peak, so trigger recalculation of coefficients and table updates
+    this.fitEnergyCalibrationData(dataStore.currentDetector);
+    this.refreshCoefficientsTableData();
+    this.refreshDetectorTableData(dataStore.currentDetector);
+    console.log(dataStore);
+  }
+  return;
 },
 
 this.postFittingTasks = function(){
@@ -716,63 +496,58 @@ this.fitEnergyCalibrationData = function(thisDetector){
   dataStore.THESEcalibrations[thisDetector].residualVar = 0;
   var mean = dataStore.THESEcalibrations[thisDetector].residualMean;
   for(var j=0; j<dataStore.THESEcalibrations[thisDetector].xPH.length; j++){
-dataStore.THESEcalibrations[thisDetector].residualVar +=
-(Math.abs(dataStore.THESEcalibrations[thisDetector].residual[j]) - mean) * (Math.abs(dataStore.THESEcalibrations[thisDetector].residual[j]) - mean);
+    dataStore.THESEcalibrations[thisDetector].residualVar +=
+    (Math.abs(dataStore.THESEcalibrations[thisDetector].residual[j]) - mean) * (Math.abs(dataStore.THESEcalibrations[thisDetector].residual[j]) - mean);
   }
   dataStore.THESEcalibrations[thisDetector].residualVar /= dataStore.THESEcalibrations[thisDetector].residual.length;
 
 },
 
-
-
-
-
-
 this.updateEnergies = function(){
-            //callback for the calibration source dropdown; updates energy input boxes with standard values
-            //this: gainMatchReport object
+  //callback for the calibration source dropdown; updates energy input boxes with standard values
+  //this: gainMatchReport object
 
-    var calibrationSourceName = getSelected(this.wrapID + 'calibrationSource');
+  var calibrationSourceName = getSelected(this.wrapID + 'calibrationSource');
 
-            // Find the index number for the source information for this sourceType
-    var index = dataStore.sourceInfo.map(function(e) { return e.name; }).indexOf(calibrationSourceName);
+  // Find the index number for the source information for this sourceType
+  var index = dataStore.sourceInfo.map(function(e) { return e.name; }).indexOf(calibrationSourceName);
 
-            // Set the peak energies for this source
-    document.getElementById('peak1').value  = dataStore.sourceInfo[index].lowEnergy;
-    document.getElementById('peak2').value  = dataStore.sourceInfo[index].midEnergy;
-    document.getElementById('peak3').value = dataStore.sourceInfo[index].highEnergy;
-    document.getElementById('peak4').value  = dataStore.sourceInfo[index].vhiEnergy;
+  // Set the peak energies for this source
+  document.getElementById('peak1').value  = dataStore.sourceInfo[index].lowEnergy;
+  document.getElementById('peak2').value  = dataStore.sourceInfo[index].midEnergy;
+  document.getElementById('peak3').value = dataStore.sourceInfo[index].highEnergy;
+  document.getElementById('peak4').value  = dataStore.sourceInfo[index].vhiEnergy;
 
 },
 
 this.customEnergy = function(){
-            //callback for changing the calibration energies to custom values
-            //this: gainMatchReport object
+  //callback for changing the calibration energies to custom values
+  //this: gainMatchReport object
 
-    var i, keys = Object.keys(dataStore.fitResults)
-    var defaultSources = document.getElementById(this.wrapID + 'calibrationSource')
+  var i, keys = Object.keys(dataStore.fitResults)
+  var defaultSources = document.getElementById(this.wrapID + 'calibrationSource')
 
-    defaultSources.value = 'custom'
+  defaultSources.value = 'custom'
 },
 
 this.toggleFitMode = function(){
-            //gain matcher needs special fit controls for convenience
-            //this: fit mode engage button element
+  //gain matcher needs special fit controls for convenience
+  //this: fit mode engage button element
 
-    var viewerName = dataStore.plots[0];
+  var viewerName = dataStore.plots[0];
 
-    if(parseInt(this.getAttribute('engaged'),10) == 0){
-        dataStore.viewers[viewerName].setupFitMode();
-        this.setAttribute('engaged', 1);
-        if(this.id == 'refitButton')
-            document.getElementById('refitButtonBadge').classList.add('red-text')
-    }
-    else{
-        dataStore.viewers[viewerName].leaveFitMode();
-        this.setAttribute('engaged', 0);
-        if(this.id == 'refitButton')
-            document.getElementById('refitButtonBadge').classList.remove('red-text')
-    }
+  if(parseInt(this.getAttribute('engaged'),10) == 0){
+    dataStore.viewers[viewerName].setupFitMode();
+    this.setAttribute('engaged', 1);
+    if(this.id == 'refitButton')
+    document.getElementById('refitButtonBadge').classList.add('red-text')
+  }
+  else{
+    dataStore.viewers[viewerName].leaveFitMode();
+    this.setAttribute('engaged', 0);
+    if(this.id == 'refitButton')
+    document.getElementById('refitButtonBadge').classList.remove('red-text')
+  }
 
   // Set the peak index in the datastore
   dataStore.currentPeak = document.getElementById('refitSelect').value;
@@ -780,42 +555,40 @@ this.toggleFitMode = function(){
 },
 
 this.toggleAnalyzerwrite = function(){
-            //toggle Analyzer writing permission.
+  //toggle Analyzer writing permission.
 
-    var allowed = document.getElementById(this.wrapID + 'yesDefinitelyWriteAnalyzer').checked
+  var allowed = document.getElementById(this.wrapID + 'yesDefinitelyWriteAnalyzer').checked
 
-    if(allowed)
-        document.getElementById(this.wrapID + 'writeToAnalyzer').removeAttribute('disabled');
-    else
-        document.getElementById(this.wrapID + 'writeToAnalyzer').setAttribute('disabled', true);
+  if(allowed)
+  document.getElementById(this.wrapID + 'writeToAnalyzer').removeAttribute('disabled');
+  else
+  document.getElementById(this.wrapID + 'writeToAnalyzer').setAttribute('disabled', true);
 }
 
 this.toggleODBwrite = function(){
-            //toggle odb writing permission.
+  //toggle odb writing permission.
 
-    var allowed = document.getElementById(this.wrapID + 'yesDefinitelyWriteODB').checked
+  var allowed = document.getElementById(this.wrapID + 'yesDefinitelyWriteODB').checked
 
-    if(allowed)
-        document.getElementById(this.wrapID + 'writeToODB').removeAttribute('disabled');
-    else
-        document.getElementById(this.wrapID + 'writeToODB').setAttribute('disabled', true);
+  if(allowed)
+  document.getElementById(this.wrapID + 'writeToODB').removeAttribute('disabled');
+  else
+  document.getElementById(this.wrapID + 'writeToODB').setAttribute('disabled', true);
 }
 
 this.toggleAllODBWrites = function(){
-            // make each channel's odb write toggle match the master switch
+  // make each channel's odb write toggle match the master switch
 
-    var toggles = document.getElementsByClassName('write-to-odb'),
-    master = document.getElementById('writeAllChannels'),
-    state = master.checked,
-    i;
+  var toggles = document.getElementsByClassName('write-to-odb'),
+  master = document.getElementById('writeAllChannels'),
+  state = master.checked,
+  i;
 
-    for(i=0; i<toggles.length; i++){
-        toggles[i].checked = state;
-    }
+  for(i=0; i<toggles.length; i++){
+    toggles[i].checked = state;
+  }
 
 },
-
-
 
 this.refreshDetectorPlotData = function(thisDetectorIndex){
   //arrange the latest residual info for representation in the dygraph.
@@ -840,9 +613,6 @@ this.refreshDetectorPlotData = function(thisDetectorIndex){
   var eventString = 'updateDyData'+plotIndex;
   dispatcher({ 'data': dataStore.dataplotData[plotIndex] }, eventString);
 }
-
-
-
 
 }
 </script>

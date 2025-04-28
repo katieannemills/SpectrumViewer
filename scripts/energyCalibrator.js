@@ -53,7 +53,7 @@ function setupDataStore(){
   // Variables for Pagination menu buttons
   dataStore.buttonNames = ["Spectra", "Detector Results", "Fit Coefficients"];                      // Names to appear on the buttons
   dataStore.buttonIDs = ["plotRegionMenuButton", "tableRegionMenuButton", "graphRegionMenuButton"]; // IDs for the buttons
-  dataStore.buttonPages = ["plotRegion", "detectorReportRegion", "resultsTableRegion"];                 // Pages (div IDs) to be associated with the buttons
+  dataStore.buttonPages = ["plotRegion", "detectorReportRegion", "resultsTableRegion"];             // Pages (div IDs) to be associated with the buttons
 
 
   dataStore.pageTitle = 'Efficiency Fitter';                                   //header title
