@@ -37,6 +37,7 @@ function setupDataStore(){
   dataStore.histoFileDirectoryPath = '/Users/garns/Work/Data';
   dataStore.histoFileName = '';
   dataStore.histoAutoLoad = false;        // Flag set by the presence of a directory and filename in the URL to automatically load it. Default is off.
+  dataStore.Config = {};                  // Place to store the Calibrations from the config file. Used for building Cal files etc.
 
   // histoChoiceBar
   dataStore.histoChoiceBarContents = ['TimeCalibrator', '60Co'];  // Array defining the contents of the histoChoiceBar user input. Used in setupHistoListSelect()
@@ -390,900 +391,804 @@ function setupDataStore(){
       receiveScript(JSON.stringify(payload));
     }
 
-    function setupHistoListSelect(){
+    function setupFastTimingCalibrations(){
+      // This fast timing app is different from the others. We dont actually want peak fitting.
+      //
 
-      // Remove the select if it already exists
-      try{
-        document.getElementById('HistoListSelect').remove();
-        document.getElementById('HistoListSelectLabel').remove();
-      }
-      catch(err){ }
+      // Grab the template peak-fitting script to a local copy here
+      var thisScript = {};
+      thisScript = dataStore.peakFitterScriptTemplate['TimeCalibrator'];
 
+      // Get the user input on histogramFileNames
+      thisScript.histogramFileNames.push(document.getElementById('HistoListSelectTimeCalibrator').value);
+
+      // Setup the peak-fitting script from the template
+      receiveScript(JSON.stringify(thisScript));
+
+      // Disable user inputs now we have launched the process
       for(var i=0; i<dataStore.histoChoiceBarContents.length; i++){
         var thisTitle = dataStore.histoChoiceBarContents[i];
-        var rowIndex = Math.floor(i/2);
-
-        if(i%2==0){
-          // Inject the Container Div (a row) for this pair of selects.
-          var newDiv = document.createElement("div");
-          newDiv.id = 'histoChoiceDivRow'+rowIndex;
-          newDiv.class = 'col-md-12';
-          document.getElementById('histoChoiceDir').appendChild(newDiv);
-        }
-
-        // Inject the Div for this label and select
-        var newDiv = document.createElement("div");
-        newDiv.id = 'histoChoice'+thisTitle;
-        newDiv.class = 'col-md-4';
-        document.getElementById('histoChoiceDivRow'+rowIndex).appendChild(newDiv);
-
-
-        // Add the title text for the label
-        var newLabel = document.createElement("label");
-        newLabel.for = 'HistoListSelect'+thisTitle;
-        newLabel.id = 'HistoListSelectLabel'+thisTitle;
-        newLabel.innerHTML = thisTitle+' Histogram file: ';
-        document.getElementById('histoChoice'+thisTitle).appendChild(newLabel);
-
-        // Create a select input for the histo file list
-        var newSelect = document.createElement("select");
-        newSelect.id = 'HistoListSelect'+thisTitle;
-        newSelect.name = 'HistoListSelect'+thisTitle;
-        /*
-        newSelect.onchange = function(){
-        var thisKey = this.name.split('Select')[1];
-        dataStore.sourceInfo[thisKey].histoFileName = this.value;
-      }.bind(newSelect);
-      */
-      document.getElementById('histoChoice'+thisTitle).appendChild(newSelect);
-
-      // Add the list of histo files as the options
-      thisSelect = document.getElementById('HistoListSelect'+thisTitle);
-      if(thisTitle == "11Be" || thisTitle == "133Ba"){
-        thisSelect.add( new Option("Do not include "+thisTitle, "exclude") );
+        document.getElementById('HistoListSelect'+thisTitle).setAttribute('disabled', true);
       }
-      for(var j=0; j<dataStore.histoFileList.length; j++){
-        thisSelect.add( new Option(dataStore.histoFileList[j], dataStore.histoFileList[j]) );
-      }
+      document.getElementById('launchSubmitButton').setAttribute('disabled', true);
 
-      // Fire the onchange event for the select with the default value to set it
-      //document.getElementById('HistoListSelect'+thisTitle).onchange();
+      // Start the automatic process
+      launchPeakFittingProcess();
     }
 
-  }
-
-  function setupFastTimingCalibrations(){
-    // This fast timing app is different from the others. We dont actually want peak fitting.
-    //
-
-    // Grab the template peak-fitting script to a local copy here
-    var thisScript = {};
-    thisScript = dataStore.peakFitterScriptTemplate['TimeCalibrator'];
-
-    // Get the user input on histogramFileNames
-    thisScript.histogramFileNames.push(document.getElementById('HistoListSelectTimeCalibrator').value);
-
-    // Setup the peak-fitting script from the template
-    receiveScript(JSON.stringify(thisScript));
-
-    // Disable user inputs now we have launched the process
-    for(var i=0; i<dataStore.histoChoiceBarContents.length; i++){
-      var thisTitle = dataStore.histoChoiceBarContents[i];
-      document.getElementById('HistoListSelect'+thisTitle).setAttribute('disabled', true);
-    }
-    document.getElementById('launchSubmitButton').setAttribute('disabled', true);
-
-    // Start the automatic process
-    launchPeakFittingProcess();
-  }
-
-  function launchPeakFittingProcess(){
-    // This is the start of the automated process
-    // The work flow in the analysis process will be; download all spectra for first histogram file, make any projections for 2d spectra, fit all singles, fit all projections, add results to table, delete all raw data, repeat for next histogram file in list until the end of the list.
-    // The workflow in functions will be:
-    // launchPeakFittingProcess() (requests first file in the list)
-    // fetchCallback()
-    // createAllLocalMatrices() - this is matrix unpacking into local storage - loops: createLocalMatrices(i) which loops: packZcompressed()
-    // projectAllMatrices() -
-    // projectionsCallback()
-    // fitAllSinglesPeaks() - loops: fitSpectra()
-    // fitAllProjectionsPeaks() - loops: fitSpectra()
-    // fittingCallback() - calls populateReportTable(), clearLocalMemory() then if more histogram files it requests the next file.
-    //
+    function launchPeakFittingProcess(){
+      // This is the start of the automated process
+      // The work flow in the analysis process will be; download all spectra for first histogram file, make any projections for 2d spectra, fit all singles, fit all projections, add results to table, delete all raw data, repeat for next histogram file in list until the end of the list.
+      // The workflow in functions will be:
+      // launchPeakFittingProcess() (requests first file in the list)
+      // fetchCallback()
+      // createAllLocalMatrices() - this is matrix unpacking into local storage - loops: createLocalMatrices(i) which loops: packZcompressed()
+      // projectAllMatrices() -
+      // projectionsCallback()
+      // fitAllSinglesPeaks() - loops: fitSpectra()
+      // fitAllProjectionsPeaks() - loops: fitSpectra()
+      // fittingCallback() - calls populateReportTable(), clearLocalMemory() then if more histogram files it requests the next file.
+      //
 
 
-    // Set up the progress tracking
-    setupProgressBarTracking();
-
-    ////////////////
-    // Set up the menus, reports and display objects
-    ////////////////
-
-    // Build the menu list
-    var groups = [];
-
-    for(i=0; i<dataStore.spectrumListHistoFileNames.length; i++){
-      var histoName = dataStore.spectrumListHistoFileNames[i].split(".")[0];
-      // Build the list of spectra for this histogram name
-      var thesePlots = [];
-      for(j=0; j<dataStore.spectrumList1d.length; j++){
-        thesePlots.push(
-          {
-            "plotID": histoName + ":" + dataStore.spectrumList1d[j],
-            "title": dataStore.spectrumList1d[j]
-          });
-        }
-        // Build the top level dropdown for this histogram name
-        groups.push({
-          "groupID": histoName,
-          "groupTitle": histoName,
-          "plots": thesePlots
-        });
-      }
-      if(dataStore.spectrumListHistoFileNames.length>1){
-        dataStore.plotGroups = groups;     //groups to arrange spectra into for dropdowns
-      }else{
-        dataStore.plotGroups.push(groups[0]);     //add these groups to arrange spectra into for dropdowns
-      }
-
-      // Generate the spectrum lists based on the list of detectors
-      dataStore._plotListLite = new plotListLite('plotList');
-      dataStore._plotListLite.setup();
-
-      // Generate the pileupCorrections report table
-      //  dataStore._pileupCorrectionsReport = new pileupCorrectionsReport('pileupCorrections','crystalKReportRegionpileupCorrectionsDetector','crystal1stHitReportRegionpileupCorrectionsDetector');
-      //  dataStore._pileupCorrectionsReport.setup();
-
-      // Draw the search region
-      dataStore.viewers[dataStore.plots[0]].plotData();
+      // Set up the progress tracking
+      setupProgressBarTracking();
 
       ////////////////
-      // Now set up for the start of the process
+      // Set up the menus, reports and display objects
       ////////////////
 
-      // Plug in the active spectra names for the 1d histograms
-      for(var i=0; i<dataStore.spectrumList1d.length; i++){
-        dataStore._plotControl.activeSpectra.push(dataStore.spectrumList1d[i]);
-      }
-      // Plug in the active spectra names for the 2d histograms
-      for(i=0; i<dataStore.spectrumList2d.length; i++){
-        dataStore._plotControl.active2dSpectra.push(dataStore.spectrumList2d[i]);
-      }
+      // Build the menu list
+      var groups = [];
 
-      // Set the dataStore.histoFileName to this source so that constructQueries requests the correct spectrum
-      dataStore.histoFileName = dataStore.currentHistoFileName = dataStore.spectrumListHistoFileNames[0];
-
-      // Request the config file for this histogram file in order to get the details on runtime
-      // First format check for the data file directory path
-      var filename = dataStore.histoFileDirectoryPath;
-      if(filename[filename.length]!='/'){
-        filename += '/';
-      }
-      filename += dataStore.histoFileName;
-      url = dataStore.spectrumServer + '/?cmd=viewConfig' + '&filename=' + filename;
-      XHR(url, "Problem getting Config file for "+ filename +" from analyzer server", processConfigFileForRunDetails, function(error){ErrorConnectingToAnalyzerServer(error)});
-
-      // change information message
-      document.getElementById('welcomeMessage').classList.add('hidden');
-      document.getElementById('fetchingMessage').classList.remove('hidden');
-
-      // Set the current task to keep track of our progress
-      dataStore.currentTask = 'Fetching';
-
-      // Request the first histogram file from the server.
-      // This launches a series of promises. Once complete we end with fetchCallback.
-      dataStore._plotControl.refreshAll();
-
-    };
-
-    function fetchCallback(){
-      // Create the objects for each matrix in the local storage
-      // createAllLocalMatrices(listOfMatrices,callback);
-      createAllLocalMatrices(dataStore.spectrumList2d,createAllLocalMatricesCallback);
-
-    }
-
-    function createAllLocalMatricesCallback(){
-
-      // change information message
-      document.getElementById('fetchingMessage').classList.add('hidden');
-      document.getElementById('projectionsMessage').classList.remove('hidden');
-
-      // Set the current task to keep track of our progress
-      dataStore.currentTask = 'Projections';
-
-      // Create projectionsList for the input of the function projectAllMatrices(projectionsList)
-      // projectionsList is an array of objects.
-      // Each object contains the "matrixName" which is a valid key for the dataStore.matrix array.
-      // Each object also contains the "gateDetails" which is an array of gates specific to that 2d spectrum.
-      // Format for gates: 'matrixname': [[axis,gateMin,gateMax,BG1SF,BG1Min,BG1Max,BG2SF,BG2Min,BG2Max], [], ...]
-      // Where BG1SF is the Scaling Factor for a projection between bins BG1Min and BG1Max which will be subtracted from the main Gate projection between bins gateMin and gateMax onto the 'axis' axis.
-      var projectionsList = [];
-      var histoName = dataStore.histoFileName.split(".")[0] + ":";
-      for(var i=0; i<dataStore.spectrumList2d.length; i++){
-        for(var j=0; j<dataStore.spectrumListGates[dataStore.spectrumList2d[i]].length; j++){
-          projectionsList.push(
+      for(i=0; i<dataStore.spectrumListHistoFileNames.length; i++){
+        var histoName = dataStore.spectrumListHistoFileNames[i].split(".")[0];
+        // Build the list of spectra for this histogram name
+        var thesePlots = [];
+        for(j=0; j<dataStore.spectrumList1d.length; j++){
+          thesePlots.push(
             {
-              "matrixName": histoName + dataStore.spectrumList2d[i],
-              "gateDetails": dataStore.spectrumListGates[dataStore.spectrumList2d[i]][j]
+              "plotID": histoName + ":" + dataStore.spectrumList1d[j],
+              "title": dataStore.spectrumList1d[j]
             });
           }
+          // Build the top level dropdown for this histogram name
+          groups.push({
+            "groupID": histoName,
+            "groupTitle": histoName,
+            "plots": thesePlots
+          });
         }
-
-        // Make the projections needed from each matrix
-        projectAllMatrices(projectionsList);
-      }
-
-      function projectionsCallback(){
-        // Need to move these projections into the dataStore.spectrumListProjections object
-        // Need to add these projections to the spectrum menu
-        var keys = Object.keys(dataStore.createdSpectra);
-        var histoName = dataStore.histoFileName.split(".")[0];
-
-        for(i=0; i<keys.length; i++){
-          // Only process the newly created projections for the current histogram file
-          if(!keys[i].includes(histoName)){ continue; }
-
-          // Add this projection spectrum to the list which need to be fitted
-          dataStore.spectrumListProjections.push(keys[i]);
-
-          // Create the list of peaks to fit for this projection if it does not already exist.
-          // If it exists it is because it has unique peaks specified for it.
-          if(!dataStore.spectrumListProjectionsPeaks.hasOwnProperty(keys[i])){
-            // A key for this spectrum name does not exist.
-            dataStore.spectrumListProjectionsPeaks[keys[i]] = [];
-          }
-
-          // Add the list of peaks for this filename, if it exists
-          if(dataStore.spectrumListProjectionsPeaks.hasOwnProperty(keys[i].split(":")[0])){
-            dataStore.spectrumListProjectionsPeaks[keys[i]].push(...dataStore.spectrumListProjectionsPeaks[keys[i].split(":")[0]]);
-          }
-
-          // Add the list of peaks for this 2d spectrum name, if it exists
-          if(dataStore.spectrumListProjectionsPeaks.hasOwnProperty(keys[i].split(":")[1].split("x-")[0])){
-            dataStore.spectrumListProjectionsPeaks[keys[i]].push(...dataStore.spectrumListProjectionsPeaks[keys[i].split(":")[1].split("x-")[0]]);
-          }
-          if(dataStore.spectrumListProjectionsPeaks.hasOwnProperty(keys[i].split(":")[1].split("y-")[0])){
-            dataStore.spectrumListProjectionsPeaks[keys[i]].push(...dataStore.spectrumListProjectionsPeaks[keys[i].split(":")[1].split("y-")[0]]);
-          }
-
-          // Add the list of peaks for this projection for all 2d spectra for all filenames, if it exists
-          // Projection list keys will start with either 'x' or 'y'
-          if(dataStore.spectrumListProjectionsPeaks.hasOwnProperty(("x-"+(keys[i].split(":")[1].split("x-")[1])))){
-            dataStore.spectrumListProjectionsPeaks[keys[i]].push(...dataStore.spectrumListProjectionsPeaks[("x-"+(keys[i].split(":")[1].split("x-")[1]))]);
-          }
-          if(dataStore.spectrumListProjectionsPeaks.hasOwnProperty(("y-"+(keys[i].split(":")[1].split("y-")[1])))){
-            dataStore.spectrumListProjectionsPeaks[keys[i]].push(...dataStore.spectrumListProjectionsPeaks[("y-"+(keys[i].split(":")[1].split("y-")[1]))]);
-          }
-
-          // Add the list of peaks for this specific projection name, if it exists
-          if(dataStore.spectrumListProjectionsPeaks.hasOwnProperty(keys[i].split(":")[1])){
-            dataStore.spectrumListProjectionsPeaks[keys[i]].push(...dataStore.spectrumListProjectionsPeaks[keys[i].split(":")[1]]);
-          }
-
-          // Add the All peaks for projections
-          dataStore.spectrumListProjectionsPeaks[keys[i]].push(...dataStore.spectrumListProjectionsPeaks["All"]);
-
-          // Remove any duplicate values. This seems to be easier than checking before pushing the other lists.
-          dataStore.spectrumListProjectionsPeaks[keys[i]] = [...new Set(dataStore.spectrumListProjectionsPeaks[keys[i]])];
-
-          // Sort the Array now we have added all peaks
-          dataStore.spectrumListProjectionsPeaks[keys[i]].sort(function(a, b){return a-b});
-
-          // Add this projection to the spectrum menu
-          newMenuItem = document.createElement('li');
-          newMenuItem.setAttribute('id', 'plotList'+keys[i]);
-          newMenuItem.setAttribute('value', keys[i]);
-          newMenuItem.setAttribute('class', 'list-group-item toggle');
-          newMenuItem.innerHTML = keys[i].split(':')[1].trim()+'<span id=\'plotListbadge'+keys[i]+'\' class=\"badge plotPresence hidden\">&#x2713;</span>';
-          document.getElementById('plotListplots'+histoName).appendChild(newMenuItem);
-          document.getElementById('plotList'+keys[i]).onclick = function(){ dataStore._plotListLite.exclusivePlot(this.id.split('plotList')[1], dataStore.viewers[dataStore.plots[0]]); }
-        }
-
-        // change information message
-        document.getElementById('projectionsMessage').classList.add('hidden');
-        document.getElementById('fittingSinglesMessage').classList.remove('hidden');
-
-        // Here most apps would initiate the peak-fitting process with a function call to fitPeaksInSeriesOfHistograms
-        // This app is different. Instead we will call the custom functions to process the Time Calibrator spectra and the LaBr3 calibration
-
-        if(dataStore.currentJob == 'timeCalibrator'){
-          findTacCalibration(); // Find the gain of the TACs using the time calibrator run
-
-          // Advance to the next job
-          dataStore.currentJob = '60Co';
-
-          // Grab the template peak-fitting script to a local copy here
-          var thisScript = {};
-          thisScript = dataStore.peakFitterScriptTemplate['60Co'];
-
-          // Get the user input on histogramFileNames
-          thisScript.histogramFileNames.push(document.getElementById('HistoListSelect60Co').value);
-
-          // Setup the peak-fitting script from the template
-          receiveScript(JSON.stringify(thisScript));
-
-          // Request the Config for this histogram to get the addresses needed for building the Cal file
-          viewConfigOfHisto(document.getElementById('HistoListSelect60Co').value);
-
-          // Start the automatic process
-          launchPeakFittingProcess();
-
-        }else if(dataStore.currentJob == '60Co'){
-          findTacOffsets(); // Find the offset of the TAC for each LaBr combination using the 60Co run
-          gainMatchLBL();   // Determine the gain for each LaBr energy using the 60Co run
+        if(dataStore.spectrumListHistoFileNames.length>1){
+          dataStore.plotGroups = groups;     //groups to arrange spectra into for dropdowns
         }else{
-          console.log('All fitting is complete. Now put it together.');
+          dataStore.plotGroups.push(groups[0]);     //add these groups to arrange spectra into for dropdowns
         }
-      }
 
-      function fittingCallback(){
-        // All fitting has now been completed
+        // Generate the spectrum lists based on the list of detectors
+        dataStore._plotListLite = new plotListLite('plotList');
+        dataStore._plotListLite.setup();
 
-        // We now have gain and have found the peak centroids for the TACs.
-        // Use peak centroid to calculate the offset values for each LBL-LBL combination.
+        // Generate the pileupCorrections report table
+        //  dataStore._pileupCorrectionsReport = new pileupCorrectionsReport('pileupCorrections','crystalKReportRegionpileupCorrectionsDetector','crystal1stHitReportRegionpileupCorrectionsDetector');
+        //  dataStore._pileupCorrectionsReport.setup();
 
-        var histoName = dataStore.currentHistoFileName.split(".")[0];
-        var specList = dataStore.peakFitterScriptTemplate["60Co"].spectrumList1d;
-        var index=0;
-        dataStore.comboOffsets.fillN(0,29);
+        // Draw the search region
+        dataStore.viewers[dataStore.plots[0]].plotData();
 
-        var string = "int tac_lbl_combo_offset[(int)((N_LABR)*(N_LABR-1)/2)+2] = {";
-        for(var i=0; i<specList.length; i++){
-          if(!specList[i].includes("TAC_")){ continue; } // Only use TAC histograms in the 60Co run
-          var thisKey = histoName + ":" + specList[i];
-          dataStore.comboOffsets[index] = 500 - dataStore.fitResults[thisKey][0][1];
-          if(i>0){ string += ","; }
-          string += (500 - dataStore.fitResults[thisKey][0][1]).toFixed(0);
-          index++;
+        ////////////////
+        // Now set up for the start of the process
+        ////////////////
+
+        // Plug in the active spectra names for the 1d histograms
+        for(var i=0; i<dataStore.spectrumList1d.length; i++){
+          dataStore._plotControl.activeSpectra.push(dataStore.spectrumList1d[i]);
         }
-        string += "};";
+        // Plug in the active spectra names for the 2d histograms
+        for(i=0; i<dataStore.spectrumList2d.length; i++){
+          dataStore._plotControl.active2dSpectra.push(dataStore.spectrumList2d[i]);
+        }
 
-        // Now we are done.
-        // Reveal the download buttons
-        document.getElementById('saveCalDiv').classList.remove('hidden');
-        //  document.getElementById('saveCSVDiv').classList.remove('hidden');
-        //  document.getElementById('saveScriptDiv').classList.remove('hidden');
+        // Set the dataStore.histoFileName to this source so that constructQueries requests the correct spectrum
+        dataStore.histoFileName = dataStore.currentHistoFileName = dataStore.spectrumListHistoFileNames[0];
+
+        // Request the Config for this histogram to get the addresses and calibrations needed for building the Cal file
+        // This also gets the midas info about this run (title, start time, duration)
+        viewConfigOfHisto(dataStore.histoFileName);
 
         // change information message
-        document.getElementById('fittingProjectionsMessage').classList.add('hidden');
-        document.getElementById('reviewMessage').classList.remove('hidden');
+        document.getElementById('welcomeMessage').classList.add('hidden');
+        document.getElementById('fetchingMessage').classList.remove('hidden');
 
-        // Display the results in the table
-        //  dataStore._pileupCorrectionsReport.updateTable();
+        // Set the current task to keep track of our progress
+        dataStore.currentTask = 'Fetching';
 
-        console.log(dataStore);
-        console.log("Finished");
-        console.log("Completed: "+dataStore.progressBarTasksCompleted+"/"+dataStore.progressBarNumberTasks+" = " + dataStore.ProgressValue);
+        // Request the first histogram file from the server.
+        // This launches a series of promises. Once complete we end with fetchCallback.
+        dataStore._plotControl.refreshAll();
 
-        // Reveal the post-processing buttons nad report div
-        //document.getElementById('postProcessDiv').classList.remove('hidden');
+      };
 
-        // Launch the post-processing...
+      function fetchCallback(){
+        // Create the objects for each matrix in the local storage
+        // createAllLocalMatrices(listOfMatrices,callback);
+        createAllLocalMatrices(dataStore.spectrumList2d,createAllLocalMatricesCallback);
 
       }
 
-      function postProcessTacCalibration(){
+      function createAllLocalMatricesCallback(){
 
-        var keys = Object.keys(dataStore.rawData);
-        for(var i=0; i<keys.length; i++){
-          // Only use histograms in the 60Co run
-          if(!keys[i].includes(document.getElementById('HistoListSelect60Co').value.split(".")[0])){
-            continue;
+        // change information message
+        document.getElementById('fetchingMessage').classList.add('hidden');
+        document.getElementById('projectionsMessage').classList.remove('hidden');
+
+        // Set the current task to keep track of our progress
+        dataStore.currentTask = 'Projections';
+
+        // Create projectionsList for the input of the function projectAllMatrices(projectionsList)
+        // projectionsList is an array of objects.
+        // Each object contains the "matrixName" which is a valid key for the dataStore.matrix array.
+        // Each object also contains the "gateDetails" which is an array of gates specific to that 2d spectrum.
+        // Format for gates: 'matrixname': [[axis,gateMin,gateMax,BG1SF,BG1Min,BG1Max,BG2SF,BG2Min,BG2Max], [], ...]
+        // Where BG1SF is the Scaling Factor for a projection between bins BG1Min and BG1Max which will be subtracted from the main Gate projection between bins gateMin and gateMax onto the 'axis' axis.
+        var projectionsList = [];
+        var histoName = dataStore.histoFileName.split(".")[0] + ":";
+        for(var i=0; i<dataStore.spectrumList2d.length; i++){
+          for(var j=0; j<dataStore.spectrumListGates[dataStore.spectrumList2d[i]].length; j++){
+            projectionsList.push(
+              {
+                "matrixName": histoName + dataStore.spectrumList2d[i],
+                "gateDetails": dataStore.spectrumListGates[dataStore.spectrumList2d[i]][j]
+              });
+            }
           }
-          // Calibrate the offset correction values
-          var thisCentroid = dataStore.fitResults[keys[i]][1].toFixed(1);
+
+          // Make the projections needed from each matrix
+          projectAllMatrices(projectionsList);
         }
-      }
 
-      function findTacCalibration(){
-        // The time calibrator produces a picket fence of peaks in the spectrum at well-known time differences.
-        // Here we will first find the 5 peaks, then perform the linear calibration to 10 picoseconds per channel
+        function projectionsCallback(){
+          // Need to move these projections into the dataStore.spectrumListProjections object
+          // Need to add these projections to the spectrum menu
+          var keys = Object.keys(dataStore.createdSpectra);
+          var histoName = dataStore.histoFileName.split(".")[0];
 
-        var keys = Object.keys(dataStore.rawData);
-        for(var i=0; i<keys.length; i++){
-          // Only use time calibrator runs
-          if(!keys[i].includes(document.getElementById('HistoListSelectTimeCalibrator').value.split(".")[0])){
-            continue;
+          for(i=0; i<keys.length; i++){
+            // Only process the newly created projections for the current histogram file
+            if(!keys[i].includes(histoName)){ continue; }
+
+            // Add this projection spectrum to the list which need to be fitted
+            dataStore.spectrumListProjections.push(keys[i]);
+
+            // Create the list of peaks to fit for this projection if it does not already exist.
+            // If it exists it is because it has unique peaks specified for it.
+            if(!dataStore.spectrumListProjectionsPeaks.hasOwnProperty(keys[i])){
+              // A key for this spectrum name does not exist.
+              dataStore.spectrumListProjectionsPeaks[keys[i]] = [];
+            }
+
+            // Add the list of peaks for this filename, if it exists
+            if(dataStore.spectrumListProjectionsPeaks.hasOwnProperty(keys[i].split(":")[0])){
+              dataStore.spectrumListProjectionsPeaks[keys[i]].push(...dataStore.spectrumListProjectionsPeaks[keys[i].split(":")[0]]);
+            }
+
+            // Add the list of peaks for this 2d spectrum name, if it exists
+            if(dataStore.spectrumListProjectionsPeaks.hasOwnProperty(keys[i].split(":")[1].split("x-")[0])){
+              dataStore.spectrumListProjectionsPeaks[keys[i]].push(...dataStore.spectrumListProjectionsPeaks[keys[i].split(":")[1].split("x-")[0]]);
+            }
+            if(dataStore.spectrumListProjectionsPeaks.hasOwnProperty(keys[i].split(":")[1].split("y-")[0])){
+              dataStore.spectrumListProjectionsPeaks[keys[i]].push(...dataStore.spectrumListProjectionsPeaks[keys[i].split(":")[1].split("y-")[0]]);
+            }
+
+            // Add the list of peaks for this projection for all 2d spectra for all filenames, if it exists
+            // Projection list keys will start with either 'x' or 'y'
+            if(dataStore.spectrumListProjectionsPeaks.hasOwnProperty(("x-"+(keys[i].split(":")[1].split("x-")[1])))){
+              dataStore.spectrumListProjectionsPeaks[keys[i]].push(...dataStore.spectrumListProjectionsPeaks[("x-"+(keys[i].split(":")[1].split("x-")[1]))]);
+            }
+            if(dataStore.spectrumListProjectionsPeaks.hasOwnProperty(("y-"+(keys[i].split(":")[1].split("y-")[1])))){
+              dataStore.spectrumListProjectionsPeaks[keys[i]].push(...dataStore.spectrumListProjectionsPeaks[("y-"+(keys[i].split(":")[1].split("y-")[1]))]);
+            }
+
+            // Add the list of peaks for this specific projection name, if it exists
+            if(dataStore.spectrumListProjectionsPeaks.hasOwnProperty(keys[i].split(":")[1])){
+              dataStore.spectrumListProjectionsPeaks[keys[i]].push(...dataStore.spectrumListProjectionsPeaks[keys[i].split(":")[1]]);
+            }
+
+            // Add the All peaks for projections
+            dataStore.spectrumListProjectionsPeaks[keys[i]].push(...dataStore.spectrumListProjectionsPeaks["All"]);
+
+            // Remove any duplicate values. This seems to be easier than checking before pushing the other lists.
+            dataStore.spectrumListProjectionsPeaks[keys[i]] = [...new Set(dataStore.spectrumListProjectionsPeaks[keys[i]])];
+
+            // Sort the Array now we have added all peaks
+            dataStore.spectrumListProjectionsPeaks[keys[i]].sort(function(a, b){return a-b});
+
+            // Add this projection to the spectrum menu
+            newMenuItem = document.createElement('li');
+            newMenuItem.setAttribute('id', 'plotList'+keys[i]);
+            newMenuItem.setAttribute('value', keys[i]);
+            newMenuItem.setAttribute('class', 'list-group-item toggle');
+            newMenuItem.innerHTML = keys[i].split(':')[1].trim()+'<span id=\'plotListbadge'+keys[i]+'\' class=\"badge plotPresence hidden\">&#x2713;</span>';
+            document.getElementById('plotListplots'+histoName).appendChild(newMenuItem);
+            document.getElementById('plotList'+keys[i]).onclick = function(){ dataStore._plotListLite.exclusivePlot(this.id.split('plotList')[1], dataStore.viewers[dataStore.plots[0]]); }
           }
-          // Only use TAC histograms in the 60Co run
-          if(!keys[i].includes("LBT")){
-            continue;
+
+          // change information message
+          document.getElementById('projectionsMessage').classList.add('hidden');
+          document.getElementById('fittingSinglesMessage').classList.remove('hidden');
+
+          // Here most apps would initiate the peak-fitting process with a function call to fitPeaksInSeriesOfHistograms
+          // This app is different. Instead we will call the custom functions to process the Time Calibrator spectra and the LaBr3 calibration
+
+          if(dataStore.currentJob == 'timeCalibrator'){
+            findTacCalibration(); // Find the gain of the TACs using the time calibrator run
+
+            // Advance to the next job
+            dataStore.currentJob = '60Co';
+
+            // Grab the template peak-fitting script to a local copy here
+            var thisScript = {};
+            thisScript = dataStore.peakFitterScriptTemplate['60Co'];
+
+            // Get the user input on histogramFileNames
+            thisScript.histogramFileNames.push(document.getElementById('HistoListSelect60Co').value);
+
+            // Setup the peak-fitting script from the template
+            receiveScript(JSON.stringify(thisScript));
+
+            // Request the Config for this histogram to get the addresses needed for building the Cal file
+            viewConfigOfHisto(document.getElementById('HistoListSelect60Co').value);
+
+            // Start the automatic process
+            launchPeakFittingProcess();
+
+          }else if(dataStore.currentJob == '60Co'){
+            findTacOffsets(); // Find the offset of the TAC for each LaBr combination using the 60Co run
+            gainMatchLBL();   // Determine the gain for each LaBr energy using the 60Co run
+          }else{
+            console.log('All fitting is complete. Now put it together.');
+          }
+        }
+
+        function fittingCallback(){
+          // All fitting has now been completed
+
+          // We now have gain and have found the peak centroids for the TACs.
+          // Use peak centroid to calculate the offset values for each LBL-LBL combination.
+
+          var histoName = dataStore.currentHistoFileName.split(".")[0];
+          var specList = dataStore.peakFitterScriptTemplate["60Co"].spectrumList1d;
+          var index=0;
+          dataStore.comboOffsets.fillN(0,29);
+
+          var string = "int tac_lbl_combo_offset[(int)((N_LABR)*(N_LABR-1)/2)+2] = {";
+          for(var i=0; i<specList.length; i++){
+            if(!specList[i].includes("TAC_")){ continue; } // Only use TAC histograms in the 60Co run
+            var thisKey = histoName + ":" + specList[i];
+            dataStore.comboOffsets[index] = 500 - dataStore.fitResults[thisKey][0][1];
+            if(i>0){ string += ","; }
+            string += (500 - dataStore.fitResults[thisKey][0][1]).toFixed(0);
+            index++;
+          }
+          string += "};";
+
+          // Now we are done.
+          // Reveal the download buttons
+          document.getElementById('saveCalDiv').classList.remove('hidden');
+          //  document.getElementById('saveCSVDiv').classList.remove('hidden');
+          //  document.getElementById('saveScriptDiv').classList.remove('hidden');
+
+          // change information message
+          document.getElementById('fittingProjectionsMessage').classList.add('hidden');
+          document.getElementById('reviewMessage').classList.remove('hidden');
+
+          // Display the results in the table
+          //  dataStore._pileupCorrectionsReport.updateTable();
+
+          console.log(dataStore);
+          console.log("Finished");
+          console.log("Completed: "+dataStore.progressBarTasksCompleted+"/"+dataStore.progressBarNumberTasks+" = " + dataStore.ProgressValue);
+
+          // Reveal the post-processing buttons nad report div
+          //document.getElementById('postProcessDiv').classList.remove('hidden');
+
+          // Launch the post-processing...
+
+        }
+
+        function postProcessTacCalibration(){
+
+          var keys = Object.keys(dataStore.rawData);
+          for(var i=0; i<keys.length; i++){
+            // Only use histograms in the 60Co run
+            if(!keys[i].includes(document.getElementById('HistoListSelect60Co').value.split(".")[0])){
+              continue;
+            }
+            // Calibrate the offset correction values
+            var thisCentroid = dataStore.fitResults[keys[i]][1].toFixed(1);
+          }
+        }
+
+        function findTacCalibration(){
+          // The time calibrator produces a picket fence of peaks in the spectrum at well-known time differences.
+          // Here we will first find the 5 peaks, then perform the linear calibration to 10 picoseconds per channel
+
+          var keys = Object.keys(dataStore.rawData);
+          for(var i=0; i<keys.length; i++){
+            // Only use time calibrator runs
+            if(!keys[i].includes(document.getElementById('HistoListSelectTimeCalibrator').value.split(".")[0])){
+              continue;
+            }
+            // Only use TAC histograms in the 60Co run
+            if(!keys[i].includes("LBT")){
+              continue;
+            }
+
+            // We expect to find 5 or 6 peaks within the TAC range in a 16834 channel spectrum
+            // The 1st peak is around channel zero and is unreliable so we will ignore it
+            // The 6th peak is often clipping the ADC range and is unreliable so we will ignore it
+            // So we will find 4 peaks
+            // Split the spectrum into 4 sections and find the peak within each section
+            var start = 1200; // skip the region around channel zero
+            var sectionLength = 2805; // 16834 / 6 = 2805 channels per section
+            for(var section=0; section<4; section++){
+              var thisLowerLimit = start+(section*sectionLength);
+              var thisUpperLimit = thisLowerLimit+sectionLength;
+              var thisSectionData = dataStore.rawData[keys[i]].slice(thisLowerLimit,thisUpperLimit);
+
+              if(!dataStore.timeCalibratorPeaks[keys[i]]){ dataStore.timeCalibratorPeaks[keys[i]] = []; }
+              //dataStore.timeCalibratorPeaks[keys[i]].push(thisSectionData.indexOf(Math.max(thisSectionData)));
+              var maxValue = 0; var index=-1;
+              for(k=0; k<thisSectionData.length; k++){
+                if(isNaN(thisSectionData[k])){ continue; }
+                if(thisSectionData[k]>maxValue){ maxValue = thisSectionData[k]; index = k+thisLowerLimit; }
+              }
+
+              dataStore.timeCalibratorPeaks[keys[i]].push(index);
+            }
+
+            var gain = (dataStore.timeCalibratorPeaks[keys[i]][dataStore.timeCalibratorPeaks[keys[i]].length-1] - dataStore.timeCalibratorPeaks[keys[i]][0]) / ((dataStore.timeCalibratorPeaks[keys[i]].length-1)*dataStore.timeCalibratorPeriod);
+
+            if(!dataStore.tacCalibration[keys[i]]){ dataStore.tacCalibration[keys[i]] = []; }
+            dataStore.tacCalibration[keys[i]][0] = gain;
+
+            var thisTAC = (Number(keys[i].split("LBT")[1].split("X")[0]))-1;
+            dataStore.tacGain[thisTAC] = gain;
           }
 
-          // We expect to find 5 or 6 peaks within the TAC range in a 16834 channel spectrum
-          // The 1st peak is around channel zero and is unreliable so we will ignore it
-          // The 6th peak is often clipping the ADC range and is unreliable so we will ignore it
-          // So we will find 4 peaks
-          // Split the spectrum into 4 sections and find the peak within each section
-          var start = 1200; // skip the region around channel zero
-          var sectionLength = 2805; // 16834 / 6 = 2805 channels per section
-          for(var section=0; section<4; section++){
-            var thisLowerLimit = start+(section*sectionLength);
-            var thisUpperLimit = thisLowerLimit+sectionLength;
-            var thisSectionData = dataStore.rawData[keys[i]].slice(thisLowerLimit,thisUpperLimit);
+        }
 
-            if(!dataStore.timeCalibratorPeaks[keys[i]]){ dataStore.timeCalibratorPeaks[keys[i]] = []; }
-            //dataStore.timeCalibratorPeaks[keys[i]].push(thisSectionData.indexOf(Math.max(thisSectionData)));
-            var maxValue = 0; var index=-1;
+        function findTacOffsets(){
+          var spectrumList = [];
+          var peaksList = {};
+
+          var keys = Object.keys(dataStore.rawData);
+          for(var i=0; i<keys.length; i++){
+            // Only use histograms in the 60Co run
+            if(!keys[i].includes(document.getElementById('HistoListSelect60Co').value.split(".")[0])){
+              continue;
+            }
+            // Only use TAC histograms in the 60Co run
+            if(!keys[i].includes("TAC_")){
+              continue;
+            }
+
+            // Add this histogram to the list of spectrum names (used as a key)
+            spectrumList.push(keys[i]);
+
+            // Create the calibrated TAC spectrum using the gain coefficient
+            var thisTAC = Number(keys[i].split("TAC_")[1].split("_")[0]);
+            var calibratedSpectrum = [];
+            calibratedSpectrum.fillN(0,8192);
+            for(j=0; j<dataStore.rawData[keys[i]].length; j++){
+              calibratedSpectrum[Math.floor(j*dataStore.tacGain[thisTAC])] += dataStore.rawData[keys[i]][j];
+            }
+            dataStore.rawData[keys[i]] = calibratedSpectrum; // Change the raw spectrum to the calibrated spectrum
+
+            // We expect to find 1 peak within the TAC range for each LBL-LBL combo
+            // There is often a spike at the overflow channel which needs to be excluded
+            var thisLowerLimit = 15;
+            j=calibratedSpectrum.length-1;
+            while(j>0 && calibratedSpectrum[j]<1){ j--; }
+            if(j>3000){ var thisUpperLimit = j-100; }else{ var thisUpperLimit = 3000; };
+            var thisSectionData = calibratedSpectrum.slice(thisLowerLimit,thisUpperLimit);
+
+            if(!dataStore.rawTACPeaks[keys[i]]){ dataStore.rawTACPeaks[keys[i]] = []; }
+
+            // Find the maximum bin which is close to peak centre
+            var maxValue = 0; var maxIndex=-1; var index;
             for(k=0; k<thisSectionData.length; k++){
               if(isNaN(thisSectionData[k])){ continue; }
-              if(thisSectionData[k]>maxValue){ maxValue = thisSectionData[k]; index = k+thisLowerLimit; }
+              if(thisSectionData[k]>maxValue){ maxValue = thisSectionData[k]; maxIndex = index = k+thisLowerLimit; }
             }
 
-            dataStore.timeCalibratorPeaks[keys[i]].push(index);
+            // Save the max bin locally for guessing the peak centroid
+            peaksList[keys[i]] = [];
+            peaksList[keys[i]].push(index);
+
+            // Find the rough FWHM
+            index = maxIndex-thisLowerLimit;
+            while(thisSectionData[index]>maxValue/2){ index--; }
+            var ROIlowerLimit = maxIndex - (maxIndex-index)*5;
+            var ROIupperLimit = maxIndex + (maxIndex-index)*5;
+
+            // Reduce the sectionData to just the peak Region of Interest
+            thisSectionData = calibratedSpectrum.slice(ROIlowerLimit,ROIupperLimit);
+
+            // Find the centre of mass of this peak
+            var sum = sumProducts = 0;
+            for(k=0; k<thisSectionData.length; k++){
+              if(isNaN(thisSectionData[k])){ continue; }
+              sum += thisSectionData[k];
+              sumProducts += thisSectionData[k] * (k+ROIlowerLimit);
+            }
+            var mean = sumProducts / sum;
+
+            dataStore.rawTACPeaks[keys[i]].push(mean);
           }
 
-          var gain = (dataStore.timeCalibratorPeaks[keys[i]][dataStore.timeCalibratorPeaks[keys[i]].length-1] - dataStore.timeCalibratorPeaks[keys[i]][0]) / ((dataStore.timeCalibratorPeaks[keys[i]].length-1)*dataStore.timeCalibratorPeriod);
+          // Now do fitting of these TAC Peaks
 
-          if(!dataStore.tacCalibration[keys[i]]){ dataStore.tacCalibration[keys[i]] = []; }
-          dataStore.tacCalibration[keys[i]][0] = gain;
+          //set the x axis valueRange
+          document.getElementById('maxX').value = 16000;
+          document.getElementById('maxX').onchange();
 
-          var thisTAC = (Number(keys[i].split("LBT")[1].split("X")[0]))-1;
-          dataStore.tacGain[thisTAC] = gain;
+          // Start the whole fitting routine for singles peaks
+          fitPeaksInSeriesOfHistograms(spectrumList,peaksList);
+
         }
 
-      }
+        function gainMatchLBL(){
+          var peaksList = {};
 
-      function findTacOffsets(){
-        var spectrumList = [];
-        var peaksList = {};
+          var keys = Object.keys(dataStore.rawData);
+          for(var i=0; i<keys.length; i++){
+            // Only use histograms in the 60Co run
+            if(!keys[i].includes(document.getElementById('HistoListSelect60Co').value.split(".")[0])){
+              continue;
+            }
+            // Only use TAC histograms in the 60Co run
+            if(!keys[i].includes("LBL")){
+              continue;
+            }
 
-        var keys = Object.keys(dataStore.rawData);
-        for(var i=0; i<keys.length; i++){
-          // Only use histograms in the 60Co run
-          if(!keys[i].includes(document.getElementById('HistoListSelect60Co').value.split(".")[0])){
-            continue;
-          }
-          // Only use TAC histograms in the 60Co run
-          if(!keys[i].includes("TAC_")){
-            continue;
-          }
+            // Create the empty spectrum that will be a starting point for each interation
+            var testSpectrumLength = 3000;
+            var testSpectrum = [];
+            var errorSpectrum = [];
+            var emptySpectrum = [];
+            emptySpectrum.fillN(0,testSpectrumLength); // For LBL we will try and match between zero and 3MeV
 
-          // Add this histogram to the list of spectrum names (used as a key)
-          spectrumList.push(keys[i]);
+            // Get the reference spectrum from the store
+            var referenceSpectrum = dataStore.referenceSpectrum["LBL"].slice(0,testSpectrumLength);
 
-          // Create the calibrated TAC spectrum using the gain coefficient
-          var thisTAC = Number(keys[i].split("TAC_")[1].split("_")[0]);
-          var calibratedSpectrum = [];
-          calibratedSpectrum.fillN(0,8192);
-          for(j=0; j<dataStore.rawData[keys[i]].length; j++){
-            calibratedSpectrum[Math.floor(j*dataStore.tacGain[thisTAC])] += dataStore.rawData[keys[i]][j];
-          }
-          dataStore.rawData[keys[i]] = calibratedSpectrum; // Change the raw spectrum to the calibrated spectrum
-
-          // We expect to find 1 peak within the TAC range for each LBL-LBL combo
-          // There is often a spike at the overflow channel which needs to be excluded
-          var thisLowerLimit = 15;
-          j=calibratedSpectrum.length-1;
-          while(j>0 && calibratedSpectrum[j]<1){ j--; }
-          if(j>3000){ var thisUpperLimit = j-100; }else{ var thisUpperLimit = 3000; };
-          var thisSectionData = calibratedSpectrum.slice(thisLowerLimit,thisUpperLimit);
-
-          if(!dataStore.rawTACPeaks[keys[i]]){ dataStore.rawTACPeaks[keys[i]] = []; }
-
-          // Find the maximum bin which is close to peak centre
-          var maxValue = 0; var maxIndex=-1; var index;
-          for(k=0; k<thisSectionData.length; k++){
-            if(isNaN(thisSectionData[k])){ continue; }
-            if(thisSectionData[k]>maxValue){ maxValue = thisSectionData[k]; maxIndex = index = k+thisLowerLimit; }
-          }
-
-          // Save the max bin locally for guessing the peak centroid
-          peaksList[keys[i]] = [];
-          peaksList[keys[i]].push(index);
-
-          // Find the rough FWHM
-          index = maxIndex-thisLowerLimit;
-          while(thisSectionData[index]>maxValue/2){ index--; }
-          var ROIlowerLimit = maxIndex - (maxIndex-index)*5;
-          var ROIupperLimit = maxIndex + (maxIndex-index)*5;
-
-          // Reduce the sectionData to just the peak Region of Interest
-          thisSectionData = calibratedSpectrum.slice(ROIlowerLimit,ROIupperLimit);
-
-          // Find the centre of mass of this peak
-          var sum = sumProducts = 0;
-          for(k=0; k<thisSectionData.length; k++){
-            if(isNaN(thisSectionData[k])){ continue; }
-            sum += thisSectionData[k];
-            sumProducts += thisSectionData[k] * (k+ROIlowerLimit);
-          }
-          var mean = sumProducts / sum;
-
-          dataStore.rawTACPeaks[keys[i]].push(mean);
-        }
-
-        // Now do fitting of these TAC Peaks
-
-        //set the x axis valueRange
-        document.getElementById('maxX').value = 16000;
-        document.getElementById('maxX').onchange();
-
-        // Start the whole fitting routine for singles peaks
-        fitPeaksInSeriesOfHistograms(spectrumList,peaksList);
-
-      }
-
-      function gainMatchLBL(){
-        var peaksList = {};
-
-        var keys = Object.keys(dataStore.rawData);
-        for(var i=0; i<keys.length; i++){
-          // Only use histograms in the 60Co run
-          if(!keys[i].includes(document.getElementById('HistoListSelect60Co').value.split(".")[0])){
-            continue;
-          }
-          // Only use TAC histograms in the 60Co run
-          if(!keys[i].includes("LBL")){
-            continue;
-          }
-
-          // Create the empty spectrum that will be a starting point for each interation
-          var testSpectrumLength = 3000;
-          var testSpectrum = [];
-          var errorSpectrum = [];
-          var emptySpectrum = [];
-          emptySpectrum.fillN(0,testSpectrumLength); // For LBL we will try and match between zero and 3MeV
-
-          // Get the reference spectrum from the store
-          var referenceSpectrum = dataStore.referenceSpectrum["LBL"].slice(0,testSpectrumLength);
-
-          // Set the parameters for the chi-square sweep
-          var gainLowerLimit = 0.7;
-          var gainUpperLimit = 2.2;
-          var gainStepSize = 0.001;
-          var minChiSquare = 100000000;
-          var chiSquareSeries = [];
-          var optimalGain = 1.0;
-          // Scan through gain values
-          for(gain=gainLowerLimit; gain<gainUpperLimit; gain+=gainStepSize){
-            testSpectrum = [];
-            errorSpectrum = [];
-            testSpectrum.fillN(0,testSpectrumLength); // For LBL we will try and match between zero and 3MeV
-            errorSpectrum.fillN(0,testSpectrumLength); // For LBL we will try and match between zero and 3MeV
-            for(j=0; j<testSpectrumLength; j++){
-              var bin = Math.round(j*gain);
-              if(bin>=0 && bin<testSpectrumLength){
-                testSpectrum[bin] += dataStore.rawData[keys[i]][j];
+            // Set the parameters for the chi-square sweep
+            var gainLowerLimit = 0.7;
+            var gainUpperLimit = 2.2;
+            var gainStepSize = 0.001;
+            var minChiSquare = 100000000;
+            var chiSquareSeries = [];
+            var optimalGain = 1.0;
+            // Scan through gain values
+            for(gain=gainLowerLimit; gain<gainUpperLimit; gain+=gainStepSize){
+              testSpectrum = [];
+              errorSpectrum = [];
+              testSpectrum.fillN(0,testSpectrumLength); // For LBL we will try and match between zero and 3MeV
+              errorSpectrum.fillN(0,testSpectrumLength); // For LBL we will try and match between zero and 3MeV
+              for(j=0; j<testSpectrumLength; j++){
+                var bin = Math.round(j*gain);
+                if(bin>=0 && bin<testSpectrumLength){
+                  testSpectrum[bin] += dataStore.rawData[keys[i]][j];
+                }
               }
+              for(j=0; j<testSpectrumLength; j++){ errorSpectrum[j] = Math.sqrt(testSpectrum[j]); }
+              testSpectrum[0] = testSpectrum[1];   // elimimate noise
+              errorSpectrum[0] = errorSpectrum[1]; // elimimate noise
+              thisChiSquare = calculateChiSquare(testSpectrum,errorSpectrum,referenceSpectrum);
+              chiSquareSeries.push(thisChiSquare);
+
+              // Decide if this is the best fit and save it if it is
+              if(thisChiSquare<minChiSquare){ minChiSquare = thisChiSquare; optimalGain = gain; }
             }
-            for(j=0; j<testSpectrumLength; j++){ errorSpectrum[j] = Math.sqrt(testSpectrum[j]); }
-            testSpectrum[0] = testSpectrum[1];   // elimimate noise
-            errorSpectrum[0] = errorSpectrum[1]; // elimimate noise
-            thisChiSquare = calculateChiSquare(testSpectrum,errorSpectrum,referenceSpectrum);
-            chiSquareSeries.push(thisChiSquare);
-
-            // Decide if this is the best fit and save it if it is
-            if(thisChiSquare<minChiSquare){ minChiSquare = thisChiSquare; optimalGain = gain; }
-          }
-          dataStore.LBLgains.push(optimalGain);
-        }
-      }
-
-      function buildCSVfile(){
-        console.log('Download initiated');
-        var keys = Object.keys(dataStore.fitResults);
-        var index = 1;
-
-        // Write the table of results to a CSV file for download.
-        var CSV = '';
-
-        CSV += 'GRIFFIN Peak Fitter Results Data\n\n';
-
-        //fit results: 'plotname': [[amplitude, center, width, intercept, slope, area, FWHM], [amplitude, center, width, intercept, slope, area, FWHM]]
-
-        CSV += 'Fit Index,';
-        CSV += 'Histogram File,';
-        CSV += 'Run Title,Run StartTime,Run Duration,';
-        CSV += 'Spectrum,';
-        CSV += 'Centroid,'; //
-        CSV += 'Height,'; //
-        CSV += 'Width,'; //
-        CSV += 'Intercept (BG),'; //
-        CSV += 'Slope (BG),'; //
-        CSV += 'Area,'; //
-        CSV += 'Area Unc.,'; //
-        CSV += 'FWHM\n'; //
-        for(var i=0; i<keys.length; i++){
-          for(var j=0; j<dataStore.fitResults[keys[i]].length; j++){
-            CSV += index + ','; index++;
-            CSV += keys[i].split(":")[0] + ',';
-            CSV += dataStore.spectrumListHistoFileDetails[keys[i].split(":")[0]].Title + ',';
-            CSV += dataStore.spectrumListHistoFileDetails[keys[i].split(":")[0]].StartTime + ',';
-            CSV += dataStore.spectrumListHistoFileDetails[keys[i].split(":")[0]].Duration + ',';
-            CSV += keys[i].split(":")[1] + ',';
-            CSV += dataStore.fitResults[keys[i]][j][1].toFixed(2) + ','; // Center
-            CSV += dataStore.fitResults[keys[i]][j][0].toFixed(2) + ','; // Amplitude
-            CSV += dataStore.fitResults[keys[i]][j][2].toFixed(2) + ','; // width
-            CSV += dataStore.fitResults[keys[i]][j][3].toFixed(2) + ','; // intercept
-            CSV += dataStore.fitResults[keys[i]][j][4].toFixed(2) + ','; // slope
-            CSV += dataStore.fitResults[keys[i]][j][5].toFixed(2) + ','; // area
-            CSV += Math.sqrt(dataStore.fitResults[keys[i]][j][5]).toFixed(2) + ','; // area uncertainty
-            CSV += dataStore.fitResults[keys[i]][j][6].toFixed(2) + '\n'; // FWHM
+            dataStore.LBLgains.push(optimalGain);
           }
         }
-        CSV += '\n';
 
-        // Create a download link
-        const textBlob = new Blob([CSV], {type: 'text/plain'});
-        URL.revokeObjectURL(window.textBlobURL);
-        const downloadLink = document.createElement('a');
-        downloadLink.href = URL.createObjectURL(textBlob);
-        downloadLink.download = 'GRIFFIN-peakFitter-Results.csv';
+        function buildCSVfile(){
+          console.log('Download initiated');
+          var keys = Object.keys(dataStore.fitResults);
+          var index = 1;
 
-        // Trigger the download
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-      }
+          // Write the table of results to a CSV file for download.
+          var CSV = '';
 
-      function buildScriptfile(){
-        console.log('Download initiated');
+          CSV += 'GRIFFIN Peak Fitter Results Data\n\n';
 
-        // Write the contents of the json script to a file for download.
-        var JSONstring = '';
-        JSONstring = JSON.stringify(dataStore.peakFitterScript, null, 4);
+          //fit results: 'plotname': [[amplitude, center, width, intercept, slope, area, FWHM], [amplitude, center, width, intercept, slope, area, FWHM]]
 
-        // Need to purge some spectrum specific peak entries if they match All.
+          CSV += 'Fit Index,';
+          CSV += 'Histogram File,';
+          CSV += 'Run Title,Run StartTime,Run Duration,';
+          CSV += 'Spectrum,';
+          CSV += 'Centroid,'; //
+          CSV += 'Height,'; //
+          CSV += 'Width,'; //
+          CSV += 'Intercept (BG),'; //
+          CSV += 'Slope (BG),'; //
+          CSV += 'Area,'; //
+          CSV += 'Area Unc.,'; //
+          CSV += 'FWHM\n'; //
+          for(var i=0; i<keys.length; i++){
+            for(var j=0; j<dataStore.fitResults[keys[i]].length; j++){
+              CSV += index + ','; index++;
+              CSV += keys[i].split(":")[0] + ',';
+              CSV += dataStore.spectrumListHistoFileDetails[keys[i].split(":")[0]].Title + ',';
+              CSV += dataStore.spectrumListHistoFileDetails[keys[i].split(":")[0]].StartTime + ',';
+              CSV += dataStore.spectrumListHistoFileDetails[keys[i].split(":")[0]].Duration + ',';
+              CSV += keys[i].split(":")[1] + ',';
+              CSV += dataStore.fitResults[keys[i]][j][1].toFixed(2) + ','; // Center
+              CSV += dataStore.fitResults[keys[i]][j][0].toFixed(2) + ','; // Amplitude
+              CSV += dataStore.fitResults[keys[i]][j][2].toFixed(2) + ','; // width
+              CSV += dataStore.fitResults[keys[i]][j][3].toFixed(2) + ','; // intercept
+              CSV += dataStore.fitResults[keys[i]][j][4].toFixed(2) + ','; // slope
+              CSV += dataStore.fitResults[keys[i]][j][5].toFixed(2) + ','; // area
+              CSV += Math.sqrt(dataStore.fitResults[keys[i]][j][5]).toFixed(2) + ','; // area uncertainty
+              CSV += dataStore.fitResults[keys[i]][j][6].toFixed(2) + '\n'; // FWHM
+            }
+          }
+          CSV += '\n';
 
+          // Create a download link
+          const textBlob = new Blob([CSV], {type: 'text/plain'});
+          URL.revokeObjectURL(window.textBlobURL);
+          const downloadLink = document.createElement('a');
+          downloadLink.href = URL.createObjectURL(textBlob);
+          downloadLink.download = 'GRIFFIN-peakFitter-Results.csv';
 
-        // Create a download link
-        const textBlob = new Blob([JSONstring], {type: 'text/plain'});
-        URL.revokeObjectURL(window.textBlobURL);
-        const downloadLink = document.createElement('a');
-        downloadLink.href = URL.createObjectURL(textBlob);
-        downloadLink.download = 'GRIFFIN-peakFitter-script.json';
-
-        // Trigger the download
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-      }
-
-      function buildCalfile(){
-        console.log('Download initiated');
-
-        // This cal file will contain:
-        // LBL energy calibration Coefficients
-        // LBT TAC Gain coefficients
-        // TAC_OFFSET parameters for the different LBL-LBL combinations
-
-        var tac_offset_name = [
-          "TAC_01_02", "TAC_01_03", "TAC_01_04", "TAC_01_05", "TAC_01_06", "TAC_01_07", "TAC_01_08",
-          "TAC_02_03", "TAC_02_04", "TAC_02_05", "TAC_02_06", "TAC_02_07", "TAC_02_08",
-          "TAC_03_04", "TAC_03_05", "TAC_03_06", "TAC_03_07", "TAC_03_08",
-          "TAC_04_05", "TAC_04_06", "TAC_04_07", "TAC_04_08",
-          "TAC_05_06", "TAC_05_07", "TAC_05_08",
-          "TAC_06_07", "TAC_06_08",
-          "TAC_07_08",
-          "TAC_02_01"
-        ];
-
-        // Write the Cal file
-        CAL = '';
-
-        // The LBL energy calibration Coefficients
-        for(var i=0; i<dataStore.LBLgains.length; i++){
-          var thisName = "LBL" + alwaysThisLong(i+1,2) + "XN00X";
-          CAL += thisName+' { \n';
-          CAL += 'Name:	'+thisName+'\n';
-          CAL += 'Number:	'+i+'\n';
-          var thisCalibrationIndex = dataStore.Config.map(function(e) { return e.name; }).indexOf(thisName);
-          var thisAddress = dataStore.Config[thisCalibrationIndex].address;
-          CAL += 'Address:  0x'+thisAddress.toString(16).toLocaleString(undefined, {minimumIntegerDigits: 2})+'\n';
-          CAL += 'Digitizer:	GRF16\n';
-          CAL += 'EngCoeff:	'+0.0+' '+dataStore.LBLgains[i]+' '+0.0+'\n';
-          CAL += 'Integration:	0\n';
-          CAL += 'ENGChi2:	0\n';
-          CAL += 'FileInt:	0\n';
-          CAL += '}\n';
-          CAL += '\n';
-          CAL += '//====================================//\n';
+          // Trigger the download
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
         }
 
+        function buildScriptfile(){
+          console.log('Download initiated');
 
-        // LBT TAC Gain coefficients
-        for(var i=0; i<dataStore.tacGain.length; i++){
-          var thisName = "LBT" + alwaysThisLong(i+1,2) + "XT00X";
-          CAL += thisName+' { \n';
-          CAL += 'Name:	'+thisName+'\n';
-          CAL += 'Number:	'+i+'\n';
-          var thisCalibrationIndex = dataStore.Config.map(function(e) { return e.name; }).indexOf(thisName);
-          var thisAddress = dataStore.Config[thisCalibrationIndex].address;
-          CAL += 'Address:  0x'+thisAddress.toString(16).toLocaleString(undefined, {minimumIntegerDigits: 2})+'\n';
-          CAL += 'Digitizer:	GRF16\n';
-          CAL += 'EngCoeff:	'+0.0+' '+dataStore.tacGain[i]+' '+0.0+'\n';
-          CAL += 'Integration:	0\n';
-          CAL += 'ENGChi2:	0\n';
-          CAL += 'FileInt:	0\n';
-          CAL += '}\n';
-          CAL += '\n';
-          CAL += '//====================================//\n';
+          // Write the contents of the json script to a file for download.
+          var JSONstring = '';
+          JSONstring = JSON.stringify(dataStore.peakFitterScript, null, 4);
+
+          // Need to purge some spectrum specific peak entries if they match All.
+
+
+          // Create a download link
+          const textBlob = new Blob([JSONstring], {type: 'text/plain'});
+          URL.revokeObjectURL(window.textBlobURL);
+          const downloadLink = document.createElement('a');
+          downloadLink.href = URL.createObjectURL(textBlob);
+          downloadLink.download = 'GRIFFIN-peakFitter-script.json';
+
+          // Trigger the download
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
         }
 
-        // TAC_OFFSET parameters for the different LBL-LBL combinations
-        for(var i=0; i<dataStore.comboOffsets.length; i++){
-          CAL += "TAC_OFFSET"+' { \n';
-          CAL += 'Name:	'+tac_offset_name[i]+'\n';
-          CAL += 'EngCoeff:	'+dataStore.comboOffsets[i]+' '+tac_offset_name[i].split("_")[1]+' '+tac_offset_name[i].split("_")[2]+'\n';
-          CAL += '}\n';
-          CAL += '\n';
-          CAL += '//====================================//\n';
-        }
+        function buildCalfile(){
+          console.log('Download initiated');
 
-        // Create a download link
-        const textBlob = new Blob([CAL], {type: 'text/plain'});
-        URL.revokeObjectURL(window.textBlobURL);
-        const downloadLink = document.createElement('a');
-        downloadLink.href = URL.createObjectURL(textBlob);
-        downloadLink.download = document.getElementById('saveCalname').value;
+          // This cal file will contain:
+          // LBL energy calibration Coefficients
+          // LBT TAC Gain coefficients
+          // TAC_OFFSET parameters for the different LBL-LBL combinations
 
-        // Trigger the download
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-      }
+          var tac_offset_name = [
+            "TAC_01_02", "TAC_01_03", "TAC_01_04", "TAC_01_05", "TAC_01_06", "TAC_01_07", "TAC_01_08",
+            "TAC_02_03", "TAC_02_04", "TAC_02_05", "TAC_02_06", "TAC_02_07", "TAC_02_08",
+            "TAC_03_04", "TAC_03_05", "TAC_03_06", "TAC_03_07", "TAC_03_08",
+            "TAC_04_05", "TAC_04_06", "TAC_04_07", "TAC_04_08",
+            "TAC_05_06", "TAC_05_07", "TAC_05_08",
+            "TAC_06_07", "TAC_06_08",
+            "TAC_07_08",
+            "TAC_02_01"
+          ];
 
+          // Write the Cal file
+          CAL = '';
 
-      function updateAnalyzer(){
-
-        // For the ODB it first grabs the PSB table and then sets values only for the channels that are defined there.
-        // For the Analyzer we can get a similar list from the viewConfig command with the Histogram file as the argument.
-        // That should probably be done for the building of the initial spectrum list for gain-matching if Histogram mode is selected.
-        // Need to reformat the URLs generated here for the Analyzer
-
-        // bail out if there's no fit parameters yet
-        if(Object.keys(dataStore.fitResultsParameters).length == 0)
-        return;
-
-        var NumGe = 64;
-        var  gain =[], offset = [], quad = [];
-        var i, j=0, q, g, o, num=0, position, urls = [];
-        var crystals = ["B","G","R","W"];
-        var letter = ["A","B"];
-
-        //for every channel, update the three pileup arrays of parameters:
-        // Loop through all Ge crystals
-        for(var thisGeindex = 0; thisGeindex<NumGe; thisGeindex++){
-
-          // Start this url, a separate one for each crystal
-          urls[num]= dataStore.spectrumServer + '?cmd=setPileupCorrection';
-
-          // Create the channel name for this crystal
-          var cloverNum = Math.floor(thisGeindex/4)+1;
-          var GeName = "GRG" + alwaysThisLong(cloverNum, 2) + crystals[thisGeindex%4] + 'N00' + letter[0];
-          urls[num] += "&channelName0="+GeName;
-
-          // Add the k1 coefficients
-          urls[num] += "&pileupk10=";
-          for(var i=0; i<dataStore.fitResultsParameters[GeName]['k1'].length; i++){
-            if(i>0){ urls[num] += ",";  }
-            urls[num] += dataStore.fitResultsParameters[GeName]['k1'][i];
+          // The LBL energy calibration Coefficients
+          for(var i=0; i<dataStore.LBLgains.length; i++){
+            var thisName = "LBL" + alwaysThisLong(i+1,2) + "XN00X";
+            CAL += thisName+' { \n';
+            CAL += 'Name:	'+thisName+'\n';
+            CAL += 'Number:	'+i+'\n';
+            var thisCalibrationIndex = dataStore.Config.map(function(e) { return e.name; }).indexOf(thisName);
+            var thisAddress = dataStore.Config[thisCalibrationIndex].address;
+            CAL += 'Address:  0x'+thisAddress.toString(16).toLocaleString(undefined, {minimumIntegerDigits: 2})+'\n';
+            CAL += 'Digitizer:	GRF16\n';
+            CAL += 'EngCoeff:	'+0.0+' '+dataStore.LBLgains[i]+' '+0.0+'\n';
+            CAL += 'Integration:	0\n';
+            CAL += 'ENGChi2:	0\n';
+            CAL += 'FileInt:	0\n';
+            CAL += '}\n';
+            CAL += '\n';
+            CAL += '//====================================//\n';
           }
 
-          // Add the k2 coefficients
-          urls[num] += "&pileupk20=";
-          for(var i=0; i<dataStore.fitResultsParameters[GeName]['k2'].length; i++){
-            if(i>0){ urls[num] += ",";  }
-            urls[num] += dataStore.fitResultsParameters[GeName]['k2'][i];
+
+          // LBT TAC Gain coefficients
+          for(var i=0; i<dataStore.tacGain.length; i++){
+            var thisName = "LBT" + alwaysThisLong(i+1,2) + "XT00X";
+            CAL += thisName+' { \n';
+            CAL += 'Name:	'+thisName+'\n';
+            CAL += 'Number:	'+i+'\n';
+            var thisCalibrationIndex = dataStore.Config.map(function(e) { return e.name; }).indexOf(thisName);
+            var thisAddress = dataStore.Config[thisCalibrationIndex].address;
+            CAL += 'Address:  0x'+thisAddress.toString(16).toLocaleString(undefined, {minimumIntegerDigits: 2})+'\n';
+            CAL += 'Digitizer:	GRF16\n';
+            CAL += 'EngCoeff:	'+0.0+' '+dataStore.tacGain[i]+' '+0.0+'\n';
+            CAL += 'Integration:	0\n';
+            CAL += 'ENGChi2:	0\n';
+            CAL += 'FileInt:	0\n';
+            CAL += '}\n';
+            CAL += '\n';
+            CAL += '//====================================//\n';
           }
 
-          // Add the e1 offset coefficients
-          urls[num] += "&pileupE10=";
-          for(var i=0; i<dataStore.fitResultsParameters[GeName]['e1'].length; i++){
-            if(i>0){ urls[num] += ",";  }
-            urls[num] += dataStore.fitResultsParameters[GeName]['e1'][i];
+          // TAC_OFFSET parameters for the different LBL-LBL combinations
+          for(var i=0; i<dataStore.comboOffsets.length; i++){
+            CAL += "TAC_OFFSET"+' { \n';
+            CAL += 'Name:	'+tac_offset_name[i]+'\n';
+            CAL += 'EngCoeff:	'+dataStore.comboOffsets[i]+' '+tac_offset_name[i].split("_")[1]+' '+tac_offset_name[i].split("_")[2]+'\n';
+            CAL += '}\n';
+            CAL += '\n';
+            CAL += '//====================================//\n';
           }
 
-          num++; // move to next url, one for each crystal
-        } // end of Ge loop
+          // Create a download link
+          const textBlob = new Blob([CAL], {type: 'text/plain'});
+          URL.revokeObjectURL(window.textBlobURL);
+          const downloadLink = document.createElement('a');
+          downloadLink.href = URL.createObjectURL(textBlob);
+          downloadLink.download = document.getElementById('saveCalname').value;
 
-        //send requests
-        for(i=0; i<urls.length; i++){
-          XHR(urls[i],
-            'check ODB - response rejected. This will happen despite successful ODB write if this app is served from anywhere other than the same host and port as MIDAS (ie, as a custom page).',
-            function(){return 0},
-            function(error){console.log(error)}
-          )
+          // Trigger the download
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
         }
 
-        //get rid of the modal
-        document.getElementById('dismissAnalyzermodal').click();
-      }
 
+        function updateAnalyzer(){
 
-      ///////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////
-      /////  Drop-area handling
-      ///////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////
+          // For the ODB it first grabs the PSB table and then sets values only for the channels that are defined there.
+          // For the Analyzer we can get a similar list from the viewConfig command with the Histogram file as the argument.
+          // That should probably be done for the building of the initial spectrum list for gain-matching if Histogram mode is selected.
+          // Need to reformat the URLs generated here for the Analyzer
 
-      function setupDropArea(){
-        // Set up event listeners for the drop area
-        let dropArea = document.getElementById('drop-area');
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-          dropArea.addEventListener(eventName, preventDropDefaults, false)
-        });
-
-        ['dragenter', 'dragover'].forEach(eventName => {
-          dropArea.addEventListener(eventName, highlightDrop, false)
-        });
-
-        ['dragleave', 'drop'].forEach(eventName => {
-          dropArea.addEventListener(eventName, unhighlightDrop, false)
-        });
-
-        dropArea.addEventListener('drop', handleDrop, false)
-      }
-
-
-      function processDropFile(file){
-
-        // Set the title for the uploaded file
-        document.getElementById('dropAreaTitleDiv').innerHTML = "Uploaded: \""+file.name+"\"";
-
-        let fr = new FileReader();
-
-        fr.onload = function(){
-          console.log(fr.result);
-
-          // Check the format is good json
-
-          // Pass the script contents to the receive function
-          receiveScript(fr.result);
+          // bail out if there's no fit parameters yet
+          if(Object.keys(dataStore.fitResultsParameters).length == 0)
           return;
 
-          // Reformat the string for display with html
-          let string = fr.result.replace(/(?:\r\n|\r|\n)/g, '<br>');
+          var NumGe = 64;
+          var  gain =[], offset = [], quad = [];
+          var i, j=0, q, g, o, num=0, position, urls = [];
+          var crystals = ["B","G","R","W"];
+          var letter = ["A","B"];
 
-          // Display the whole contents in the Div
-          //document.getElementById('fileContentsDiv').innerHTML = string;
+          //for every channel, update the three pileup arrays of parameters:
+          // Loop through all Ge crystals
+          for(var thisGeindex = 0; thisGeindex<NumGe; thisGeindex++){
 
-          // Split the Cal file into the different entries
-          var arrStr = fr.result.split(/[{}]/);
+            // Start this url, a separate one for each crystal
+            urls[num]= dataStore.spectrumServer + '?cmd=setPileupCorrection';
 
-          // Remove any extra lines; comments etc
-          for(var i=0; i<arrStr.length; i++){
-            if(!arrStr[i].includes("Name")){
-              arrStr.splice(i, 1);
+            // Create the channel name for this crystal
+            var cloverNum = Math.floor(thisGeindex/4)+1;
+            var GeName = "GRG" + alwaysThisLong(cloverNum, 2) + crystals[thisGeindex%4] + 'N00' + letter[0];
+            urls[num] += "&channelName0="+GeName;
+
+            // Add the k1 coefficients
+            urls[num] += "&pileupk10=";
+            for(var i=0; i<dataStore.fitResultsParameters[GeName]['k1'].length; i++){
+              if(i>0){ urls[num] += ",";  }
+              urls[num] += dataStore.fitResultsParameters[GeName]['k1'][i];
             }
+
+            // Add the k2 coefficients
+            urls[num] += "&pileupk20=";
+            for(var i=0; i<dataStore.fitResultsParameters[GeName]['k2'].length; i++){
+              if(i>0){ urls[num] += ",";  }
+              urls[num] += dataStore.fitResultsParameters[GeName]['k2'][i];
+            }
+
+            // Add the e1 offset coefficients
+            urls[num] += "&pileupE10=";
+            for(var i=0; i<dataStore.fitResultsParameters[GeName]['e1'].length; i++){
+              if(i>0){ urls[num] += ",";  }
+              urls[num] += dataStore.fitResultsParameters[GeName]['e1'][i];
+            }
+
+            num++; // move to next url, one for each crystal
+          } // end of Ge loop
+
+          //send requests
+          for(i=0; i<urls.length; i++){
+            XHR(urls[i],
+              'check ODB - response rejected. This will happen despite successful ODB write if this app is served from anywhere other than the same host and port as MIDAS (ie, as a custom page).',
+              function(){return 0},
+              function(error){console.log(error)}
+            )
           }
-          //console.log(arrStr);
 
+          //get rid of the modal
+          document.getElementById('dismissAnalyzermodal').click();
         }
 
-        fr.readAsText(file);
-      }
 
-      function viewConfigOfHisto(histo){
+        ///////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////
+        /////  Drop-area handling
+        ///////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////
 
-        // Format check for the data file
-        HistoFileDirectory = dataStore.histoFileDirectoryPath;
-        if(HistoFileDirectory[HistoFileDirectory.length]!='/'){
-          HistoFileDirectory += '/';
+        function setupDropArea(){
+          // Set up event listeners for the drop area
+          let dropArea = document.getElementById('drop-area');
+          ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDropDefaults, false)
+          });
+
+          ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlightDrop, false)
+          });
+
+          ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, unhighlightDrop, false)
+          });
+
+          dropArea.addEventListener('drop', handleDrop, false)
         }
-        filename = HistoFileDirectory + histo;
 
-        // get the config file from the server/ODB for this histogram
-        url = dataStore.spectrumServer + '/?cmd=viewConfig' + '&filename=' + filename;
-        XHR(url, "Problem getting Config file for "+ filename +" from analyzer server", processConfigFileForCalibrations, function(error){ErrorConnectingToAnalyzerServer(error)});
 
-      }
+        function processDropFile(file){
 
-      function processConfigFileForCalibrations(payload){
+          // Set the title for the uploaded file
+          document.getElementById('dropAreaTitleDiv').innerHTML = "Uploaded: \""+file.name+"\"";
 
-        // Unpack the response from the server into a local variable
-        var thisConfig = JSON.parse(payload);
+          let fr = new FileReader();
 
-        var content = '';
+          fr.onload = function(){
+            console.log(fr.result);
 
-        // We only care about the Calbrations in this app
-        // Save the contents of the Config file for this Histogram file for this source
-        dataStore.Config = thisConfig.Analyzer[4].Calibrations;
+            // Check the format is good json
 
-      }
+            // Pass the script contents to the receive function
+            receiveScript(fr.result);
+            return;
+
+            // Reformat the string for display with html
+            let string = fr.result.replace(/(?:\r\n|\r|\n)/g, '<br>');
+
+            // Display the whole contents in the Div
+            //document.getElementById('fileContentsDiv').innerHTML = string;
+
+            // Split the Cal file into the different entries
+            var arrStr = fr.result.split(/[{}]/);
+
+            // Remove any extra lines; comments etc
+            for(var i=0; i<arrStr.length; i++){
+              if(!arrStr[i].includes("Name")){
+                arrStr.splice(i, 1);
+              }
+            }
+            //console.log(arrStr);
+
+          }
+
+          fr.readAsText(file);
+        }

@@ -14,7 +14,7 @@ function histofit(){
 
 	//Config
 	this.stepSize = 1;  //initial size of step to take along gradient towards minima
-	
+
 	///////////////////////////////////////////
 	/////member functions//////////////////////
 	///////////////////////////////////////////
@@ -104,8 +104,9 @@ function histofit(){
 		limit = 30; // Previously set to 1000 which sometimes took a long execution time. It seems like all fits already converge here by about 20 iterations.
 
 		//demand same length of this.x and this.y
-		while(this.x.length > this.y.length){ this.x.pop(); console.log("fitit pop x to "+this.x.length); }
-		while(this.y.length > this.x.length){ this.y.pop(); console.log("fitit pop y to "+this.y.length); }
+		if(this.y.length<1){ return; }
+		while(this.x.length > this.y.length && this.y.length>1){ this.x.pop(); console.log("fitit pop x to "+this.x.length); }
+		while(this.y.length > this.x.length && this.x.length>1){ this.y.pop(); console.log("fitit pop y to "+this.y.length); }
 		if(this.x.length != this.y.length){
 			console.log('length of input [x,'+this.x.length+'] and output [y,'+this.y.length+'] arrays must be equal; fit aborted.')
 			return;

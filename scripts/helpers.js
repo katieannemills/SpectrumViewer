@@ -555,6 +555,21 @@ function getConfigFileFromServer(){
   XHR(url, "Problem getting Config file from analyzer server", processConfigFile, function(error){ErrorConnectingToAnalyzerServer(error)});
 }
 
+function viewConfigOfHisto(histo){
+
+  // Format check for the data file
+  HistoFileDirectory = dataStore.histoFileDirectoryPath;
+  if(HistoFileDirectory[HistoFileDirectory.length]!='/'){
+    HistoFileDirectory += '/';
+  }
+  filename = HistoFileDirectory + histo;
+
+  // get the config file from the server/ODB for this histogram
+  url = dataStore.spectrumServer + '/?cmd=viewConfig' + '&filename=' + filename;
+  XHR(url, "Problem getting Config file for "+ filename +" from analyzer server", processConfigFileForRunDetails, function(error){ErrorConnectingToAnalyzerServer(error)});
+
+}
+
 function getMidasFileListFromServer(){
   // use a one-off XHR request with callback for getting the list of MIDAS files
   var directoryPath = dataStore.midasFileDataDirectoryPath;
@@ -709,6 +724,15 @@ function processConfigFile(payload){
   // Update content that involves the config file
   dispatcher({}, 'requestHistogramsRefresh');
   dispatcher({}, 'requestConfigCalibrationsRefresh');
+}
+
+function processConfigFileForCalibrations(payload){
+
+  // Unpack the response from the server into a local variable
+  var thisConfig = JSON.parse(payload);
+
+  // We only care about the Calbrations in this app
+  dataStore.Config = thisConfig.Analyzer[4].Calibrations;
 }
 
 function processMidasFileList(payload){
@@ -887,41 +911,43 @@ function processHistoFileList(payload){
   setupHistoListSelect();
 }
 
+/*
 function setupHistoListSelect(){
-  // Only proceed if this is needed.
-  if(!document.getElementById('histo-list-menu-div')){ return; }
+// Only proceed if this is needed.
+if(!document.getElementById('histo-list-menu-div')){ return; }
 
-  // Clear the previous contents
-  document.getElementById('histo-list-menu-div').innerHTML = 'Histogram file: ';
+// Clear the previous contents
+document.getElementById('histo-list-menu-div').innerHTML = 'Histogram file: ';
 
-  // Create a select input for the histo file list
-  var newSelect = document.createElement("select");
-  newSelect.id = 'HistoListSelect';
-  newSelect.name = 'HistoListSelect';
-  newSelect.onchange = function(){
-    dataStore.histoFileName = this.value;
-    GetSpectrumListFromServer(dataStore.spectrumServer,processSpectrumList);
-    console.log('Histogram selected is '+dataStore.histoFileName);
-  }.bind(newSelect);
+// Create a select input for the histo file list
+var newSelect = document.createElement("select");
+newSelect.id = 'HistoListSelect';
+newSelect.name = 'HistoListSelect';
+newSelect.onchange = function(){
+dataStore.histoFileName = this.value;
+GetSpectrumListFromServer(dataStore.spectrumServer,processSpectrumList);
+console.log('Histogram selected is '+dataStore.histoFileName);
+}.bind(newSelect);
 
-  document.getElementById('histo-list-menu-div').appendChild(newSelect);
+document.getElementById('histo-list-menu-div').appendChild(newSelect);
 
-  // Add the list of histo files as the options
-  thisSelect = document.getElementById('HistoListSelect');
-  thisSelect.add( new Option('Online', 'Online') );
-  for(var i=0; i<dataStore.histoFileList.length; i++){
-    thisSelect.add( new Option(dataStore.histoFileList[i], dataStore.histoFileList[i]) );
-  }
-
-  // if a Histogram file has been specified in the URL, make it the selected option
-  if(dataStore.histoFileName.length>0){
-    thisSelect.value = dataStore.histoFileName;
-  }
-
-  // Get the spectrum list for whatever is selected on startup
-  dataStore.histoFileName = document.getElementById('HistoListSelect').value;
-  GetSpectrumListFromServer(dataStore.spectrumServer,processSpectrumList);
+// Add the list of histo files as the options
+thisSelect = document.getElementById('HistoListSelect');
+thisSelect.add( new Option('Online', 'Online') );
+for(var i=0; i<dataStore.histoFileList.length; i++){
+thisSelect.add( new Option(dataStore.histoFileList[i], dataStore.histoFileList[i]) );
 }
+
+// if a Histogram file has been specified in the URL, make it the selected option
+if(dataStore.histoFileName.length>0){
+thisSelect.value = dataStore.histoFileName;
+}
+
+// Get the spectrum list for whatever is selected on startup
+dataStore.histoFileName = document.getElementById('HistoListSelect').value;
+GetSpectrumListFromServer(dataStore.spectrumServer,processSpectrumList);
+}
+*/
 
 function ErrorConnectingToAnalyzerServer(error){
   var string = 'Problem connecting to analyzer server: '+dataStore.spectrumServer+'<br>'+error;
@@ -1084,6 +1110,62 @@ function constructNewSpectrumMenu(){
   }
 }
 
+function setupHistoListSelect(){
+
+  // Remove the select if it already exists
+  try{
+    document.getElementById('HistoListSelect').remove();
+    document.getElementById('HistoListSelectLabel').remove();
+  }
+  catch(err){ }
+
+  for(var i=0; i<dataStore.histoChoiceBarContents.length; i++){
+    var thisTitle = dataStore.histoChoiceBarContents[i];
+    var rowIndex = Math.floor(i/2);
+
+    if(i%2==0){
+      // Inject the Container Div (a row) for this pair of selects.
+      var newDiv = document.createElement("div");
+      newDiv.id = 'histoChoiceDivRow'+rowIndex;
+      newDiv.class = 'col-md-12';
+      document.getElementById('histoChoiceDir').appendChild(newDiv);
+    }
+
+    // Inject the Div for this label and select
+    var newDiv = document.createElement("div");
+    newDiv.id = 'histoChoice'+thisTitle;
+    newDiv.class = 'col-md-4';
+    document.getElementById('histoChoiceDivRow'+rowIndex).appendChild(newDiv);
+
+
+    // Add the title text for the label
+    var newLabel = document.createElement("label");
+    newLabel.for = 'HistoListSelect'+thisTitle;
+    newLabel.id = 'HistoListSelectLabel'+thisTitle;
+    newLabel.innerHTML = thisTitle+' Histogram file: ';
+    document.getElementById('histoChoice'+thisTitle).appendChild(newLabel);
+
+    // Create a select input for the histo file list
+    var newSelect = document.createElement("select");
+    newSelect.id = 'HistoListSelect'+thisTitle;
+    newSelect.name = 'HistoListSelect'+thisTitle;
+    document.getElementById('histoChoice'+thisTitle).appendChild(newSelect);
+
+    // Add the list of histo files as the options
+    thisSelect = document.getElementById('HistoListSelect'+thisTitle);
+    if(thisTitle == "11Be" || thisTitle == "133Ba"){
+      thisSelect.add( new Option("Do not include "+thisTitle, "exclude") );
+    }
+    for(var j=0; j<dataStore.histoFileList.length; j++){
+      thisSelect.add( new Option(dataStore.histoFileList[j], dataStore.histoFileList[j]) );
+    }
+
+    // Fire the onchange event for the select with the default value to set it
+    //document.getElementById('HistoListSelect'+thisTitle).onchange();
+  }
+
+}
+
 //////////////////////////////////
 // App workflow generic functions
 //////////////////////////////////
@@ -1103,9 +1185,14 @@ function processConfigFileForRunDetails(payload){
     console.log("Problem getting Config information for file: "+dataStore.histoFileName+". Check filename and data directory.");
     document.getElementById('error-messages-for-drop-area').innerHTML = "Problem getting Config information for file: "+dataStore.histoFileName+". Check filename and data directory.";
   }else{
-  //  console.log(payload);
+    //  console.log(payload);
   }
   var thisConfig = JSON.parse(payload);
+
+// Ensure the object exists
+if(!dataStore.spectrumListHistoFileDetails){
+  dataStore.spectrumListHistoFileDetails = {};
+}
 
   // Unpack Midas content
   var keyName = dataStore.histoFileName.split(".")[0];
@@ -1115,6 +1202,8 @@ function processConfigFileForRunDetails(payload){
     'Duration': thisConfig.Analyzer[6].Midas[2].Value,
   };
 
+    // Save the Calbration data
+    dataStore.Config = thisConfig.Analyzer[4].Calibrations;
 }
 
 // Function to increment the progressBar by the stated amount
@@ -1844,166 +1933,225 @@ function packZcompressed(raw2,XaxisLength,YaxisLength,Zmax,symmeterize,generateC
   //    console.log(rowLength);
   //    console.log(nRows);
 
-// Unpack the matrix data as a list of 16x16 submatrices (faster transfer from server)
-// The values are given in the order of x0y0, x1y0, ..., x0y1, x1y1, ..., xmaxymax, but split into the 16x16 submatrices
-// Submatrix format is one of three:
-// ["empty"],
-// ["array", 0,1,2,3,4,5 ... 255 ],
-// ["list", 23,55, ... ],
-// these formats are as follows:
-// "empty" means all 256 bins are zero
-// "array" is just 256 values - contents (z value) of each x,y bin
-// "list" is list of bin-number[0-255], bin-content pairs
+  // Unpack the matrix data as a list of 16x16 submatrices (faster transfer from server)
+  // The values are given in the order of x0y0, x1y0, ..., x0y1, x1y1, ..., xmaxymax, but split into the 16x16 submatrices
+  // Submatrix format is one of three:
+  // ["empty"],
+  // ["array", 0,1,2,3,4,5 ... 255 ],
+  // ["list", 23,55, ... ],
+  // these formats are as follows:
+  // "empty" means all 256 bins are zero
+  // "array" is just 256 values - contents (z value) of each x,y bin
+  // "list" is list of bin-number[0-255], bin-content pairs
 
-// Create the whole matrix full of zeros. This then allows us to access any element directly
-repack2 = new Array(nRows);
-for (let i = 0; i < repack2.length; i++) {
-  repack2[i] = new Array(rowLength).fill(0); // Creating an array of size rowLength and filled of 0
-}
-
-// Create a full color map for this matrix. Building this now saves the time of accessing all elements again later.
-// First check if a color map exists for this matrix. If so, zero it. If not, create it.
-if(generateColorMap){
-  try{ objectIndex = dataStore.hm.colorMap.map(e => e.matrix).indexOf(dataStore.activeMatrix);
-    //  console.log('A colorMap exists for this matrix.');
+  // Create the whole matrix full of zeros. This then allows us to access any element directly
+  repack2 = new Array(nRows);
+  for (let i = 0; i < repack2.length; i++) {
+    repack2[i] = new Array(rowLength).fill(0); // Creating an array of size rowLength and filled of 0
   }
-  catch(err){ console.log('No colorMap for this matrix.'); objectIndex=-1; }
 
-  if(objectIndex<0){
-    // A colorMap for this matrix does not exist, so we need to create space for it
-    let name = dataStore.activeMatrix;
-    newMatrix = {
-      "matrix" : dataStore.activeMatrix,
-      "data" : []
+  // Create a full color map for this matrix. Building this now saves the time of accessing all elements again later.
+  // First check if a color map exists for this matrix. If so, zero it. If not, create it.
+  if(generateColorMap){
+    try{ objectIndex = dataStore.hm.colorMap.map(e => e.matrix).indexOf(dataStore.activeMatrix);
+      //  console.log('A colorMap exists for this matrix.');
     }
-    if(dataStore.hm.colorMap == undefined){ dataStore.hm.colorMap = []; }
-    dataStore.hm.colorMap.push(newMatrix);
-    objectIndex = dataStore.hm.colorMap.map(e => e.matrix).indexOf(dataStore.activeMatrix);
-  }else{
-    //  console.log('zero the color map and build it for this zoomed region');
-    dataStore.hm.colorMap[objectIndex].data = [];
+    catch(err){ console.log('No colorMap for this matrix.'); objectIndex=-1; }
+
+    if(objectIndex<0){
+      // A colorMap for this matrix does not exist, so we need to create space for it
+      let name = dataStore.activeMatrix;
+      newMatrix = {
+        "matrix" : dataStore.activeMatrix,
+        "data" : []
+      }
+      if(dataStore.hm.colorMap == undefined){ dataStore.hm.colorMap = []; }
+      dataStore.hm.colorMap.push(newMatrix);
+      objectIndex = dataStore.hm.colorMap.map(e => e.matrix).indexOf(dataStore.activeMatrix);
+    }else{
+      //  console.log('zero the color map and build it for this zoomed region');
+      dataStore.hm.colorMap[objectIndex].data = [];
+    }
   }
-}
 
-subMatrixIndexValue=-1;
-for(subMatrixIndex=0; subMatrixIndex<raw2.length; subMatrixIndex++){
-  // Step through the subMatrix arrays one at a time.
-  subMatrixIndexValue++;
+  subMatrixIndexValue=-1;
+  for(subMatrixIndex=0; subMatrixIndex<raw2.length; subMatrixIndex++){
+    // Step through the subMatrix arrays one at a time.
+    subMatrixIndexValue++;
 
-  // Calculate the subMatrix Coordinates
-  subMatrixX = (Math.floor(subMatrixIndexValue%Math.floor(rowLength/subMatrixXlength)));
-  subMatrixY = (Math.floor(subMatrixIndexValue/Math.floor(rowLength/subMatrixXlength)));
-  subMatrixXbaseCoordinate = subMatrixX*subMatrixXlength;
-  subMatrixYbaseCoordinate = subMatrixY*subMatrixYlength;
-  //	console.log('SubMatrix '+subMatrixIndex+', '+subMatrixIndexValue+' ['+subMatrixX+']['+subMatrixY+']');
+    // Calculate the subMatrix Coordinates
+    subMatrixX = (Math.floor(subMatrixIndexValue%Math.floor(rowLength/subMatrixXlength)));
+    subMatrixY = (Math.floor(subMatrixIndexValue/Math.floor(rowLength/subMatrixXlength)));
+    subMatrixXbaseCoordinate = subMatrixX*subMatrixXlength;
+    subMatrixYbaseCoordinate = subMatrixY*subMatrixYlength;
+    //	console.log('SubMatrix '+subMatrixIndex+', '+subMatrixIndexValue+' ['+subMatrixX+']['+subMatrixY+']');
 
-  if(Number.isInteger(raw2[subMatrixIndex][0])){
-    // Process the current 16*16=256 values. Add them to the local matrix and the heatmap
-    // the subMatrixType will be communicated as an integer value between 0 and 8 (1 byte)
-    // 0 = empty
-    // 1 = list type with 8-bit values
-    // 2 = list type with 16-bit values
-    // 3 = list type with 32-bit values
-    // 4 = list type with 64-bit values
-    // 5 = array type with 8-bit values
-    // 6 = array type with 16-bit values
-    // 7 = array type with 32-bit values
-    // 8 = array type with 64-bit values
-    subMatrixType = parseInt(raw2[subMatrixIndex][0]);
-    switch(subMatrixType) {
-      case 0: // empty
-      // empty type now indicates the number of sequential empty submatrices.
-      // Need to use this value to advance the base coordinates for the next submatrix
-      //  console.log('Empty type, advance '+(parseInt(raw2[subMatrixIndex][1]))+' submatrices');
-      subMatrixIndexValue += parseInt(raw2[subMatrixIndex][1])-1;
+    if(Number.isInteger(raw2[subMatrixIndex][0])){
+      // Process the current 16*16=256 values. Add them to the local matrix and the heatmap
+      // the subMatrixType will be communicated as an integer value between 0 and 8 (1 byte)
+      // 0 = empty
+      // 1 = list type with 8-bit values
+      // 2 = list type with 16-bit values
+      // 3 = list type with 32-bit values
+      // 4 = list type with 64-bit values
+      // 5 = array type with 8-bit values
+      // 6 = array type with 16-bit values
+      // 7 = array type with 32-bit values
+      // 8 = array type with 64-bit values
+      subMatrixType = parseInt(raw2[subMatrixIndex][0]);
+      switch(subMatrixType) {
+        case 0: // empty
+        // empty type now indicates the number of sequential empty submatrices.
+        // Need to use this value to advance the base coordinates for the next submatrix
+        //  console.log('Empty type, advance '+(parseInt(raw2[subMatrixIndex][1]))+' submatrices');
+        subMatrixIndexValue += parseInt(raw2[subMatrixIndex][1])-1;
 
-      // empty format, nothing more to be done
-      break;
-      case 5: // array with 6-bit values
-      case 6: // array with 12-bit values
-      case 7: // array with 18-bit values
-      case 8: // array with 24-bit values
-      // array format
-      // 256 z values are given in order.
-      // The values are given in the order of x0y0, x1y0, ..., x0y1, x1y1, ..., xmaxymax
-      //  console.log(raw2[subMatrixIndex]);
-      // type = raw2[subMatrixIndex].shift();
+        // empty format, nothing more to be done
+        break;
+        case 5: // array with 6-bit values
+        case 6: // array with 12-bit values
+        case 7: // array with 18-bit values
+        case 8: // array with 24-bit values
+        // array format
+        // 256 z values are given in order.
+        // The values are given in the order of x0y0, x1y0, ..., x0y1, x1y1, ..., xmaxymax
+        //  console.log(raw2[subMatrixIndex]);
+        // type = raw2[subMatrixIndex].shift();
 
-      thisArrayString = raw2[subMatrixIndex][1];
-      thisArrayValueSize = Math.floor((thisArrayString.length)/256);
-      thisIndex = 0;
+        thisArrayString = raw2[subMatrixIndex][1];
+        thisArrayValueSize = Math.floor((thisArrayString.length)/256);
+        thisIndex = 0;
 
-      for(i=0; i<subMatrixYlength; i++){
-        for(j=1; j<=subMatrixXlength; j++){ // j=0 entry is the subMatrix type
-          thisXindex = subMatrixXbaseCoordinate+j;
-          thisYindex = subMatrixYbaseCoordinate+i;
-          thisValueString = thisArrayString.substr(thisIndex,thisArrayValueSize);
-          thisValue = 0;
+        for(i=0; i<subMatrixYlength; i++){
+          for(j=1; j<=subMatrixXlength; j++){ // j=0 entry is the subMatrix type
+            thisXindex = subMatrixXbaseCoordinate+j;
+            thisYindex = subMatrixYbaseCoordinate+i;
+            thisValueString = thisArrayString.substr(thisIndex,thisArrayValueSize);
+            thisValue = 0;
 
-          thisShift=0;
-          for(x=thisValueString.length-1; x>=0; x--){
-            thisByte = thisValueString[x].charCodeAt();
-            if(thisByte == 60){ thisByte = 92; }
-            thisByte -= 64;
-            thisValue = thisValue | (thisByte << (thisShift * 6));
-            thisShift++;
+            thisShift=0;
+            for(x=thisValueString.length-1; x>=0; x--){
+              thisByte = thisValueString[x].charCodeAt();
+              if(thisByte == 60){ thisByte = 92; }
+              thisByte -= 64;
+              thisValue = thisValue | (thisByte << (thisShift * 6));
+              thisShift++;
+            }
+            repack2[thisYindex][thisXindex] = thisValue;
+            if(symmeterize){ repack2[thisXindex][thisYindex] = thisValue; }
+            if(thisValue>matrixMaxValue){ matrixMaxValue = thisValue; } // Update the max Z value
+            if(generateColorMap){
+              dataStore.hm.addPointToColorMap(objectIndex,thisYindex,thisXindex,thisValue); // Add this point to the color Map
+              if(symmeterize){ dataStore.hm.addPointToColorMap(objectIndex,thisXindex,thisYindex,thisValue); }
+            }
+            thisIndex += thisArrayValueSize;
           }
-          repack2[thisYindex][thisXindex] = thisValue;
-          if(symmeterize){ repack2[thisXindex][thisYindex] = thisValue; }
-          if(thisValue>matrixMaxValue){ matrixMaxValue = thisValue; } // Update the max Z value
-          if(generateColorMap){
-            dataStore.hm.addPointToColorMap(objectIndex,thisYindex,thisXindex,thisValue); // Add this point to the color Map
-            if(symmeterize){ dataStore.hm.addPointToColorMap(objectIndex,thisXindex,thisYindex,thisValue); }
-          }
-          thisIndex += thisArrayValueSize;
         }
-      }
 
-      break;
-      case 1: // list with 8-bit values
-      case 2: // list with 16-bit values
-      case 3: // list with 32-bit values
-      case 4: // list with 64-bit values
-      // list format
-      // The values are in pairs of [bin number within this submatrix, 0-255], then [z value]
-      // console.log(raw2[subMatrixIndex]);
-      // type = raw2[subMatrixIndex].shift();
-      thisIndex=-1;
-      for(i=1; i<9; i+=2){ // Loop through the four sets of coord+value strings per subMatrix. i=0 entry is the subMatrix type
-        ++thisIndex;
-        thisCoordString = raw2[subMatrixIndex][i+0];
-        thisArrayString = raw2[subMatrixIndex][i+1];
-        //  console.log(thisCoordString+', '+thisArrayString);
-        if(thisCoordString.length==0){ continue; }
-        thisValueSize = Math.floor((thisArrayString.length)/(thisCoordString.length));
-        /*
-        console.log(thisCoordString);
-        console.log(thisArrayString);
-        console.log(thisCoordString.length);
-        console.log(thisArrayString.length);
-        */
-        //  console.log('subMatrixType'+subMatrixType+' size '+thisValueSize+' for i='+i+', index='+thisIndex);
+        break;
+        case 1: // list with 8-bit values
+        case 2: // list with 16-bit values
+        case 3: // list with 32-bit values
+        case 4: // list with 64-bit values
+        // list format
+        // The values are in pairs of [bin number within this submatrix, 0-255], then [z value]
+        // console.log(raw2[subMatrixIndex]);
+        // type = raw2[subMatrixIndex].shift();
+        thisIndex=-1;
+        for(i=1; i<9; i+=2){ // Loop through the four sets of coord+value strings per subMatrix. i=0 entry is the subMatrix type
+          ++thisIndex;
+          thisCoordString = raw2[subMatrixIndex][i+0];
+          thisArrayString = raw2[subMatrixIndex][i+1];
+          //  console.log(thisCoordString+', '+thisArrayString);
+          if(thisCoordString.length==0){ continue; }
+          thisValueSize = Math.floor((thisArrayString.length)/(thisCoordString.length));
+          /*
+          console.log(thisCoordString);
+          console.log(thisArrayString);
+          console.log(thisCoordString.length);
+          console.log(thisArrayString.length);
+          */
+          //  console.log('subMatrixType'+subMatrixType+' size '+thisValueSize+' for i='+i+', index='+thisIndex);
 
-        for(j=0; j<thisCoordString.length; j++){
-          thisByte = thisCoordString[j].charCodeAt();
-          if(thisByte == 60){ thisByte = 92; }
-          thisByte -= 64;
-          thisXindex = subMatrixXbaseCoordinate+Math.floor((thisByte+(thisIndex*64))%subMatrixXlength);
-          thisYindex = subMatrixYbaseCoordinate+Math.floor((thisByte+(thisIndex*64))/subMatrixXlength);
-          //  console.log(subMatrixXbaseCoordinate+','+subMatrixYbaseCoordinate);
-          //  console.log(Math.floor((thisByte+(thisIndex*64))%subMatrixXlength));
-          //  console.log(Math.floor((thisByte+(thisIndex*64))/subMatrixXlength));
-
-          thisValueString = thisArrayString.substr(j*thisValueSize,thisValueSize);
-          thisValue = 0;
-          thisShift=0;
-          for(x=thisValueString.length-1; x>=0; x--){
-            thisByte = thisValueString[x].charCodeAt();
+          for(j=0; j<thisCoordString.length; j++){
+            thisByte = thisCoordString[j].charCodeAt();
             if(thisByte == 60){ thisByte = 92; }
             thisByte -= 64;
-            thisValue = thisValue | (thisByte << (thisShift * 6));
-            thisShift++;
+            thisXindex = subMatrixXbaseCoordinate+Math.floor((thisByte+(thisIndex*64))%subMatrixXlength);
+            thisYindex = subMatrixYbaseCoordinate+Math.floor((thisByte+(thisIndex*64))/subMatrixXlength);
+            //  console.log(subMatrixXbaseCoordinate+','+subMatrixYbaseCoordinate);
+            //  console.log(Math.floor((thisByte+(thisIndex*64))%subMatrixXlength));
+            //  console.log(Math.floor((thisByte+(thisIndex*64))/subMatrixXlength));
+
+            thisValueString = thisArrayString.substr(j*thisValueSize,thisValueSize);
+            thisValue = 0;
+            thisShift=0;
+            for(x=thisValueString.length-1; x>=0; x--){
+              thisByte = thisValueString[x].charCodeAt();
+              if(thisByte == 60){ thisByte = 92; }
+              thisByte -= 64;
+              thisValue = thisValue | (thisByte << (thisShift * 6));
+              thisShift++;
+            }
+
+            repack2[thisYindex][thisXindex] = thisValue;
+            if(symmeterize){ repack2[thisXindex][thisYindex] = thisValue; }
+            if(thisValue>matrixMaxValue){ matrixMaxValue = thisValue; } // Update the max Z value
+            if(generateColorMap){
+              dataStore.hm.addPointToColorMap(objectIndex,thisYindex,thisXindex,thisValue); // Add this point to the color Map
+              if(symmeterize){ dataStore.hm.addPointToColorMap(objectIndex,thisXindex,thisYindex,thisValue);
+              }
+            }
           }
+        }
+        break;
+        default:
+        // code block
+        // Unrecognized format
+        console.log('Unrecognized integer format!!!');
+        console.log(raw2[subMatrixIndex]);
+      } // end of switch
+    }else{
+
+      // Process the current 16*16=256 values. Add them to the local matrix and the heatmap
+      switch(raw2[subMatrixIndex][0]) {
+        case 'empty':
+        // empty format, nothing to be done
+        break;
+        case 'array':
+        // array format
+        // 256 z values are given in order.
+        // The values are given in the order of x0y0, x1y0, ..., x0y1, x1y1, ..., xmaxymax
+        //  console.log(raw2[subMatrixIndex]);
+        // type = raw2[subMatrixIndex].shift();
+
+        for(i=0; i<subMatrixYlength; i++){
+          for(j=1; j<=subMatrixXlength; j++){ // j=0 entry is the subMatrix type
+            thisXindex = subMatrixXbaseCoordinate+j;
+            thisYindex = subMatrixYbaseCoordinate+i;
+            thisValue = raw2[subMatrixIndex][i*subMatrixXlength+j];
+
+            repack2[thisYindex][thisXindex] = thisValue;
+            if(symmeterize){ repack2[thisXindex][thisYindex] = thisValue; }
+            if(thisValue>matrixMaxValue){ matrixMaxValue = thisValue; } // Update the max Z value
+            if(generateColorMap){
+              dataStore.hm.addPointToColorMap(objectIndex,thisYindex,thisXindex,thisValue); // Add this point to the color Map
+              if(symmeterize){ dataStore.hm.addPointToColorMap(objectIndex,thisXindex,thisYindex,thisValue);
+              }
+            }
+          }
+        }
+
+        break;
+        case 'list':
+        // list format
+        // The values are in pairs of [bin number within this submatrix, 0-255], then [z value]
+        //  console.log(raw2[subMatrixIndex]);
+        // type = raw2[subMatrixIndex].shift();
+        for(j=1; j<raw2[subMatrixIndex].length; j+=2){ // j=0 entry is the subMatrix type
+          thisXindex = subMatrixXbaseCoordinate+Math.floor(raw2[subMatrixIndex][j]%subMatrixXlength);
+          thisYindex = subMatrixYbaseCoordinate+Math.floor(raw2[subMatrixIndex][j]/subMatrixXlength);
+          thisValue = raw2[subMatrixIndex][j+1];
 
           repack2[thisYindex][thisXindex] = thisValue;
           if(symmeterize){ repack2[thisXindex][thisYindex] = thisValue; }
@@ -2014,82 +2162,23 @@ for(subMatrixIndex=0; subMatrixIndex<raw2.length; subMatrixIndex++){
             }
           }
         }
-      }
-      break;
-      default:
-      // code block
-      // Unrecognized format
-      console.log('Unrecognized integer format!!!');
-      console.log(raw2[subMatrixIndex]);
-    } // end of switch
-  }else{
+        break;
+        default:
+        // code block
+        // Unrecognized format
+        console.log('Unrecognized format!!!');
+        console.log(raw2[subMatrixIndex]);
+      } // end of switch
+    } // end of if else of isInteger(submatrix type)
+  } // end of submatrices for loop
+  //  console.log('Finshed unpacking');
+  //  console.log(repack);
+  //  console.log(repack2);
 
-    // Process the current 16*16=256 values. Add them to the local matrix and the heatmap
-    switch(raw2[subMatrixIndex][0]) {
-      case 'empty':
-      // empty format, nothing to be done
-      break;
-      case 'array':
-      // array format
-      // 256 z values are given in order.
-      // The values are given in the order of x0y0, x1y0, ..., x0y1, x1y1, ..., xmaxymax
-      //  console.log(raw2[subMatrixIndex]);
-      // type = raw2[subMatrixIndex].shift();
-
-      for(i=0; i<subMatrixYlength; i++){
-        for(j=1; j<=subMatrixXlength; j++){ // j=0 entry is the subMatrix type
-          thisXindex = subMatrixXbaseCoordinate+j;
-          thisYindex = subMatrixYbaseCoordinate+i;
-          thisValue = raw2[subMatrixIndex][i*subMatrixXlength+j];
-
-          repack2[thisYindex][thisXindex] = thisValue;
-          if(symmeterize){ repack2[thisXindex][thisYindex] = thisValue; }
-          if(thisValue>matrixMaxValue){ matrixMaxValue = thisValue; } // Update the max Z value
-          if(generateColorMap){
-            dataStore.hm.addPointToColorMap(objectIndex,thisYindex,thisXindex,thisValue); // Add this point to the color Map
-            if(symmeterize){ dataStore.hm.addPointToColorMap(objectIndex,thisXindex,thisYindex,thisValue);
-            }
-          }
-        }
-      }
-
-      break;
-      case 'list':
-      // list format
-      // The values are in pairs of [bin number within this submatrix, 0-255], then [z value]
-      //  console.log(raw2[subMatrixIndex]);
-      // type = raw2[subMatrixIndex].shift();
-      for(j=1; j<raw2[subMatrixIndex].length; j+=2){ // j=0 entry is the subMatrix type
-        thisXindex = subMatrixXbaseCoordinate+Math.floor(raw2[subMatrixIndex][j]%subMatrixXlength);
-        thisYindex = subMatrixYbaseCoordinate+Math.floor(raw2[subMatrixIndex][j]/subMatrixXlength);
-        thisValue = raw2[subMatrixIndex][j+1];
-
-        repack2[thisYindex][thisXindex] = thisValue;
-        if(symmeterize){ repack2[thisXindex][thisYindex] = thisValue; }
-        if(thisValue>matrixMaxValue){ matrixMaxValue = thisValue; } // Update the max Z value
-        if(generateColorMap){
-          dataStore.hm.addPointToColorMap(objectIndex,thisYindex,thisXindex,thisValue); // Add this point to the color Map
-          if(symmeterize){ dataStore.hm.addPointToColorMap(objectIndex,thisXindex,thisYindex,thisValue);
-          }
-        }
-      }
-      break;
-      default:
-      // code block
-      // Unrecognized format
-      console.log('Unrecognized format!!!');
-      console.log(raw2[subMatrixIndex]);
-    } // end of switch
-  } // end of if else of isInteger(submatrix type)
-} // end of submatrices for loop
-//  console.log('Finshed unpacking');
-//  console.log(repack);
-//  console.log(repack2);
-
-// Remove channel zero noise and junk
-/*
-for(i=0; i<nRows; i++){
-repack2[i][0] = 0;
+  // Remove channel zero noise and junk
+  /*
+  for(i=0; i<nRows; i++){
+  repack2[i][0] = 0;
 }
 for(i=0; i<rowLength-1; i++){
 repack2[0][i] = 0;

@@ -37,6 +37,10 @@ function setupDataStore(){
   dataStore.histoFileDirectoryPath = '/Users/garns/Work/Data';
   dataStore.histoFileName = '';
   dataStore.histoAutoLoad = false;        // Flag set by the presence of a directory and filename in the URL to automatically load it. Default is off.
+  dataStore.Config = {};                  // Place to store the Calibrations from the config file. Used for building Cal files etc.
+
+  // histoChoiceBar
+  dataStore.histoChoiceBarContents = ['152Eu'];  // Array defining the contents of the histoChoiceBar user input. Used in setupHistoListSelect()
 
   // Get the analyzer Server and ODB host names from the URL
   GetURLArguments();
@@ -114,675 +118,339 @@ function setupDataStore(){
   dataStore.peakFitterScript = {};
   dataStore.peakFitterScriptTemplate = {};
 
-  // pileup Corrections for k-dependence of 1st Hit, Ge01 only.
-  dataStore.peakFitterScriptTemplate["PUE1k"] = {
-    "histogramFileNames" : ["run29578_nocorrections.tar"],
-    "spectrumList1d" : ["Ge_Sum_Energy","single_hit"],
+  // pileup Corrections for k1, k2 and 1st-Hit energy dependence.
+  dataStore.peakFitterScriptTemplate["PU-combined"] = {
+    "histogramFileNames" : [],
+    "spectrumList1d" : [
+      "GRG01BN00A_Energy","GRG01GN00A_Energy","GRG01RN00A_Energy","GRG01WN00A_Energy",
+      "GRG02BN00A_Energy","GRG02GN00A_Energy","GRG02RN00A_Energy","GRG02WN00A_Energy",
+      "GRG03BN00A_Energy","GRG03GN00A_Energy","GRG03RN00A_Energy","GRG03WN00A_Energy",
+      "GRG04BN00A_Energy","GRG04GN00A_Energy","GRG04RN00A_Energy","GRG04WN00A_Energy",
+      "GRG05BN00A_Energy","GRG05GN00A_Energy","GRG05RN00A_Energy","GRG05WN00A_Energy",
+      "GRG06BN00A_Energy","GRG06GN00A_Energy","GRG06RN00A_Energy","GRG06WN00A_Energy",
+      "GRG07BN00A_Energy","GRG07GN00A_Energy","GRG07RN00A_Energy","GRG07WN00A_Energy",
+      "GRG08BN00A_Energy","GRG08GN00A_Energy","GRG08RN00A_Energy","GRG08WN00A_Energy",
+      "GRG09BN00A_Energy","GRG09GN00A_Energy","GRG09RN00A_Energy","GRG09WN00A_Energy",
+      "GRG10BN00A_Energy","GRG10GN00A_Energy","GRG10RN00A_Energy","GRG10WN00A_Energy",
+      "GRG11BN00A_Energy","GRG11GN00A_Energy","GRG11RN00A_Energy","GRG11WN00A_Energy",
+      "GRG12BN00A_Energy","GRG12GN00A_Energy","GRG12RN00A_Energy","GRG12WN00A_Energy",
+      "GRG13BN00A_Energy","GRG13GN00A_Energy","GRG13RN00A_Energy","GRG13WN00A_Energy",
+      "GRG14BN00A_Energy","GRG14GN00A_Energy","GRG14RN00A_Energy","GRG14WN00A_Energy",
+      "GRG15BN00A_Energy","GRG15GN00A_Energy","GRG15RN00A_Energy","GRG15WN00A_Energy",
+      "GRG16BN00A_Energy","GRG16GN00A_Energy","GRG16RN00A_Energy","GRG16WN00A_Energy"
+    ],
     "spectrumList1dPeaks" : {
-      "All": [1332]
+      "All": [121,1408]
     },
     "spectrumList2d" : [
-      "Ge1_E_vs_k_1st_of_2hit"
+      "Ge00_E_vs_k_1st_of_2hit",
+      "Ge01_E_vs_k_1st_of_2hit",
+      "Ge02_E_vs_k_1st_of_2hit",
+      "Ge03_E_vs_k_1st_of_2hit",
+      "Ge04_E_vs_k_1st_of_2hit",
+      "Ge05_E_vs_k_1st_of_2hit",
+      "Ge06_E_vs_k_1st_of_2hit",
+      "Ge07_E_vs_k_1st_of_2hit",
+      "Ge08_E_vs_k_1st_of_2hit",
+      "Ge09_E_vs_k_1st_of_2hit",
+      "Ge10_E_vs_k_1st_of_2hit",
+      "Ge11_E_vs_k_1st_of_2hit",
+      "Ge12_E_vs_k_1st_of_2hit",
+      "Ge13_E_vs_k_1st_of_2hit",
+      "Ge14_E_vs_k_1st_of_2hit",
+      "Ge15_E_vs_k_1st_of_2hit",
+      "Ge16_E_vs_k_1st_of_2hit",
+      "Ge17_E_vs_k_1st_of_2hit",
+      "Ge18_E_vs_k_1st_of_2hit",
+      "Ge19_E_vs_k_1st_of_2hit",
+      "Ge20_E_vs_k_1st_of_2hit",
+      "Ge21_E_vs_k_1st_of_2hit",
+      "Ge22_E_vs_k_1st_of_2hit",
+      "Ge23_E_vs_k_1st_of_2hit",
+      "Ge24_E_vs_k_1st_of_2hit",
+      "Ge25_E_vs_k_1st_of_2hit",
+      "Ge26_E_vs_k_1st_of_2hit",
+      "Ge27_E_vs_k_1st_of_2hit",
+      "Ge28_E_vs_k_1st_of_2hit",
+      "Ge29_E_vs_k_1st_of_2hit",
+      "Ge30_E_vs_k_1st_of_2hit",
+      "Ge31_E_vs_k_1st_of_2hit",
+      "Ge32_E_vs_k_1st_of_2hit",
+      "Ge33_E_vs_k_1st_of_2hit",
+      "Ge34_E_vs_k_1st_of_2hit",
+      "Ge35_E_vs_k_1st_of_2hit",
+      "Ge36_E_vs_k_1st_of_2hit",
+      "Ge37_E_vs_k_1st_of_2hit",
+      "Ge38_E_vs_k_1st_of_2hit",
+      "Ge39_E_vs_k_1st_of_2hit",
+      "Ge40_E_vs_k_1st_of_2hit",
+      "Ge41_E_vs_k_1st_of_2hit",
+      "Ge42_E_vs_k_1st_of_2hit",
+      "Ge43_E_vs_k_1st_of_2hit",
+      "Ge44_E_vs_k_1st_of_2hit",
+      "Ge45_E_vs_k_1st_of_2hit",
+      "Ge46_E_vs_k_1st_of_2hit",
+      "Ge47_E_vs_k_1st_of_2hit",
+      "Ge48_E_vs_k_1st_of_2hit",
+      "Ge49_E_vs_k_1st_of_2hit",
+      "Ge50_E_vs_k_1st_of_2hit",
+      "Ge51_E_vs_k_1st_of_2hit",
+      "Ge52_E_vs_k_1st_of_2hit",
+      "Ge53_E_vs_k_1st_of_2hit",
+      "Ge54_E_vs_k_1st_of_2hit",
+      "Ge55_E_vs_k_1st_of_2hit",
+      "Ge56_E_vs_k_1st_of_2hit",
+      "Ge57_E_vs_k_1st_of_2hit",
+      "Ge58_E_vs_k_1st_of_2hit",
+      "Ge59_E_vs_k_1st_of_2hit",
+      "Ge60_E_vs_k_1st_of_2hit",
+      "Ge61_E_vs_k_1st_of_2hit",
+      "Ge62_E_vs_k_1st_of_2hit",
+      "Ge63_E_vs_k_1st_of_2hit",
+      "Ge00_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge01_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge02_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge03_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge04_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge05_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge06_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge07_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge08_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge09_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge00_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge01_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge02_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge03_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge04_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge05_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge06_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge07_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge08_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge09_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge10_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge11_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge12_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge13_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge14_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge15_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge16_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge17_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge18_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge19_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge20_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge21_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge22_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge23_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge24_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge25_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge26_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge27_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge28_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge29_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge30_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge31_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge32_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge33_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge34_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge35_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge36_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge37_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge38_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge39_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge40_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge41_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge42_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge43_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge44_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge45_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge46_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge47_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge48_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge49_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge50_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge51_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge52_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge53_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge54_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge55_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge56_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge57_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge58_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge59_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge60_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge61_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge62_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge63_PU2_E2_vs_k2_E1gated_on_Xrays",
+      "Ge10_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge11_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge12_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge13_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge14_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge15_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge16_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge17_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge18_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge19_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge20_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge21_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge22_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge23_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge24_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge25_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge26_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge27_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge28_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge29_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge30_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge31_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge32_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge33_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge34_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge35_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge36_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge37_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge38_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge39_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge40_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge41_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge42_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge43_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge44_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge45_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge46_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge47_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge48_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge49_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge50_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge51_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge52_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge53_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge54_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge55_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge56_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge57_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge58_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge59_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge60_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge61_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge62_PU2_E2_vs_k2_E1gated_on_1408keV",
+      "Ge63_PU2_E2_vs_k2_E1gated_on_1408keV"
     ],
-    "spectrumListGates" : [["x",0,10],
-    ["x",20,30],
-    ["x",40,50],
-    ["x",60,70],
-    ["x",80,90],
-    ["x",100,110],
-    ["x",120,130],
-    ["x",140,150],
-    ["x",160,170],
-    ["x",180,190],
-    ["x",200,210],
-    ["x",220,230],
-    ["x",240,250],
-    ["x",260,270],
-    ["x",280,290],
-    ["x",300,310],
-    ["x",320,330],
-    ["x",340,350],
-    ["x",360,370]
-  ],
-  "spectrumListProjectionsPeaks" : {
-    "All":[],
-    "x-360-370":[1332],
-    "x-340-350":[1332],
-    "x-320-330":[1332],
-    "x-300-310":[1332],
-    "x-280-290":[1332],
-    "x-260-270":[1332],
-    "x-240-250":[1332],
-    "x-220-230":[1332],
-    "x-200-210":[1332],
-    "x-180-190":[1332],
-    "x-160-170":[1332],
-    "x-140-150":[1322],
-    "x-120-130":[1322],
-    "x-100-110":[1322],
-    "x-80-90":[1316],
-    "x-60-70":[1315],
-    "x-40-50":[1315],
-    "x-20-30":[1305],
-    "x-0-10":[1300]
-  }
-};
-// pileup Corrections for k-dependence of 1st Hit, Ge01 only.
-dataStore.peakFitterScriptTemplate["PUE1k-152Eu"] = {
-  "histogramFileNames" : ["run29709-no-corrections.tar"],
-  "spectrumList1d" : [
-    "GRG01BN00A_Energy","GRG01GN00A_Energy","GRG01RN00A_Energy","GRG01WN00A_Energy",
-    "GRG02BN00A_Energy","GRG02GN00A_Energy","GRG02RN00A_Energy","GRG02WN00A_Energy"
-  ],
-  "spectrumList1dPeaks" : {
-    //"All": [1408]
-    "All": [121]
-  },
-  "spectrumList2d" : [
-    "Ge00_E_vs_k_1st_of_2hit",
-    "Ge01_E_vs_k_1st_of_2hit",
-    "Ge02_E_vs_k_1st_of_2hit",
-    "Ge03_E_vs_k_1st_of_2hit",
-    "Ge04_E_vs_k_1st_of_2hit",
-    "Ge05_E_vs_k_1st_of_2hit",
-    "Ge06_E_vs_k_1st_of_2hit",
-    "Ge07_E_vs_k_1st_of_2hit"
-  ],
-  "spectrumListGates" : [["x",0,10],
-  ["x",20,30],
-  ["x",40,50],
-  ["x",60,70],
-  ["x",80,90],
-  ["x",100,110],
-  ["x",120,130],
-  ["x",140,150],
-  ["x",160,170],
-  ["x",180,190],
-  ["x",200,210],
-  ["x",220,230],
-  ["x",240,250],
-  ["x",260,270],
-  ["x",280,290],
-  ["x",300,310],
-  ["x",320,330],
-  ["x",340,350],
-  ["x",360,370]
-],
-"spectrumListProjectionsPeaks" : {
-  //  "All":[1395]
-  "All":[126]
-}
-};
+    "spectrumListGates" : [
+      ["x",0,10],
+      ["x",20,30],
+      ["x",40,50],
+      ["x",60,70],
+      ["x",80,90],
+      ["x",100,110],
+      ["x",120,130],
+      ["x",140,150],
+      ["x",160,170],
+      ["x",180,190],
+      ["x",200,210],
+      ["x",220,230],
+      ["x",240,250],
+      ["x",260,270],
+      ["x",280,290],
+      ["x",300,310],
+      ["x",320,330],
+      ["x",340,350],
+      ["x",360,370]
+    ],
+    "spectrumListProjectionsPeaks" : {
+      "All":[1408],
+      "Ge00_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge01_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge02_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge03_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge04_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge05_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge06_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge07_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge08_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge09_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge10_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge11_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge12_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge13_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge14_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge15_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge16_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge17_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge18_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge19_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge20_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge21_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge22_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge23_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge24_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge25_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge26_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge27_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge28_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge29_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge30_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge31_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge32_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge33_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge34_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge35_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge36_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge37_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge38_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge39_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge40_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge41_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge42_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge43_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge44_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge45_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge46_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge47_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge48_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge49_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge50_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge51_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge52_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge53_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge54_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge55_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge56_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge57_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge58_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge59_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge60_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge61_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge62_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
+      "Ge63_PU2_E2_vs_k2_E1gated_on_1408keV":[136]
+    }
+  };
 
-// pileup Corrections for k-dependence of 2nd Hit, Ge01 only.
-dataStore.peakFitterScriptTemplate["PUE2k-152Eu"] = {
-  //"histogramFileNames" : ["run29709-k1-only-new2d.tar"],
-  "histogramFileNames" : ["run29709-no-corrections.tar"],
-  "spectrumList1d" : ["GRG01BN00A_Energy","GRG01GN00A_Energy","GRG01RN00A_Energy","GRG01WN00A_Energy",
-  "GRG02BN00A_Energy","GRG02GN00A_Energy","GRG02RN00A_Energy","GRG02WN00A_Energy"
-],
-"spectrumList1dPeaks" : {
-  "All": [121]
-},
-"spectrumList2d" : [
-  "Ge00_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge01_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge02_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge03_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge04_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge05_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge06_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge07_PU2_E2_vs_k2_E1gated_on_Xrays",
-],
-"spectrumListGates" : [["x",0,10],
-["x",20,30],
-["x",40,50],
-["x",60,70],
-["x",80,90],
-["x",100,110],
-["x",120,130],
-["x",140,150],
-["x",160,170],
-["x",180,190],
-["x",200,210],
-["x",220,230],
-["x",240,250],
-["x",260,270],
-["x",280,290],
-["x",300,310],
-["x",320,330],
-["x",340,350],
-["x",360,370]
-],
-"spectrumListProjectionsPeaks" : {
-  "All":[121]
-}
-};
+  // Pagination for the results and plotting display
+  // plotRegion = spectra
+  // energyCalibrator = Table of per detector (lit En., centroids PH and En and residuals)
+  // energyCalibrator = Table of all (detector num, fit params, r2)
+  // graphSection = plot of per detector the PH vs Lit en with Fit and a residuals pane
+  // graphSection = plot of all the residuals for specific peak
+  // Variables for Pagination menu buttons
+  dataStore.buttonNames = ["Spectra", "Peak-Fitting Results", "per Crystal k-dependance fits", "per Crystal 1st-Hit-dependance fits"];  // Names to appear on the buttons
+  dataStore.buttonIDs = ["plotRegionMenuButton", "graphRegionMenuButton", "crystalKRegionMenuButton", "crystal1stHitRegionMenuButton"];    // IDs for the buttons
+  dataStore.buttonPages = ["plotRegion", "resultsTableRegion", "crystalKReportRegion", "crystal1stHitReportRegion"];                 // Pages (div IDs) to be associated with the buttons
 
-// pileup Corrections for 1st-Hit dependence, Ge01 only.
-dataStore.peakFitterScriptTemplate["PUE2E1"] = {
-  "histogramFileNames" : ["run29709-k1-k2-only.tar"],
-  "spectrumList1d" : ["GRG01BN00A_Energy","GRG01GN00A_Energy","GRG01RN00A_Energy","GRG01WN00A_Energy"],
-  "spectrumList1dPeaks" : {
-    "All": [121]
-  },
-  "spectrumList2d" : [
-    "Ge01_PU2_E2_vs_E1_k370",
-    "Ge01_PU2_E2_vs_E1_k330",
-    "Ge01_PU2_E2_vs_E1_k290",
-    "Ge01_PU2_E2_vs_E1_k250",
-    "Ge01_PU2_E2_vs_E1_k210",
-    "Ge01_PU2_E2_vs_E1_k170",
-    "Ge01_PU2_E2_vs_E1_k130",
-    "Ge01_PU2_E2_vs_E1_k90",
-    "Ge01_PU2_E2_vs_E1_k50",
-    "Ge01_PU2_E2_vs_E1_k10"
-  ],
-  "spectrumListGates" : [
-    ["x",1401,1411]
-  ],
-  "spectrumListProjectionsPeaks" : {
-    "All":[141]
-  }
-};
-
-// pileup Corrections for 1st-Hit dependence, Ge01 only.
-dataStore.peakFitterScriptTemplate["PUE2E1-alt"] = {
-  //"histogramFileNames" : ["run29709-k1-k2-only.tar"],
-  "histogramFileNames" : ["run29709-no-corrections-recal.tar"],
-  "spectrumList1d" : ["GRG01BN00A_Energy","GRG01GN00A_Energy","GRG01RN00A_Energy","GRG01WN00A_Energy",
-  "GRG02BN00A_Energy","GRG02GN00A_Energy","GRG02RN00A_Energy","GRG02WN00A_Energy"
-],
-"spectrumList1dPeaks" : {
-  "All": [121]
-},
-"spectrumList2d" : [
-  "Ge00_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge01_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge02_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge03_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge04_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge05_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge06_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge07_PU2_E2_vs_k2_E1gated_on_1408keV",
-],
-"spectrumListGates" : [
-  ["x",20,30],
-  ["x",40,50],
-  ["x",60,70],
-  ["x",80,90],
-  ["x",100,110],
-  ["x",120,130],
-  ["x",140,150],
-  ["x",160,170],
-  ["x",180,190],
-  ["x",200,210],
-  ["x",220,230],
-  ["x",240,250],
-  ["x",260,270],
-  ["x",280,290],
-  ["x",300,310],
-  ["x",320,330],
-  ["x",340,350],
-  ["x",360,370]
-],
-"spectrumListProjectionsPeaks" : {
-  "All":[],
-  "x-20-30":[142],
-  "x-40-50":[142],
-  "x-60-70":[138],
-  "x-80-90":[138],
-  "x-100-110":[136],
-  "x-120-130":[135],
-  "x-140-150":[135],
-  "x-160-170":[135],
-  "x-180-190":[135],
-  "x-200-210":[135],
-  "x-220-230":[130],
-  "x-240-250":[130],
-  "x-260-270":[130],
-  "x-280-290":[130],
-  "x-300-310":[130],
-  "x-320-330":[130],
-  "x-340-350":[130],
-  "x-360-370":[130],
-}
-};
-
-// pileup Corrections for 1st-Hit dependence, Ge01 only.
-dataStore.peakFitterScriptTemplate["PU-combined"] = {
-  "histogramFileNames" : ["run29709-no-corrections.tar"],
-  "spectrumList1d" : ["GRG01BN00A_Energy","GRG01GN00A_Energy","GRG01RN00A_Energy","GRG01WN00A_Energy",
-  "GRG02BN00A_Energy","GRG02GN00A_Energy","GRG02RN00A_Energy","GRG02WN00A_Energy",
-  "GRG03BN00A_Energy","GRG03GN00A_Energy","GRG03RN00A_Energy","GRG03WN00A_Energy",
-  "GRG04BN00A_Energy","GRG04GN00A_Energy","GRG04RN00A_Energy","GRG04WN00A_Energy",
-  "GRG05BN00A_Energy","GRG05GN00A_Energy","GRG05RN00A_Energy","GRG05WN00A_Energy",
-  "GRG06BN00A_Energy","GRG06GN00A_Energy","GRG06RN00A_Energy","GRG06WN00A_Energy",
-  "GRG07BN00A_Energy","GRG07GN00A_Energy","GRG07RN00A_Energy","GRG07WN00A_Energy",
-  "GRG08BN00A_Energy","GRG08GN00A_Energy","GRG08RN00A_Energy","GRG08WN00A_Energy",
-  "GRG09BN00A_Energy","GRG09GN00A_Energy","GRG09RN00A_Energy","GRG09WN00A_Energy",
-  "GRG10BN00A_Energy","GRG10GN00A_Energy","GRG10RN00A_Energy","GRG10WN00A_Energy",
-  "GRG11BN00A_Energy","GRG11GN00A_Energy","GRG11RN00A_Energy","GRG11WN00A_Energy",
-  "GRG12BN00A_Energy","GRG12GN00A_Energy","GRG12RN00A_Energy","GRG12WN00A_Energy",
-  "GRG13BN00A_Energy","GRG13GN00A_Energy","GRG13RN00A_Energy","GRG13WN00A_Energy",
-  "GRG14BN00A_Energy","GRG14GN00A_Energy","GRG14RN00A_Energy","GRG14WN00A_Energy",
-  "GRG15BN00A_Energy","GRG15GN00A_Energy","GRG15RN00A_Energy","GRG15WN00A_Energy",
-  "GRG16BN00A_Energy","GRG16GN00A_Energy","GRG16RN00A_Energy","GRG16WN00A_Energy",
-  "GRG17BN00A_Energy","GRG17GN00A_Energy","GRG17RN00A_Energy","GRG17WN00A_Energy",
-  "GRG18BN00A_Energy","GRG18GN00A_Energy","GRG18RN00A_Energy","GRG18WN00A_Energy",
-  "GRG19BN00A_Energy","GRG19GN00A_Energy","GRG19RN00A_Energy","GRG19WN00A_Energy",
-  "GRG20BN00A_Energy","GRG20GN00A_Energy","GRG20RN00A_Energy","GRG20WN00A_Energy",
-  "GRG21BN00A_Energy","GRG21GN00A_Energy","GRG21RN00A_Energy","GRG21WN00A_Energy",
-  "GRG22BN00A_Energy","GRG22GN00A_Energy","GRG22RN00A_Energy","GRG22WN00A_Energy",
-  "GRG23BN00A_Energy","GRG23GN00A_Energy","GRG23RN00A_Energy","GRG23WN00A_Energy",
-  "GRG24BN00A_Energy","GRG24GN00A_Energy","GRG24RN00A_Energy","GRG24WN00A_Energy",
-  "GRG25BN00A_Energy","GRG25GN00A_Energy","GRG25RN00A_Energy","GRG25WN00A_Energy",
-  "GRG26BN00A_Energy","GRG26GN00A_Energy","GRG26RN00A_Energy","GRG26WN00A_Energy",
-  "GRG27BN00A_Energy","GRG27GN00A_Energy","GRG27RN00A_Energy","GRG27WN00A_Energy",
-  "GRG28BN00A_Energy","GRG28GN00A_Energy","GRG28RN00A_Energy","GRG28WN00A_Energy",
-  "GRG29BN00A_Energy","GRG29GN00A_Energy","GRG29RN00A_Energy","GRG29WN00A_Energy",
-  "GRG30BN00A_Energy","GRG30GN00A_Energy","GRG30RN00A_Energy","GRG30WN00A_Energy",
-  "GRG31BN00A_Energy","GRG31GN00A_Energy","GRG31RN00A_Energy","GRG31WN00A_Energy",
-  "GRG32BN00A_Energy","GRG32GN00A_Energy","GRG32RN00A_Energy","GRG32WN00A_Energy",
-  "GRG33BN00A_Energy","GRG33GN00A_Energy","GRG33RN00A_Energy","GRG33WN00A_Energy",
-  "GRG34BN00A_Energy","GRG34GN00A_Energy","GRG34RN00A_Energy","GRG34WN00A_Energy",
-  "GRG35BN00A_Energy","GRG35GN00A_Energy","GRG35RN00A_Energy","GRG35WN00A_Energy",
-  "GRG36BN00A_Energy","GRG36GN00A_Energy","GRG36RN00A_Energy","GRG36WN00A_Energy",
-  "GRG37BN00A_Energy","GRG37GN00A_Energy","GRG37RN00A_Energy","GRG37WN00A_Energy",
-  "GRG38BN00A_Energy","GRG38GN00A_Energy","GRG38RN00A_Energy","GRG38WN00A_Energy",
-  "GRG39BN00A_Energy","GRG39GN00A_Energy","GRG39RN00A_Energy","GRG39WN00A_Energy",
-  "GRG40BN00A_Energy","GRG40GN00A_Energy","GRG40RN00A_Energy","GRG40WN00A_Energy",
-  "GRG41BN00A_Energy","GRG41GN00A_Energy","GRG41RN00A_Energy","GRG41WN00A_Energy",
-  "GRG42BN00A_Energy","GRG42GN00A_Energy","GRG42RN00A_Energy","GRG42WN00A_Energy",
-  "GRG43BN00A_Energy","GRG43GN00A_Energy","GRG43RN00A_Energy","GRG43WN00A_Energy",
-  "GRG44BN00A_Energy","GRG44GN00A_Energy","GRG44RN00A_Energy","GRG44WN00A_Energy",
-  "GRG45BN00A_Energy","GRG45GN00A_Energy","GRG45RN00A_Energy","GRG45WN00A_Energy",
-  "GRG46BN00A_Energy","GRG46GN00A_Energy","GRG46RN00A_Energy","GRG46WN00A_Energy",
-  "GRG47BN00A_Energy","GRG47GN00A_Energy","GRG47RN00A_Energy","GRG47WN00A_Energy",
-  "GRG48BN00A_Energy","GRG48GN00A_Energy","GRG48RN00A_Energy","GRG48WN00A_Energy",
-  "GRG49BN00A_Energy","GRG49GN00A_Energy","GRG49RN00A_Energy","GRG49WN00A_Energy",
-  "GRG50BN00A_Energy","GRG50GN00A_Energy","GRG50RN00A_Energy","GRG50WN00A_Energy",
-  "GRG51BN00A_Energy","GRG51GN00A_Energy","GRG51RN00A_Energy","GRG51WN00A_Energy",
-  "GRG52BN00A_Energy","GRG52GN00A_Energy","GRG52RN00A_Energy","GRG52WN00A_Energy",
-  "GRG53BN00A_Energy","GRG53GN00A_Energy","GRG53RN00A_Energy","GRG53WN00A_Energy",
-  "GRG54BN00A_Energy","GRG54GN00A_Energy","GRG54RN00A_Energy","GRG54WN00A_Energy",
-  "GRG55BN00A_Energy","GRG55GN00A_Energy","GRG55RN00A_Energy","GRG55WN00A_Energy",
-  "GRG56BN00A_Energy","GRG56GN00A_Energy","GRG56RN00A_Energy","GRG56WN00A_Energy",
-  "GRG57BN00A_Energy","GRG57GN00A_Energy","GRG57RN00A_Energy","GRG57WN00A_Energy",
-  "GRG58BN00A_Energy","GRG58GN00A_Energy","GRG58RN00A_Energy","GRG58WN00A_Energy",
-  "GRG59BN00A_Energy","GRG59GN00A_Energy","GRG59RN00A_Energy","GRG59WN00A_Energy",
-  "GRG60BN00A_Energy","GRG60GN00A_Energy","GRG60RN00A_Energy","GRG60WN00A_Energy",
-  "GRG61BN00A_Energy","GRG61GN00A_Energy","GRG61RN00A_Energy","GRG61WN00A_Energy",
-  "GRG62BN00A_Energy","GRG62GN00A_Energy","GRG62RN00A_Energy","GRG62WN00A_Energy",
-  "GRG63BN00A_Energy","GRG63GN00A_Energy","GRG63RN00A_Energy","GRG63WN00A_Energy"
-],
-"spectrumList1dPeaks" : {
-  "All": [121,1408]
-},
-"spectrumList2d" : [
-  "Ge00_E_vs_k_1st_of_2hit",
-  "Ge01_E_vs_k_1st_of_2hit",
-  "Ge02_E_vs_k_1st_of_2hit",
-  "Ge03_E_vs_k_1st_of_2hit",
-  "Ge04_E_vs_k_1st_of_2hit",
-  "Ge05_E_vs_k_1st_of_2hit",
-  "Ge06_E_vs_k_1st_of_2hit",
-  "Ge07_E_vs_k_1st_of_2hit",
-  "Ge08_E_vs_k_1st_of_2hit",
-  "Ge09_E_vs_k_1st_of_2hit",
-  "Ge10_E_vs_k_1st_of_2hit",
-  "Ge11_E_vs_k_1st_of_2hit",
-  "Ge12_E_vs_k_1st_of_2hit",
-  "Ge13_E_vs_k_1st_of_2hit",
-  "Ge14_E_vs_k_1st_of_2hit",
-  "Ge15_E_vs_k_1st_of_2hit",
-  "Ge16_E_vs_k_1st_of_2hit",
-  "Ge17_E_vs_k_1st_of_2hit",
-  "Ge18_E_vs_k_1st_of_2hit",
-  "Ge19_E_vs_k_1st_of_2hit",
-  "Ge20_E_vs_k_1st_of_2hit",
-  "Ge21_E_vs_k_1st_of_2hit",
-  "Ge22_E_vs_k_1st_of_2hit",
-  "Ge23_E_vs_k_1st_of_2hit",
-  "Ge24_E_vs_k_1st_of_2hit",
-  "Ge25_E_vs_k_1st_of_2hit",
-  "Ge26_E_vs_k_1st_of_2hit",
-  "Ge27_E_vs_k_1st_of_2hit",
-  "Ge28_E_vs_k_1st_of_2hit",
-  "Ge29_E_vs_k_1st_of_2hit",
-  "Ge30_E_vs_k_1st_of_2hit",
-  "Ge31_E_vs_k_1st_of_2hit",
-  "Ge32_E_vs_k_1st_of_2hit",
-  "Ge33_E_vs_k_1st_of_2hit",
-  "Ge34_E_vs_k_1st_of_2hit",
-  "Ge35_E_vs_k_1st_of_2hit",
-  "Ge36_E_vs_k_1st_of_2hit",
-  "Ge37_E_vs_k_1st_of_2hit",
-  "Ge38_E_vs_k_1st_of_2hit",
-  "Ge39_E_vs_k_1st_of_2hit",
-  "Ge40_E_vs_k_1st_of_2hit",
-  "Ge41_E_vs_k_1st_of_2hit",
-  "Ge42_E_vs_k_1st_of_2hit",
-  "Ge43_E_vs_k_1st_of_2hit",
-  "Ge44_E_vs_k_1st_of_2hit",
-  "Ge45_E_vs_k_1st_of_2hit",
-  "Ge46_E_vs_k_1st_of_2hit",
-  "Ge47_E_vs_k_1st_of_2hit",
-  "Ge48_E_vs_k_1st_of_2hit",
-  "Ge49_E_vs_k_1st_of_2hit",
-  "Ge50_E_vs_k_1st_of_2hit",
-  "Ge51_E_vs_k_1st_of_2hit",
-  "Ge52_E_vs_k_1st_of_2hit",
-  "Ge53_E_vs_k_1st_of_2hit",
-  "Ge54_E_vs_k_1st_of_2hit",
-  "Ge55_E_vs_k_1st_of_2hit",
-  "Ge56_E_vs_k_1st_of_2hit",
-  "Ge57_E_vs_k_1st_of_2hit",
-  "Ge58_E_vs_k_1st_of_2hit",
-  "Ge59_E_vs_k_1st_of_2hit",
-  "Ge60_E_vs_k_1st_of_2hit",
-  "Ge61_E_vs_k_1st_of_2hit",
-  "Ge62_E_vs_k_1st_of_2hit",
-  "Ge63_E_vs_k_1st_of_2hit",
-  "Ge00_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge01_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge02_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge03_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge04_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge05_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge06_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge07_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge08_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge09_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge00_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge01_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge02_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge03_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge04_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge05_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge06_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge07_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge08_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge09_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge10_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge11_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge12_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge13_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge14_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge15_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge16_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge17_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge18_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge19_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge20_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge21_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge22_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge23_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge24_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge25_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge26_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge27_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge28_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge29_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge30_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge31_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge32_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge33_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge34_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge35_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge36_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge37_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge38_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge39_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge40_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge41_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge42_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge43_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge44_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge45_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge46_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge47_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge48_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge49_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge50_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge51_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge52_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge53_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge54_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge55_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge56_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge57_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge58_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge59_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge60_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge61_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge62_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge63_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge10_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge11_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge12_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge13_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge14_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge15_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge16_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge17_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge18_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge19_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge20_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge21_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge22_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge23_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge24_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge25_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge26_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge27_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge28_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge29_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge30_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge31_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge32_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge33_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge34_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge35_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge36_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge37_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge38_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge39_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge40_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge41_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge42_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge43_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge44_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge45_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge46_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge47_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge48_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge49_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge50_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge51_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge52_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge53_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge54_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge55_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge56_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge57_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge58_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge59_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge60_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge61_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge62_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge63_PU2_E2_vs_k2_E1gated_on_1408keV"
-],
-"spectrumListGates" : [
-  ["x",0,10],
-  ["x",20,30],
-  ["x",40,50],
-  ["x",60,70],
-  ["x",80,90],
-  ["x",100,110],
-  ["x",120,130],
-  ["x",140,150],
-  ["x",160,170],
-  ["x",180,190],
-  ["x",200,210],
-  ["x",220,230],
-  ["x",240,250],
-  ["x",260,270],
-  ["x",280,290],
-  ["x",300,310],
-  ["x",320,330],
-  ["x",340,350],
-  ["x",360,370]
-],
-"spectrumListProjectionsPeaks" : {
-  "All":[1408],
-  "Ge00_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge01_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge02_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge03_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge04_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge05_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge06_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge07_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge08_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge09_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge10_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge11_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge12_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge13_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge14_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge15_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge16_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge17_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge18_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge19_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge20_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge21_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge22_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge23_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge24_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge25_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge26_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge27_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge28_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge29_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge30_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge31_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge32_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge33_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge34_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge35_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge36_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge37_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge38_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge39_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge40_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge41_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge42_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge43_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge44_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge45_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge46_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge47_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge48_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge49_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge50_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge51_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge52_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge53_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge54_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge55_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge56_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge57_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge58_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge59_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge60_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge61_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge62_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge63_PU2_E2_vs_k2_E1gated_on_1408keV":[136]
-}
-};
-
-// pileup Corrections for 1st-Hit dependence, Ge01 only.
-dataStore.peakFitterScriptTemplate["PU-combined-quick"] = {
-  "histogramFileNames" : ["run29709-no-corrections.tar"],
-  "spectrumList1d" : ["GRG01BN00A_Energy","GRG01GN00A_Energy","GRG01RN00A_Energy","GRG01WN00A_Energy",
-  "GRG02BN00A_Energy","GRG02GN00A_Energy","GRG02RN00A_Energy","GRG02WN00A_Energy",
-  "GRG03BN00A_Energy","GRG03GN00A_Energy","GRG03RN00A_Energy","GRG03WN00A_Energy",
-  "GRG04BN00A_Energy","GRG04GN00A_Energy","GRG04RN00A_Energy","GRG04WN00A_Energy"
-],
-"spectrumList1dPeaks" : {
-  "All": [121,1408]
-},
-"spectrumList2d" : [
-  "Ge00_E_vs_k_1st_of_2hit",
-  "Ge01_E_vs_k_1st_of_2hit",
-  "Ge02_E_vs_k_1st_of_2hit",
-  "Ge03_E_vs_k_1st_of_2hit",
-  "Ge00_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge01_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge02_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge03_PU2_E2_vs_k2_E1gated_on_1408keV",
-  "Ge00_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge01_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge02_PU2_E2_vs_k2_E1gated_on_Xrays",
-  "Ge03_PU2_E2_vs_k2_E1gated_on_Xrays"
-],
-"spectrumListGates" : [
-  ["x",0,10],
-  ["x",20,30],
-  ["x",40,50],
-  ["x",60,70],
-  ["x",80,90],
-  ["x",100,110],
-  ["x",120,130],
-  ["x",140,150],
-  ["x",160,170],
-  ["x",180,190],
-  ["x",200,210],
-  ["x",220,230],
-  ["x",240,250],
-  ["x",260,270],
-  ["x",280,290],
-  ["x",300,310],
-  ["x",320,330],
-  ["x",340,350],
-  ["x",360,370]
-],
-"spectrumListProjectionsPeaks" : {
-  "All":[1408],
-  "Ge00_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge01_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge02_PU2_E2_vs_k2_E1gated_on_1408keV":[136],
-  "Ge03_PU2_E2_vs_k2_E1gated_on_1408keV":[136]
-}
-};
-
-// Pagination for the results and plotting display
-// plotRegion = spectra
-// energyCalibrator = Table of per detector (lit En., centroids PH and En and residuals)
-// energyCalibrator = Table of all (detector num, fit params, r2)
-// graphSection = plot of per detector the PH vs Lit en with Fit and a residuals pane
-// graphSection = plot of all the residuals for specific peak
-// Variables for Pagination menu buttons
-dataStore.buttonNames = ["Spectra", "Peak-Fitting Results", "per Crystal k-dependance fits", "per Crystal 1st-Hit-dependance fits"];  // Names to appear on the buttons
-dataStore.buttonIDs = ["plotRegionMenuButton", "graphRegionMenuButton", "crystalKRegionMenuButton", "crystal1stHitRegionMenuButton"];    // IDs for the buttons
-dataStore.buttonPages = ["plotRegion", "resultsTableRegion", "crystalKReportRegion", "crystal1stHitReportRegion"];                 // Pages (div IDs) to be associated with the buttons
-
-// Generate THESEdetectors object. Used for building the coefficients table
-dataStore.numberOfClovers = 16;
-dataStore.THESEdetectors = [];
-var crystals = ["B","G","R","W"];
-var letter = ["A","B"];
-var num = 0;
-for(j=0; j<letter.length; j++){
-  for(i=1; i<(dataStore.numberOfClovers+1); i++){
-    for(k=0; k<4; k++){
-      dataStore.THESEdetectors[num] = 'GRG'+alwaysThisLong(i, 2)+crystals[k]+'N00'+letter[j];
-      num++;
+  // Generate THESEdetectors object. Used for building the coefficients table
+  dataStore.numberOfClovers = 16;
+  dataStore.THESEdetectors = [];
+  var crystals = ["B","G","R","W"];
+  var letter = ["A"];  // var letter = ["A","B"];
+  var num = 0;
+  for(j=0; j<letter.length; j++){
+    for(i=1; i<(dataStore.numberOfClovers+1); i++){
+      for(k=0; k<4; k++){
+        dataStore.THESEdetectors[num] = 'GRG'+alwaysThisLong(i, 2)+crystals[k]+'N00'+letter[j];
+        num++;
+      }
     }
   }
-}
 
 }
 setupDataStore();
@@ -935,37 +603,6 @@ function receiveInputTextBoxChange(boxName,textString){
   receiveScript(JSON.stringify(payload));
 }
 
-function setupHistoListSelect(){
-  return;
-  // Remove the select if it already exists
-  try{
-    document.getElementById('HistoListSelect').remove();
-    document.getElementById('HistoListSelectLabel').remove();
-  }
-  catch(err){ }
-
-  // Create a select input for the histo file list
-  var newSelect = document.createElement("select");
-  newSelect.id = 'HistoListSelect';
-  newSelect.name = 'HistoListSelect';
-  newSelect.onchange = function(){
-    var valueString = document.getElementById('inputHistogramFiles').value;
-    if(valueString.length>1){ valueString += ","; }
-    document.getElementById('inputHistogramFiles').value = valueString + this.value;
-  }.bind(newSelect);
-  document.getElementById('histo-list-menu-div').appendChild(newSelect);
-
-  // Add the list of histo files as the options
-  thisSelect = document.getElementById('HistoListSelect');
-  for(var j=0; j<dataStore.histoFileList.length; j++){
-    thisSelect.add( new Option(dataStore.histoFileList[j], dataStore.histoFileList[j]) );
-  }
-
-  // Fire the onchange event for the select with the default value to set it
-  //document.getElementById('HistoListSelect'+thisTitle).onchange();
-
-}
-
 function launchPeakFittingProcess(){
   // This is the start of the automated process
   // The work flow in the analysis process will be; download all spectra for first histogram file, make any projections for 2d spectra, fit all singles, fit all projections, add results to table, delete all raw data, repeat for next histogram file in list until the end of the list.
@@ -980,13 +617,27 @@ function launchPeakFittingProcess(){
   // fittingCallback() - calls populateReportTable(), clearLocalMemory() then if more histogram files it requests the next file.
   //
 
+  ///////////////
+  // Setup the peakFitting script
+  ///////////////
+
+  // Grab the template peak-fitting script to a local copy here
+  var thisScript = {};
+  thisScript = dataStore.peakFitterScriptTemplate["PU-combined"];
+
+  // Get the user input on histogramFileNames
+  thisScript.histogramFileNames.push(document.getElementById('HistoListSelect152Eu').value);
+
+  // Setup the peak-fitting script from the template
+  receiveScript(JSON.stringify(thisScript));
+
 
   ////////////////
   // Set up the menus, reports and display objects
   ////////////////
 
-    // Set up the progress tracking
-    setupProgressBarTracking();
+  // Set up the progress tracking
+  setupProgressBarTracking();
 
   // Build the menu list
   var groups = [];
@@ -1038,15 +689,9 @@ function launchPeakFittingProcess(){
     // Set the dataStore.histoFileName to this source so that constructQueries requests the correct spectrum
     dataStore.histoFileName = dataStore.currentHistoFileName = dataStore.spectrumListHistoFileNames[0];
 
-    // Request the config file for this histogram file in order to get the details on runtime
-    // First format check for the data file directory path
-    var filename = dataStore.histoFileDirectoryPath;
-    if(filename[filename.length]!='/'){
-      filename += '/';
-    }
-    filename += dataStore.histoFileName;
-    url = dataStore.spectrumServer + '/?cmd=viewConfig' + '&filename=' + filename;
-    XHR(url, "Problem getting Config file for "+ filename +" from analyzer server", processConfigFileForRunDetails, function(error){ErrorConnectingToAnalyzerServer(error)});
+    // Request the Config for this histogram to get the addresses and calibrations needed for building the Cal file
+    // This also gets the midas info about this run (title, start time, duration)
+    viewConfigOfHisto(dataStore.histoFileName);
 
     // change information message
     document.getElementById('welcomeMessage').classList.add('hidden');
@@ -1215,15 +860,9 @@ function launchPeakFittingProcess(){
         // Set the dataStore.histoFileName to this source so that constructQueries requests the correct spectrum
         dataStore.currentHistoFileName = dataStore.histoFileName;
 
-        // Request the config file for this histogram file in order to get the details on runtime
-        // First format check for the data file directory path
-        var filename = dataStore.histoFileDirectoryPath;
-        if(filename[filename.length]!='/'){
-          filename += '/';
-        }
-        filename += dataStore.histoFileName;
-        url = dataStore.spectrumServer + '/?cmd=viewConfig' + '&filename=' + filename;
-        XHR(url, "Problem getting Config file for "+ filename +" from analyzer server", processConfigFileForRunDetails, function(error){ErrorConnectingToAnalyzerServer(error)});
+        // Request the Config for this histogram to get the addresses and calibrations needed for building the Cal file
+        // This also gets the midas info about this run (title, start time, duration)
+        viewConfigOfHisto(dataStore.histoFileName);
 
         // Drop as much as possible to reduce overall memory usage
         //clearLocalMemory();
@@ -1237,6 +876,7 @@ function launchPeakFittingProcess(){
       // Reveal the download buttons
       document.getElementById('saveCSVDiv').classList.remove('hidden');
       document.getElementById('saveScriptDiv').classList.remove('hidden');
+      document.getElementById('saveCalFileDiv').classList.remove('hidden');
 
       // change information message
       document.getElementById('fittingProjectionsMessage').classList.add('hidden');
@@ -1638,7 +1278,7 @@ function launchPeakFittingProcess(){
         }
         Cstring += "},<br>\n";
       } // end of Ge loop
-      document.getElementById("postProcessResults").innerHTML = Cstring + "<br>";
+    //  document.getElementById("postProcessResults").innerHTML = Cstring + "<br>";
 
       console.log(dataStore);
 
@@ -1653,6 +1293,9 @@ function launchPeakFittingProcess(){
         updateAnalyzer();
       }.bind(newButton);
       document.getElementById('postProcessResults').appendChild(newButton);
+
+      // Display the results in the Coefficients table
+      dataStore._pileupCorrectionsReport.updateCoefficientsTable();
 
     }
 
@@ -1725,6 +1368,55 @@ function launchPeakFittingProcess(){
       document.getElementById('dismissAnalyzermodal').click();
     }
 
+    function buildCalfile(){
+      console.log('Download initiated');
+
+      // Write the Cal file
+      CAL = '';
+
+      for(var i=0; i<dataStore.THESEdetectors.length; i++){
+        var GeName = dataStore.THESEdetectors[i];
+        var index = dataStore.Config.map(function(e) { return e.name; }).indexOf(GeName);
+        if(index<0){ continue; }
+        CAL += GeName+' { \n';
+        CAL += 'Name:	'+GeName+'\n';
+        CAL += 'Number:	'+i+'\n';
+        CAL += 'Address:  0x'+dataStore.Config[index].address.toString(16).toLocaleString(undefined, {minimumIntegerDigits: 2})+'\n';
+        CAL += 'Digitizer:	GRF16\n';
+        CAL += 'EngCoeff:	'+dataStore.Config[index].offset+' '+dataStore.Config[index].gain+' '+dataStore.Config[index].quad+'\n';
+        if(typeof(dataStore.fitResultsParameters[GeName]['k1']) != "undefined"){
+          CAL += 'pileupk1:	'+dataStore.fitResultsParameters[GeName]['k1'][0]+' '+dataStore.fitResultsParameters[GeName]['k1'][1]+' '+dataStore.fitResultsParameters[GeName]['k1'][2];
+          CAL +=          ' '+dataStore.fitResultsParameters[GeName]['k1'][3]+' '+dataStore.fitResultsParameters[GeName]['k1'][4]+' '+dataStore.fitResultsParameters[GeName]['k1'][5]+'\n';
+
+          CAL += 'pileupk2:	'+dataStore.fitResultsParameters[GeName]['k2'][0]+' '+dataStore.fitResultsParameters[GeName]['k2'][1]+' '+dataStore.fitResultsParameters[GeName]['k2'][2];
+          CAL +=          ' '+dataStore.fitResultsParameters[GeName]['k2'][3]+' '+dataStore.fitResultsParameters[GeName]['k2'][4]+' '+dataStore.fitResultsParameters[GeName]['k2'][5]+'\n';
+
+          CAL += 'pileupE1:	'+dataStore.fitResultsParameters[GeName]['e1'][0]+' '+dataStore.fitResultsParameters[GeName]['e1'][1]+' '+dataStore.fitResultsParameters[GeName]['e1'][2];
+          CAL +=          ' '+dataStore.fitResultsParameters[GeName]['e1'][3]+' '+dataStore.fitResultsParameters[GeName]['e1'][4]+' '+dataStore.fitResultsParameters[GeName]['e1'][5]+'\n';
+        }else{
+          CAL += 'pileupk1:	1 0 0 0 0 0\n';
+          CAL += 'pileupk2:	1 0 0 0 0 0\n';
+          CAL += 'pileupe1:	0 0 0 0 0 0\n';
+        }
+        CAL += 'Integration:	0\n';
+        CAL += 'ENGChi2:	0\n';
+        CAL += 'FileInt:	0\n';
+        CAL += '}\n';
+        CAL += '\n';
+        CAL += '//====================================//\n';
+      }
+
+      // Create a download link
+      const textBlob = new Blob([CAL], {type: 'text/plain'});
+      URL.revokeObjectURL(window.textBlobURL);
+      const downloadLink = document.createElement('a');
+      downloadLink.href = URL.createObjectURL(textBlob);
+      downloadLink.download = document.getElementById('saveCalname').value;
+
+      // Trigger the download
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+    }
 
     function postProcessPUFirst2Hit(){
       // Post processing for 2-Hit pileup, 2nd Hit correction as function of k.
