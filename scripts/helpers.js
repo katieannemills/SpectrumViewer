@@ -911,7 +911,7 @@ function processHistoFileList(payload){
   setupHistoListSelect();
 }
 
-/*
+
 function setupHistoListSelect(){
 // Only proceed if this is needed.
 if(!document.getElementById('histo-list-menu-div')){ return; }
@@ -946,8 +946,56 @@ thisSelect.value = dataStore.histoFileName;
 // Get the spectrum list for whatever is selected on startup
 dataStore.histoFileName = document.getElementById('HistoListSelect').value;
 GetSpectrumListFromServer(dataStore.spectrumServer,processSpectrumList);
+
+// Populate the histo Choice bar in apps
+  if(typeof(dataStore.histoChoiceBarContents)!="undefined"){
+    for(var i=0; i<dataStore.histoChoiceBarContents.length; i++){
+      var thisTitle = dataStore.histoChoiceBarContents[i];
+      var rowIndex = Math.floor(i/2);
+
+      if(i%2==0){
+        // Inject the Container Div (a row) for this pair of selects.
+        var newDiv = document.createElement("div");
+        newDiv.id = 'histoChoiceDivRow'+rowIndex;
+        newDiv.class = 'col-md-12';
+        document.getElementById('histoChoiceDir').appendChild(newDiv);
+      }
+
+      // Inject the Div for this label and select
+      var newDiv = document.createElement("div");
+      newDiv.id = 'histoChoice'+thisTitle;
+      newDiv.class = 'col-md-4';
+      document.getElementById('histoChoiceDivRow'+rowIndex).appendChild(newDiv);
+
+      // Add the title text for the label
+      var newLabel = document.createElement("label");
+      newLabel.for = 'HistoListSelect'+thisTitle;
+      newLabel.id = 'HistoListSelectLabel'+thisTitle;
+      newLabel.innerHTML = thisTitle+' Histogram file: ';
+      document.getElementById('histoChoice'+thisTitle).appendChild(newLabel);
+
+      // Create a select input for the histo file list
+      var newSelect = document.createElement("select");
+      newSelect.id = 'HistoListSelect'+thisTitle;
+      newSelect.name = 'HistoListSelect'+thisTitle;
+      document.getElementById('histoChoice'+thisTitle).appendChild(newSelect);
+
+      // Add the list of histo files as the options
+      thisSelect = document.getElementById('HistoListSelect'+thisTitle);
+      if(thisTitle == "11Be" || thisTitle == "133Ba"){
+        thisSelect.add( new Option("Do not include "+thisTitle, "exclude") );
+      }
+      for(var j=0; j<dataStore.histoFileList.length; j++){
+        thisSelect.add( new Option(dataStore.histoFileList[j], dataStore.histoFileList[j]) );
+      }
+
+      // Fire the onchange event for the select with the default value to set it
+      //document.getElementById('HistoListSelect'+thisTitle).onchange();
+    }
+  }
+
 }
-*/
+
 
 function ErrorConnectingToAnalyzerServer(error){
   var string = 'Problem connecting to analyzer server: '+dataStore.spectrumServer+'<br>'+error;
@@ -1091,9 +1139,14 @@ function constructNewSpectrumMenu(){
   }
 
   // Clear any previous menu content
-  if(document.getElementById('navbar-content-div').innerHTML){
+  try{
     document.getElementById('navbar-content-div').innerHTML = '';
   }
+  catch(err){
+    console.log(err);
+    return;
+  }
+
   // Clear any previous dataStore plotList object
   if(dataStore._plotList != undefined){ delete dataStore._plotList; }
   if(dataStore.currentTopGroup != undefined){ delete dataStore.currentTopGroup; }
@@ -1110,6 +1163,7 @@ function constructNewSpectrumMenu(){
   }
 }
 
+/*
 function setupHistoListSelect(){
 
   // Remove the select if it already exists
@@ -1119,52 +1173,55 @@ function setupHistoListSelect(){
   }
   catch(err){ }
 
-  for(var i=0; i<dataStore.histoChoiceBarContents.length; i++){
-    var thisTitle = dataStore.histoChoiceBarContents[i];
-    var rowIndex = Math.floor(i/2);
+  if(typeof(dataStore.histoChoiceBarContents)!="undefined"){
+    for(var i=0; i<dataStore.histoChoiceBarContents.length; i++){
+      var thisTitle = dataStore.histoChoiceBarContents[i];
+      var rowIndex = Math.floor(i/2);
 
-    if(i%2==0){
-      // Inject the Container Div (a row) for this pair of selects.
+      if(i%2==0){
+        // Inject the Container Div (a row) for this pair of selects.
+        var newDiv = document.createElement("div");
+        newDiv.id = 'histoChoiceDivRow'+rowIndex;
+        newDiv.class = 'col-md-12';
+        document.getElementById('histoChoiceDir').appendChild(newDiv);
+      }
+
+      // Inject the Div for this label and select
       var newDiv = document.createElement("div");
-      newDiv.id = 'histoChoiceDivRow'+rowIndex;
-      newDiv.class = 'col-md-12';
-      document.getElementById('histoChoiceDir').appendChild(newDiv);
+      newDiv.id = 'histoChoice'+thisTitle;
+      newDiv.class = 'col-md-4';
+      document.getElementById('histoChoiceDivRow'+rowIndex).appendChild(newDiv);
+
+
+      // Add the title text for the label
+      var newLabel = document.createElement("label");
+      newLabel.for = 'HistoListSelect'+thisTitle;
+      newLabel.id = 'HistoListSelectLabel'+thisTitle;
+      newLabel.innerHTML = thisTitle+' Histogram file: ';
+      document.getElementById('histoChoice'+thisTitle).appendChild(newLabel);
+
+      // Create a select input for the histo file list
+      var newSelect = document.createElement("select");
+      newSelect.id = 'HistoListSelect'+thisTitle;
+      newSelect.name = 'HistoListSelect'+thisTitle;
+      document.getElementById('histoChoice'+thisTitle).appendChild(newSelect);
+
+      // Add the list of histo files as the options
+      thisSelect = document.getElementById('HistoListSelect'+thisTitle);
+      if(thisTitle == "11Be" || thisTitle == "133Ba"){
+        thisSelect.add( new Option("Do not include "+thisTitle, "exclude") );
+      }
+      for(var j=0; j<dataStore.histoFileList.length; j++){
+        thisSelect.add( new Option(dataStore.histoFileList[j], dataStore.histoFileList[j]) );
+      }
+
+      // Fire the onchange event for the select with the default value to set it
+      //document.getElementById('HistoListSelect'+thisTitle).onchange();
     }
-
-    // Inject the Div for this label and select
-    var newDiv = document.createElement("div");
-    newDiv.id = 'histoChoice'+thisTitle;
-    newDiv.class = 'col-md-4';
-    document.getElementById('histoChoiceDivRow'+rowIndex).appendChild(newDiv);
-
-
-    // Add the title text for the label
-    var newLabel = document.createElement("label");
-    newLabel.for = 'HistoListSelect'+thisTitle;
-    newLabel.id = 'HistoListSelectLabel'+thisTitle;
-    newLabel.innerHTML = thisTitle+' Histogram file: ';
-    document.getElementById('histoChoice'+thisTitle).appendChild(newLabel);
-
-    // Create a select input for the histo file list
-    var newSelect = document.createElement("select");
-    newSelect.id = 'HistoListSelect'+thisTitle;
-    newSelect.name = 'HistoListSelect'+thisTitle;
-    document.getElementById('histoChoice'+thisTitle).appendChild(newSelect);
-
-    // Add the list of histo files as the options
-    thisSelect = document.getElementById('HistoListSelect'+thisTitle);
-    if(thisTitle == "11Be" || thisTitle == "133Ba"){
-      thisSelect.add( new Option("Do not include "+thisTitle, "exclude") );
-    }
-    for(var j=0; j<dataStore.histoFileList.length; j++){
-      thisSelect.add( new Option(dataStore.histoFileList[j], dataStore.histoFileList[j]) );
-    }
-
-    // Fire the onchange event for the select with the default value to set it
-    //document.getElementById('HistoListSelect'+thisTitle).onchange();
   }
 
 }
+*/
 
 //////////////////////////////////
 // App workflow generic functions
@@ -1189,10 +1246,10 @@ function processConfigFileForRunDetails(payload){
   }
   var thisConfig = JSON.parse(payload);
 
-// Ensure the object exists
-if(!dataStore.spectrumListHistoFileDetails){
-  dataStore.spectrumListHistoFileDetails = {};
-}
+  // Ensure the object exists
+  if(!dataStore.spectrumListHistoFileDetails){
+    dataStore.spectrumListHistoFileDetails = {};
+  }
 
   // Unpack Midas content
   var keyName = dataStore.histoFileName.split(".")[0];
@@ -1202,8 +1259,8 @@ if(!dataStore.spectrumListHistoFileDetails){
     'Duration': thisConfig.Analyzer[6].Midas[2].Value,
   };
 
-    // Save the Calbration data
-    dataStore.Config = thisConfig.Analyzer[4].Calibrations;
+  // Save the Calbration data
+  dataStore.Config = thisConfig.Analyzer[4].Calibrations;
 }
 
 // Function to increment the progressBar by the stated amount
