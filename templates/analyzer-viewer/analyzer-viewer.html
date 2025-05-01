@@ -8,20 +8,24 @@
       <div id='Viewer'>
 
         <div id="HistoFilesTableContainerDiv">
-          <div class='container-fluid'>
+          <div class='col-md-12'>
+            <div class='col-md-6'>
             <div class='row'>
-              <div class='col-md-2'><h5 id="histoDirViewerDiv">Histogram File Directory:</h5></div>
-              <div class='col-md-4' id='HistoDirectoryInputDivViewer'></div>
+              <div class='col-md-4'><h5 id="histoDirViewerDiv">Histogram File Directory:</h5></div>
+              <div class='col-md-8' id='HistoDirectoryInputDivViewer'></div>
             </div>
             <div class='row'>
-              <div class='col-md-2'><h5>Filename for Summed Histogram file:</h5></div>
-              <div class='col-md-4' id='HistoSumFilenameInputDiv'></div>
+              <div class='col-md-4'><h5>Filename for Summed Histogram file:</h5></div>
+              <div class='col-md-8' id='HistoSumFilenameInputDiv'></div>
             </div>
           </div>
-          <div id='AnalyzerViewerDiv'>Here it is</div>
+          <div id='launchAppsDiv' class='col-md-6'>
+            <h4>Data Analysis Tools:</h4>
+          </div>
+        </div>
+          <div id='AnalyzerViewerDiv'></div>
           <div class='container-fluid'>
             <div id='submitDivSum' class='col-md-6'></div>
-            <div id='launchAppsDiv' class='col-md-6'></div>
           </div>
           <table id="HistoFilesTable" class='analyzer-table-selectable'></table>
         </div>
@@ -75,9 +79,9 @@
 </template>
 
 <script>
-    function setupAnalyzerViewer(wrapperID){
-        document.getElementById(wrapperID).innerHTML = "";
-        document.getElementById(wrapperID).innerHTML = Mustache.to_html(dataStore.templates['analyzer-viewer'], {});
+  function setupAnalyzerViewer(wrapperID){
+    document.getElementById(wrapperID).innerHTML = "";
+    document.getElementById(wrapperID).innerHTML = Mustache.to_html(dataStore.templates['analyzer-viewer'], {});
 
     // Create the text input for the Histogram file directory
     newInput = document.createElement('input');
@@ -86,11 +90,11 @@
     newInput.className = 'analyzer-input-text';
     newInput.value = dataStore.histoFileDirectoryPath;
     newInput.onchange = function(){
-       dataStore.histoFileDirectoryPath = this.value;
-       document.getElementById('HistoDirectoryInputSorting').value = this.value;
-       getHistoFileListFromServer();
+      dataStore.histoFileDirectoryPath = this.value;
+      document.getElementById('HistoDirectoryInputSorting').value = this.value;
+      getHistoFileListFromServer();
 
-}.bind(newInput);
+    }.bind(newInput);
     document.getElementById('HistoDirectoryInputDivViewer').appendChild(newInput);
 
     // Create the text input for the Histogram Sum filename
@@ -100,7 +104,7 @@
     newInput.className = 'analyzer-input-text';
     newInput.value = dataStore.histoSumFilename;
     newInput.onchange = function(){
-    dataStore.histoSumFilename = this.value;
+      dataStore.histoSumFilename = this.value;
     }.bind(newInput);
     document.getElementById('HistoSumFilenameInputDiv').appendChild(newInput);
 
@@ -111,22 +115,59 @@
     newButton.innerHTML = "Sum selected Histogram files together";
     newButton.style.padding = '4px';
     newButton.onclick = function(){
-    submitHistoFileSumRequestToServer();
+      submitHistoFileSumRequestToServer();
     }.bind(newButton);
     document.getElementById('submitDivSum').appendChild(newButton);
 
-    // Create button for launching Energy Calibrator app
+        // Create refresh button for the histogram directory
+        newButton = document.createElement('button');
+        newButton.setAttribute('id', 'refreshViewerHistoDir');
+        newButton.setAttribute('class', 'btn btn-default btn-sm');
+        newButton.innerHTML = "<span class=\"glyphicon glyphicon-refresh\"></span>";
+        newButton.style.padding = '4px';
+        newButton.onclick = function(){
+          getHistoFileListFromServer();
+        }.bind(newButton);
+        document.getElementById('histoDirViewerDiv').appendChild(newButton);
+
+    // Create button for launching Peak Fitter app
     newButton = document.createElement('button');
-    newButton.setAttribute('id', 'launchEnCalButton');
+    newButton.setAttribute('id', 'launchPeakFitButton');
     newButton.setAttribute('class', 'btn btn-default btn-lg');
-    newButton.innerHTML = "Launch Energy Calibrator";
+    newButton.innerHTML = "Launch Peak Fitter";
     document.getElementById('launchAppsDiv').style.textAlign = 'right';
     newButton.style.padding = '4px';
     newButton.onclick = function(){
-      var url = "https://griffincollaboration.github.io/SpectrumViewer/energyCalibrator.html?analyzerBackend="+dataStore.spectrumServerBackend+"&analyzerPort="+dataStore.spectrumServerPort+"&histoDir="+dataStore.histoFileDirectoryPath;
+      var url = "https://griffincollaboration.github.io/SpectrumViewer/peakFitter.html?analyzerBackend="+dataStore.spectrumServerBackend+"&analyzerPort="+dataStore.spectrumServerPort+"&histoDir="+dataStore.histoFileDirectoryPath;
       window.open(url);
     }.bind(newButton);
     document.getElementById('launchAppsDiv').appendChild(newButton);
+
+        // Create button for launching Energy Calibrator app
+        newButton = document.createElement('button');
+        newButton.setAttribute('id', 'launchEnCalButton');
+        newButton.setAttribute('class', 'btn btn-default btn-lg');
+        newButton.innerHTML = "Launch Energy Calibrator";
+        document.getElementById('launchAppsDiv').style.textAlign = 'right';
+        newButton.style.padding = '4px';
+        newButton.onclick = function(){
+          var url = "https://griffincollaboration.github.io/SpectrumViewer/energyCalibrator.html?analyzerBackend="+dataStore.spectrumServerBackend+"&analyzerPort="+dataStore.spectrumServerPort+"&histoDir="+dataStore.histoFileDirectoryPath;
+          window.open(url);
+        }.bind(newButton);
+        document.getElementById('launchAppsDiv').appendChild(newButton);
+
+        // Create button for launching fastTimingCalibrations app
+        newButton = document.createElement('button');
+        newButton.setAttribute('id', 'launchFTCalButton');
+        newButton.setAttribute('class', 'btn btn-default btn-lg');
+        newButton.innerHTML = "Launch Fast-Timing Calibrations";
+        document.getElementById('launchAppsDiv').style.textAlign = 'right';
+        newButton.style.padding = '4px';
+        newButton.onclick = function(){
+          var url = "https://griffincollaboration.github.io/SpectrumViewer/fastTimingCalibrations.html?analyzerBackend="+dataStore.spectrumServerBackend+"&analyzerPort="+dataStore.spectrumServerPort+"&histoDir="+dataStore.histoFileDirectoryPath;
+          window.open(url);
+        }.bind(newButton);
+        document.getElementById('launchAppsDiv').appendChild(newButton);
 
     // Create button for launching Efficiency Fitter app
     newButton = document.createElement('button');
@@ -141,16 +182,18 @@
     }.bind(newButton);
     document.getElementById('launchAppsDiv').appendChild(newButton);
 
-    // Create refresh button for the histogram directory
-    newButton = document.createElement('button');
-    newButton.setAttribute('id', 'refreshViewerHistoDir');
-    newButton.setAttribute('class', 'btn btn-default btn-sm');
-    newButton.innerHTML = "<span class=\"glyphicon glyphicon-refresh\"></span>";
-    newButton.style.padding = '4px';
-    newButton.onclick = function(){
-    getHistoFileListFromServer();
-    }.bind(newButton);
-    document.getElementById('histoDirViewerDiv').appendChild(newButton);
+        // Create button for launching pileup corrections app
+        newButton = document.createElement('button');
+        newButton.setAttribute('id', 'launchPUButton');
+        newButton.setAttribute('class', 'btn btn-default btn-lg');
+        newButton.innerHTML = "Launch Pileup Corrections";
+        document.getElementById('launchAppsDiv').style.textAlign = 'right';
+        newButton.style.padding = '4px';
+        newButton.onclick = function(){
+          var url = "https://griffincollaboration.github.io/SpectrumViewer/pileupCorrections.html?analyzerBackend="+dataStore.spectrumServerBackend+"&analyzerPort="+dataStore.spectrumServerPort+"&histoDir="+dataStore.histoFileDirectoryPath;
+          window.open(url);
+        }.bind(newButton);
+        document.getElementById('launchAppsDiv').appendChild(newButton);
 
     // set up event listeners
     listener(wrapperID, 'requestViewerRefresh', setupViewerContent);
@@ -159,5 +202,5 @@
     // Set up the content of this sub page
     setupViewerContent();
 
-    }
+  }
 </script>

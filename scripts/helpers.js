@@ -1143,7 +1143,7 @@ function constructNewSpectrumMenu(){
     document.getElementById('navbar-content-div').innerHTML = '';
   }
   catch(err){
-    console.log(err);
+  //  console.log(err);
     return;
   }
 

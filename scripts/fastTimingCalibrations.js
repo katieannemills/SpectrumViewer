@@ -481,10 +481,12 @@ function setupDataStore(){
         ////////////////
 
         // Plug in the active spectra names for the 1d histograms
+        dataStore._plotControl.activeSpectra = [];
         for(var i=0; i<dataStore.spectrumList1d.length; i++){
           dataStore._plotControl.activeSpectra.push(dataStore.spectrumList1d[i]);
         }
         // Plug in the active spectra names for the 2d histograms
+        dataStore._plotControl.active2dSpectra = [];
         for(i=0; i<dataStore.spectrumList2d.length; i++){
           dataStore._plotControl.active2dSpectra.push(dataStore.spectrumList2d[i]);
         }
@@ -548,6 +550,7 @@ function setupDataStore(){
         }
 
         function projectionsCallback(){
+          console.log("projectionsCallback with job "+dataStore.currentJob);
           // Need to move these projections into the dataStore.spectrumListProjections object
           // Need to add these projections to the spectrum menu
           var keys = Object.keys(dataStore.createdSpectra);
@@ -643,6 +646,7 @@ function setupDataStore(){
             launchPeakFittingProcess();
 
           }else if(dataStore.currentJob == '60Co'){
+            console.log(dataStore);
             findTacOffsets(); // Find the offset of the TAC for each LaBr combination using the 60Co run
             gainMatchLBL();   // Determine the gain for each LaBr energy using the 60Co run
           }else{
@@ -652,6 +656,7 @@ function setupDataStore(){
 
         function fittingCallback(){
           // All fitting has now been completed
+          console.log("fittingCallback");
 
           // We now have gain and have found the peak centroids for the TACs.
           // Use peak centroid to calculate the offset values for each LBL-LBL combination.
@@ -665,6 +670,7 @@ function setupDataStore(){
           for(var i=0; i<specList.length; i++){
             if(!specList[i].includes("TAC_")){ continue; } // Only use TAC histograms in the 60Co run
             var thisKey = histoName + ":" + specList[i];
+            if(!dataStore.fitResults[thisKey]){ continue; } // Bail out if there are no fit results yet
             dataStore.comboOffsets[index] = 500 - dataStore.fitResults[thisKey][0][1];
             if(i>0){ string += ","; }
             string += (500 - dataStore.fitResults[thisKey][0][1]).toFixed(0);
@@ -697,6 +703,7 @@ function setupDataStore(){
         }
 
         function postProcessTacCalibration(){
+          console.log("postProcessTacCalibration");
 
           var keys = Object.keys(dataStore.rawData);
           for(var i=0; i<keys.length; i++){
@@ -712,6 +719,7 @@ function setupDataStore(){
         function findTacCalibration(){
           // The time calibrator produces a picket fence of peaks in the spectrum at well-known time differences.
           // Here we will first find the 5 peaks, then perform the linear calibration to 10 picoseconds per channel
+          console.log("findTacCalibration");
 
           var keys = Object.keys(dataStore.rawData);
           for(var i=0; i<keys.length; i++){
@@ -759,6 +767,7 @@ function setupDataStore(){
         }
 
         function findTacOffsets(){
+        console.log("findTacOffsets");
           var spectrumList = [];
           var peaksList = {};
 
@@ -839,6 +848,7 @@ function setupDataStore(){
         }
 
         function gainMatchLBL(){
+        console.log("gainMatchLBL");
           var peaksList = {};
 
           var keys = Object.keys(dataStore.rawData);
