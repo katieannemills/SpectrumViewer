@@ -879,6 +879,9 @@ function setupDataStore(){
             var minChiSquare = 100000000;
             var chiSquareSeries = [];
             var optimalGain = 1.0;
+            var lowerTestBin = 40;
+            var upperTestBin = 1500;
+            var lengthTestBins = upperTestBin-lowerTestBin;
             // Scan through gain values
             for(gain=gainLowerLimit; gain<gainUpperLimit; gain+=gainStepSize){
               testSpectrum = [];
@@ -895,12 +898,15 @@ function setupDataStore(){
               testSpectrum[0] = testSpectrum[1];   // elimimate noise
               errorSpectrum[0] = errorSpectrum[1]; // elimimate noise
               thisChiSquare = calculateChiSquare(testSpectrum,errorSpectrum,referenceSpectrum);
+            //  thisChiSquare = calculateChiSquare(testSpectrum.slice(lowerTestBin,lengthTestBins),errorSpectrum.slice(lowerTestBin,lengthTestBins),referenceSpectrum.slice(lowerTestBin,lengthTestBins));
               chiSquareSeries.push(thisChiSquare);
 
               // Decide if this is the best fit and save it if it is
               if(thisChiSquare<minChiSquare){ minChiSquare = thisChiSquare; optimalGain = gain; }
             }
             dataStore.LBLgains.push(optimalGain);
+          //  console.log(keys[i]+", best chi-square ("+minChiSquare +") at gain "+optimalGain);
+          //  console.log(chiSquareSeries);
           }
         }
 

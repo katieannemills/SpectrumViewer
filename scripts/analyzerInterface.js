@@ -400,11 +400,18 @@ function processSortStatus(payload){
     // Set the heartbeat frequency
     dataStore.heartbeatInterval = dataStore.heartbeatIntervalSUMMINGvalue;
 
+// Get the file numbers
+var thisFileNum = parseInt(payload.split(' ')[3]);
+var totalFiles = parseInt(payload.split(' ')[4]);
+var summingPercentage = (thisFileNum/totalFiles)*100;
+    thisFileNum += 1;
+    if(summingPercentage<10){ summingPercentage=10; }
+
     // Update the progress bar
     document.getElementById('progress').className = 'progress-bar progress-bar-success progress-bar-striped';
-    document.getElementById('progress').setAttribute('style', 'width:' + 100 + '%' );
+    document.getElementById('progress').setAttribute('style', 'width:' + summingPercentage + '%' );
     document.getElementById('progress').innerHTML = 'Summing histogram files...';
-    document.getElementById("sortStatusDisplay").innerHTML = 'Summing histogram files together.';
+    document.getElementById("sortStatusDisplay").innerHTML = 'Summing file '+ thisFileNum +' of '+ totalFiles +' histogram files together.';
     return;
   }else{
     // Set the heartbeat frequency
