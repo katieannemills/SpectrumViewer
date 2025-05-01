@@ -530,7 +530,7 @@ function launchPeakFittingProcess(){
       dataStore.spectrumList1d.forEach((element) => spectrumList.push(histoName+":"+element));
 
       // Start the whole fitting routine for singles peaks
-      fitPeaksInSeriesOfHistograms(spectrumList,dataStore.spectrumList1dPeaks);
+      fitPeaksInSeriesOfHistograms(spectrumList,dataStore.spectrumList1dPeaks,"HPGe");
     }
 
     function fittingCallback(){
@@ -559,7 +559,7 @@ function launchPeakFittingProcess(){
         }
 
         // Start the fitting routine for projections peaks for this run file
-        fitPeaksInSeriesOfHistograms(theseProjections,dataStore.spectrumListProjectionsPeaks);
+        fitPeaksInSeriesOfHistograms(theseProjections,dataStore.spectrumListProjectionsPeaks,"HPGe");
         return;
       }
 

@@ -843,7 +843,7 @@ function setupDataStore(){
           document.getElementById('maxX').onchange();
 
           // Start the whole fitting routine for singles peaks
-          fitPeaksInSeriesOfHistograms(spectrumList,peaksList);
+          fitPeaksInSeriesOfHistograms(spectrumList,peaksList,"TAC");
 
         }
 

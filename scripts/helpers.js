@@ -1551,7 +1551,7 @@ async function createNewProjection(axis,min,max,BG1SF,BG1Min,BG1Max,BG2SF,BG2Min
 };
 
 
-function fitPeaksInSeriesOfHistograms(spectra,peaks){
+function fitPeaksInSeriesOfHistograms(spectra,peaks,detectorType){
   //fit all spectra to the peaks defined.
 
   // Return a new promise.
@@ -1583,7 +1583,7 @@ function fitPeaksInSeriesOfHistograms(spectra,peaks){
         updateProgressBar(thesePeaks.length);
 
         // Call the fitting routine
-        fitSpectra(thisKey,thesePeaks)
+        fitSpectra(thisKey,thesePeaks,detectorType)
       }.bind(this),
 
       function(){
@@ -1607,7 +1607,7 @@ function fitPeaksInSeriesOfHistograms(spectra,peaks){
 }
 
 
-function fitSpectra(spectrum,peaks){
+function fitSpectra(spectrum,peaks,detectorType){
   //redo the fits for the named spectrum.
   //<spectrum>: string; name of spectrum, per names from analyzer
 
@@ -1636,7 +1636,7 @@ function fitSpectra(spectrum,peaks){
   for(peakIndex=0; peakIndex<peaks.length; peakIndex++){
 
     // Determine the peak width for the fit region
-    var thisPeakWidth = Math.ceil(typicalPeakWidth(peaks[peakIndex],"HPGe")*8);
+    var thisPeakWidth = Math.ceil(typicalPeakWidth(peaks[peakIndex],detectorType)*6);
 
     //set up peak fit
     dataStore.currentPeak = peakIndex;
@@ -2504,6 +2504,9 @@ function typicalPeakWidth(energy,detector){
   }
   if(detector == "RCMP"){
     width = 40;
+  }
+  if(detector == "TAC"){
+    width = 80;
   }
   if(width<1.0){ return(1); }
   return(width);
