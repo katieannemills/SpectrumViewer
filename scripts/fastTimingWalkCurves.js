@@ -161,9 +161,9 @@ function setupDataStore(){
     //dataStore.buttonNames = ["Spectra", "Peak-Fitting Results", "per Crystal k-dependance fits", "per Crystal 1st-Hit-dependance fits"];  // Names to appear on the buttons
     //  dataStore.buttonIDs = ["plotRegionMenuButton", "graphRegionMenuButton", "crystalKRegionMenuButton", "crystal1stHitRegionMenuButton"];    // IDs for the buttons
     //dataStore.buttonPages = ["plotRegion", "resultsTableRegion", "crystalKReportRegion", "crystal1stHitReportRegion"];                 // Pages (div IDs) to be associated with the buttons
-    dataStore.buttonNames = ["Spectra", "Compton Walk Curves", "Peak-Fitting Results"];  // Names to appear on the buttons
-    dataStore.buttonIDs = ["plotRegionMenuButton", "tableRegionMenuButton", "graphRegionMenuButton"];    // IDs for the buttons
-    dataStore.buttonPages = ["plotRegion", "detectorReportRegion", "resultsTableRegion"];                 // Pages (div IDs) to be associated with the buttons
+    dataStore.buttonNames = ["Spectra", "Individual Compton Walk Curves", "Peak-Fitting Results", "Compton Walk Curves Plot"];  // Names to appear on the buttons
+    dataStore.buttonIDs = ["plotRegionMenuButton", "tableRegionMenuButton", "graphRegionMenuButton", "dataPlotRegionMenuButton"];    // IDs for the buttons
+    dataStore.buttonPages = ["plotRegion", "detectorReportRegion", "resultsTableRegion","resultsPlotRegion"];                 // Pages (div IDs) to be associated with the buttons
 
     // Generate THESEdetectors object. Used for building the walk curve table
     dataStore.THESEdetectors = [];
@@ -182,20 +182,45 @@ dataStore.plotStyle = [];
 dataStore.plotStyle[0] = {                     //dygraphs style object
   labels: ["Energy (keV)", "Centroid Position (ps)"],
   title: 'LaBr3 Time Walk Curve',
+  xlabel: 'Energy (keV)',
+  ylabel: 'Centroid Position (ps)',
   axisLabelColor: '#FFFFFF',
   colors: ["#AAE66A", "#EFB2F0", "#B2D1F0", "#F0DBB2"],
   labelsDiv: 'detectorReportPlotLegend',
+  height: '640',
   drawPoints: 'true',
   connectSeparatedPoints: 'true',
   pointSize: '5',
+  highlightCircleSize: '7',
   strokeWidth: '0',
+  //customBars: true,
+  legend: 'always',
+  axes: { x: { valueRange: [0,2000] }, y : { valueRange: [0,400] } }
+}
+dataStore.plotStyle[1] = {                     //dygraphs style object
+  labels: ["Energy (keV)", "Det 0", "Det 1", "Det 2", "Det 3", "Det 4", "Det 5", "Det 6", "Det 7"],
+  title: 'LaBr3 Compton Time Walk Curve',
+  xlabel: 'Energy (keV)',
+  ylabel: 'Centroid Position (ps)',
+  axisLabelColor: '#FFFFFF',
+  colors: ["#FFFFFF", "#FF0000", "#00FFFF", "#FFFF00", "#FF9900", "#0066FF", "#44FF44", "#FF00CC"],
+  labelsDiv: 'fastTimingWalkCurvesPlotLegend',
+  height: '960',
+  drawPoints: 'true',
+  connectSeparatedPoints: 'true',
+  pointSize: '5',
+  highlightCircleSize: '7',
+  strokeWidth: '0',
+  //customBars: true,
   legend: 'always',
   axes: { x: { valueRange: [0,2000] }, y : { valueRange: [0,400] } }
 }
 dataStore.plotInitData = [];
 dataStore.plotInitData[0] = [[0,0], [1,0], [2,0], [3,0], [4,0]];      //initial dummy data for _dataplot[0]
-dataStore.YAxisMinValue = [[0,0]];
-dataStore.YAxisMaxValue = [[0,0]];
+//dataStore.plotInitData[1] = [[0,0], [1,0], [2,0], [3,0], [4,0], [5,0], [6,0], [7,0]];      //initial dummy data for _dataplot[1]
+dataStore.plotInitData[1] = [[0,0,0,0,0,0,0,0,0], [1,0,0,0,0,0,0,0,0], [2,0,0,0,0,0,0,0,0], [3,0,0,0,0,0,0,0,0], [4,0,0,0,0,0,0,0,0], [5,0,0,0,0,0,0,0,0], [6,0,0,0,0,0,0,0,0], [7,0,0,0,0,0,0,0,0]];      //initial dummy data for _dataplot[1]
+dataStore.YAxisMinValue = [[0,0],[0,0]];
+dataStore.YAxisMaxValue = [[0,0],[0,0]];
 
 
   } // end of setupDataStore()
@@ -431,9 +456,13 @@ dataStore.YAxisMaxValue = [[0,0]];
       dataStore._fastTimingWalkCurvesReport = new fastTimingWalkCurvesReport('fastTimingWalkCurves','resultsTableRegion');
       dataStore._fastTimingWalkCurvesReport.setup();
 
-        // Generate the plot
-        dataStore._dataplot[0] = new dataplot('detectorReportPlot',0);
-        dataStore._dataplot[0].setup(0);
+      // Generate the plot
+      dataStore._dataplot[0] = new dataplot('detectorReportPlot',0);
+      dataStore._dataplot[0].setup(0);
+
+      // Generate the plot
+      dataStore._dataplot[1] = new dataplot('fastTimingWalkCurvesPlot',1);
+      dataStore._dataplot[1].setup(1);
 
       // Draw the search region
       dataStore.viewers[dataStore.plots[0]].plotData();
@@ -660,7 +689,8 @@ dataStore.YAxisMaxValue = [[0,0]];
             walkCurveData["TAC"+thisTAC] = {
               "xSeries": [],
               "ySeries": [],
-              "yUncSeries": [],
+              "yUncSeries": [], // lo,hi
+              "yUncHiLoSeries": [], // lo,hi
               "yMeans": [],
               "ySigmas": [],
             };
@@ -685,6 +715,9 @@ dataStore.YAxisMaxValue = [[0,0]];
           for(var j=0; j<walkCurveData[keys[i]].xSeries.length; j++){
             walkCurveData[keys[i]].ySeries[j] = walkCurveData[keys[i]].yMeans[j] - walkCurveData[keys[i]].yMeans[walkCurveData[keys[i]].xSeries.length-1];
             walkCurveData[keys[i]].yUncSeries[j] = (walkCurveData[keys[i]].ySigmas[j] / walkCurveData[keys[i]].yMeans[j]) * walkCurveData[keys[i]].ySeries[j];
+            walkCurveData[keys[i]].yUncHiLoSeries[j] = [];
+            walkCurveData[keys[i]].yUncHiLoSeries[j][0] = walkCurveData[keys[i]].ySeries[j] - ((walkCurveData[keys[i]].ySigmas[j] / walkCurveData[keys[i]].yMeans[j]) * walkCurveData[keys[i]].ySeries[j]);
+            walkCurveData[keys[i]].yUncHiLoSeries[j][1] = walkCurveData[keys[i]].ySeries[j] + ((walkCurveData[keys[i]].ySigmas[j] / walkCurveData[keys[i]].yMeans[j]) * walkCurveData[keys[i]].ySeries[j]);
           }
         }
 
@@ -695,6 +728,8 @@ dataStore.YAxisMaxValue = [[0,0]];
 
         // Display the results in the table
         dataStore._fastTimingWalkCurvesReport.updateTable();
+        // The indivudal curve plots are triggered from the above function. Here draw the full plot with all curves
+        dataStore._fastTimingWalkCurvesReport.refreshFullPlotData();
       }
 
       function buildCSVfile(){

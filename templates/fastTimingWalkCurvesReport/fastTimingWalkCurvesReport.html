@@ -129,21 +129,21 @@ this.updateTable = function(){
   var tableID = "fastTimingWalkCurvesfastTimingWalkCurvesResults";
   var key = "TAC0";
 
-    for(var j=0; j<dataStore.ComptonWalkCurves[key].xSeries.length; j++){
-      // if a row for this peak does not exist in the table then create it
-      if(!document.getElementById(tableID+'Row-'+j)){
-        var row = document.getElementById(tableID).insertRow(document.getElementById(tableID).rows.length);
-        row.id = tableID+'Row-'+j;
-        for(var cellIndex=0; cellIndex<3; cellIndex++){
-          var cell = row.insertCell(cellIndex);
-          cell.id = row.id + 'Cell' + cellIndex;
-        }
+  for(var j=0; j<dataStore.ComptonWalkCurves[key].xSeries.length; j++){
+    // if a row for this peak does not exist in the table then create it
+    if(!document.getElementById(tableID+'Row-'+j)){
+      var row = document.getElementById(tableID).insertRow(document.getElementById(tableID).rows.length);
+      row.id = tableID+'Row-'+j;
+      for(var cellIndex=0; cellIndex<3; cellIndex++){
+        var cell = row.insertCell(cellIndex);
+        cell.id = row.id + 'Cell' + cellIndex;
       }
-
-      document.getElementById(row.id + 'Cell' + 0).innerHTML = dataStore.ComptonWalkCurves[key].xSeries[j];
-      document.getElementById(row.id + 'Cell' + 1).innerHTML = dataStore.ComptonWalkCurves[key].ySeries[j];
-      document.getElementById(row.id + 'Cell' + 2).innerHTML = dataStore.ComptonWalkCurves[key].yUncSeries[j];
     }
+
+    document.getElementById(row.id + 'Cell' + 0).innerHTML = dataStore.ComptonWalkCurves[key].xSeries[j];
+    document.getElementById(row.id + 'Cell' + 1).innerHTML = dataStore.ComptonWalkCurves[key].ySeries[j];
+    document.getElementById(row.id + 'Cell' + 2).innerHTML = dataStore.ComptonWalkCurves[key].yUncSeries[j];
+  }
 
 
 };
@@ -277,6 +277,49 @@ this.refreshDetectorPlotData = function(thisDetectorIndex){
   dataStore.YAxisMinValue[plotIndex][0] = min * 1.33;
 
   dataStore.dataplotData[plotIndex] = arrangePoints(dataStore.ComptonWalkCurves[key].xSeries, [dataStore.ComptonWalkCurves[key].ySeries], flags );
+  //  dataStore.dataplotData[plotIndex] = arrangePoints(dataStore.ComptonWalkCurves[key].xSeries, [dataStore.ComptonWalkCurves[key].yUncHiLoSeries[0],dataStore.ComptonWalkCurves[key].ySeries,dataStore.ComptonWalkCurves[key].yUncHiLoSeries[1]], flags );
+  var eventString = 'updateDyData'+plotIndex;
+  dispatcher({ 'data': dataStore.dataplotData[plotIndex] }, eventString);
+};
+
+this.refreshFullPlotData = function(){
+  //arrange the latest residual info for representation in the dygraph.
+  var keys = Object.keys(dataStore.ComptonWalkCurves);
+
+  // Build the flags array. All zeros but needs to be the correct length
+  var plotIndex = 1; // Plot 0 is the detector results plot
+  var i, evt, dataIndex = [],
+  flags = [];
+  flags.fillN(0, dataStore.ComptonWalkCurves[keys[0]].xSeries.length);
+
+  // Build the Y series data
+  var ySeriesData = [];
+  for(var j=keys.length-1; j>=0; j--){
+    ySeriesData.push(dataStore.ComptonWalkCurves[keys[j]].ySeries);
+  }
+
+  // Update the Y axis scale for these data
+  var max = 0;
+  for(var j=0; j<keys.length; j++){
+    for(i=0; i<dataStore.ComptonWalkCurves[keys[j]].ySeries.length; i++){
+      if(Math.abs(dataStore.ComptonWalkCurves[keys[j]].ySeries[i])>max){
+        max = Math.abs(dataStore.ComptonWalkCurves[keys[j]].ySeries[i]);
+      }
+    }
+  }
+  dataStore.YAxisMaxValue[plotIndex][0] = max * 1.33;
+  var min = 0;
+  for(var j=0; j<keys.length; j++){
+    for(i=0; i<dataStore.ComptonWalkCurves[keys[j]].ySeries.length; i++){
+      if(dataStore.ComptonWalkCurves[keys[j]].ySeries[i]<min){
+        min = dataStore.ComptonWalkCurves[keys[j]].ySeries[i];
+      }
+    }
+  }
+  dataStore.YAxisMinValue[plotIndex][0] = min * 1.33;
+
+  dataStore.dataplotData[plotIndex] = arrangePoints(dataStore.ComptonWalkCurves[keys[0]].xSeries, ySeriesData, flags );
+  //  dataStore.dataplotData[plotIndex] = arrangePoints(dataStore.ComptonWalkCurves[key].xSeries, [dataStore.ComptonWalkCurves[key].yUncHiLoSeries[0],dataStore.ComptonWalkCurves[key].ySeries,dataStore.ComptonWalkCurves[key].yUncHiLoSeries[1]], flags );
   var eventString = 'updateDyData'+plotIndex;
   dispatcher({ 'data': dataStore.dataplotData[plotIndex] }, eventString);
 };

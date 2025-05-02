@@ -1881,6 +1881,11 @@ function fitCOMSpectra(spectrum,peaks){
 function arrangePoints(x, y, flags){
   //arrange an array of x values, an array of arrays of y values, and data series flag for consumption by dygraphs
   //see test suite for examples of behavior.
+  //
+  // Example input to this function. flags is a single array with length of x series.
+  // Pass multiple y series as a comma separated array of arrays
+  //flags.fillN(0, dataStore.THESEdetectors.length)
+  //dataStore.resolutionData = arrangePoints(detectorIndex, [dataStore.PeakResolution[0], dataStore.PeakResolution[1], dataStore.PeakResolution[2], dataStore.PeakResolution[3]], flags );
 
   var copyFlags = []
   var uniqueFlags;
