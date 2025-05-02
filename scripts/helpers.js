@@ -913,41 +913,41 @@ function processHistoFileList(payload){
 
 
 function setupHistoListSelect(){
-// Only proceed if this is needed.
-if(!document.getElementById('histo-list-menu-div')){ return; }
+  // Only proceed if this is needed.
+  if(!document.getElementById('histo-list-menu-div')){ return; }
 
-// Clear the previous contents
-document.getElementById('histo-list-menu-div').innerHTML = 'Histogram file: ';
+  // Clear the previous contents
+  document.getElementById('histo-list-menu-div').innerHTML = 'Histogram file: ';
 
-// Create a select input for the histo file list
-var newSelect = document.createElement("select");
-newSelect.id = 'HistoListSelect';
-newSelect.name = 'HistoListSelect';
-newSelect.onchange = function(){
-dataStore.histoFileName = this.value;
-GetSpectrumListFromServer(dataStore.spectrumServer,processSpectrumList);
-console.log('Histogram selected is '+dataStore.histoFileName);
-}.bind(newSelect);
+  // Create a select input for the histo file list
+  var newSelect = document.createElement("select");
+  newSelect.id = 'HistoListSelect';
+  newSelect.name = 'HistoListSelect';
+  newSelect.onchange = function(){
+    dataStore.histoFileName = this.value;
+    GetSpectrumListFromServer(dataStore.spectrumServer,processSpectrumList);
+    console.log('Histogram selected is '+dataStore.histoFileName);
+  }.bind(newSelect);
 
-document.getElementById('histo-list-menu-div').appendChild(newSelect);
+  document.getElementById('histo-list-menu-div').appendChild(newSelect);
 
-// Add the list of histo files as the options
-thisSelect = document.getElementById('HistoListSelect');
-thisSelect.add( new Option('Online', 'Online') );
-for(var i=0; i<dataStore.histoFileList.length; i++){
-thisSelect.add( new Option(dataStore.histoFileList[i], dataStore.histoFileList[i]) );
-}
+  // Add the list of histo files as the options
+  thisSelect = document.getElementById('HistoListSelect');
+  thisSelect.add( new Option('Online', 'Online') );
+  for(var i=0; i<dataStore.histoFileList.length; i++){
+    thisSelect.add( new Option(dataStore.histoFileList[i], dataStore.histoFileList[i]) );
+  }
 
-// if a Histogram file has been specified in the URL, make it the selected option
-if(dataStore.histoFileName.length>0){
-thisSelect.value = dataStore.histoFileName;
-}
+  // if a Histogram file has been specified in the URL, make it the selected option
+  if(dataStore.histoFileName.length>0){
+    thisSelect.value = dataStore.histoFileName;
+  }
 
-// Get the spectrum list for whatever is selected on startup
-dataStore.histoFileName = document.getElementById('HistoListSelect').value;
-GetSpectrumListFromServer(dataStore.spectrumServer,processSpectrumList);
+  // Get the spectrum list for whatever is selected on startup
+  dataStore.histoFileName = document.getElementById('HistoListSelect').value;
+  GetSpectrumListFromServer(dataStore.spectrumServer,processSpectrumList);
 
-// Populate the histo Choice bar in apps
+  // Populate the histo Choice bar in apps
   if(typeof(dataStore.histoChoiceBarContents)!="undefined"){
     for(var i=0; i<dataStore.histoChoiceBarContents.length; i++){
       var thisTitle = dataStore.histoChoiceBarContents[i];
@@ -1143,7 +1143,7 @@ function constructNewSpectrumMenu(){
     document.getElementById('navbar-content-div').innerHTML = '';
   }
   catch(err){
-  //  console.log(err);
+    //  console.log(err);
     return;
   }
 
@@ -1166,59 +1166,59 @@ function constructNewSpectrumMenu(){
 /*
 function setupHistoListSelect(){
 
-  // Remove the select if it already exists
-  try{
-    document.getElementById('HistoListSelect').remove();
-    document.getElementById('HistoListSelectLabel').remove();
-  }
-  catch(err){ }
+// Remove the select if it already exists
+try{
+document.getElementById('HistoListSelect').remove();
+document.getElementById('HistoListSelectLabel').remove();
+}
+catch(err){ }
 
-  if(typeof(dataStore.histoChoiceBarContents)!="undefined"){
-    for(var i=0; i<dataStore.histoChoiceBarContents.length; i++){
-      var thisTitle = dataStore.histoChoiceBarContents[i];
-      var rowIndex = Math.floor(i/2);
+if(typeof(dataStore.histoChoiceBarContents)!="undefined"){
+for(var i=0; i<dataStore.histoChoiceBarContents.length; i++){
+var thisTitle = dataStore.histoChoiceBarContents[i];
+var rowIndex = Math.floor(i/2);
 
-      if(i%2==0){
-        // Inject the Container Div (a row) for this pair of selects.
-        var newDiv = document.createElement("div");
-        newDiv.id = 'histoChoiceDivRow'+rowIndex;
-        newDiv.class = 'col-md-12';
-        document.getElementById('histoChoiceDir').appendChild(newDiv);
-      }
+if(i%2==0){
+// Inject the Container Div (a row) for this pair of selects.
+var newDiv = document.createElement("div");
+newDiv.id = 'histoChoiceDivRow'+rowIndex;
+newDiv.class = 'col-md-12';
+document.getElementById('histoChoiceDir').appendChild(newDiv);
+}
 
-      // Inject the Div for this label and select
-      var newDiv = document.createElement("div");
-      newDiv.id = 'histoChoice'+thisTitle;
-      newDiv.class = 'col-md-4';
-      document.getElementById('histoChoiceDivRow'+rowIndex).appendChild(newDiv);
+// Inject the Div for this label and select
+var newDiv = document.createElement("div");
+newDiv.id = 'histoChoice'+thisTitle;
+newDiv.class = 'col-md-4';
+document.getElementById('histoChoiceDivRow'+rowIndex).appendChild(newDiv);
 
 
-      // Add the title text for the label
-      var newLabel = document.createElement("label");
-      newLabel.for = 'HistoListSelect'+thisTitle;
-      newLabel.id = 'HistoListSelectLabel'+thisTitle;
-      newLabel.innerHTML = thisTitle+' Histogram file: ';
-      document.getElementById('histoChoice'+thisTitle).appendChild(newLabel);
+// Add the title text for the label
+var newLabel = document.createElement("label");
+newLabel.for = 'HistoListSelect'+thisTitle;
+newLabel.id = 'HistoListSelectLabel'+thisTitle;
+newLabel.innerHTML = thisTitle+' Histogram file: ';
+document.getElementById('histoChoice'+thisTitle).appendChild(newLabel);
 
-      // Create a select input for the histo file list
-      var newSelect = document.createElement("select");
-      newSelect.id = 'HistoListSelect'+thisTitle;
-      newSelect.name = 'HistoListSelect'+thisTitle;
-      document.getElementById('histoChoice'+thisTitle).appendChild(newSelect);
+// Create a select input for the histo file list
+var newSelect = document.createElement("select");
+newSelect.id = 'HistoListSelect'+thisTitle;
+newSelect.name = 'HistoListSelect'+thisTitle;
+document.getElementById('histoChoice'+thisTitle).appendChild(newSelect);
 
-      // Add the list of histo files as the options
-      thisSelect = document.getElementById('HistoListSelect'+thisTitle);
-      if(thisTitle == "11Be" || thisTitle == "133Ba"){
-        thisSelect.add( new Option("Do not include "+thisTitle, "exclude") );
-      }
-      for(var j=0; j<dataStore.histoFileList.length; j++){
-        thisSelect.add( new Option(dataStore.histoFileList[j], dataStore.histoFileList[j]) );
-      }
+// Add the list of histo files as the options
+thisSelect = document.getElementById('HistoListSelect'+thisTitle);
+if(thisTitle == "11Be" || thisTitle == "133Ba"){
+thisSelect.add( new Option("Do not include "+thisTitle, "exclude") );
+}
+for(var j=0; j<dataStore.histoFileList.length; j++){
+thisSelect.add( new Option(dataStore.histoFileList[j], dataStore.histoFileList[j]) );
+}
 
-      // Fire the onchange event for the select with the default value to set it
-      //document.getElementById('HistoListSelect'+thisTitle).onchange();
-    }
-  }
+// Fire the onchange event for the select with the default value to set it
+//document.getElementById('HistoListSelect'+thisTitle).onchange();
+}
+}
 
 }
 */
@@ -1594,9 +1594,6 @@ function fitPeaksInSeriesOfHistograms(spectra,peaks,detectorType){
         // Callback
         fittingCallback();
 
-        // resolve the promise
-        //resolve('Success!');
-
       }.bind(this),
 
       keys.length-1
@@ -1729,6 +1726,151 @@ function addFitLines(){
   }
 
   dataStore.viewers[viewerName].stage.update();
+}
+
+function fitCOMInSeriesOfHistograms(spectra,peaks){
+  //fit Centre-Of-Mass in all regions in all spectra defined.
+
+  // Return a new promise.
+  return new Promise(function(resolve, reject) {
+
+    // Get the list of keys
+    var i, keys = spectra,
+    buffer = dataStore.currentPlot //keep track of whatever was originally plotted so we can return to it
+
+    //dump data so there is one displayed at a time
+    dataStore.viewers[dataStore.plots[0]].removeData(dataStore.currentPlot);
+
+    releaser(
+      function(i){
+        // Set up the next spectra and peaks to fit
+        var keys = spectra;
+        var thisKey = keys[i];
+
+        // Peak values must be integer as they represent bin/channel numbers
+        var thesePeaks = [];
+        for(var j=0; j<peaks[keys[i]].length; j++){
+          thesePeaks.push(parseInt(peaks[keys[i]][j]));
+        }
+
+        // Update the progress bar by one task
+        updateProgressBar(thesePeaks.length);
+
+        // Call the fitting routine
+        fitCOMSpectra(thisKey,thesePeaks)
+      }.bind(this),
+
+      function(){
+        var evt;
+        //set up fit line re-drawing
+        dataStore.viewers[dataStore.plots[0]].drawCallback = addFitLines;
+
+        // Callback
+        fittingCOMCallback();
+
+      }.bind(this),
+
+      keys.length-1
+    )
+
+  }); // end of promise definition
+
+}
+
+function fitCOMSpectra(spectrum,peaks){
+  // find the Center-Of-Mass (COM) for the named spectrum.
+  //<spectrum>: string; name of spectrum, per names from analyzer
+
+  var viewerName = dataStore.plots[0];
+  var spectrumData = [];
+
+  //set up fitting for this spectrum/source
+  dataStore.currentPlot = spectrum;
+  dataStore.viewers[viewerName].plotData() //kludge to update limits, could be nicer
+  dataStore._plotListLite.exclusivePlot(spectrum, dataStore.viewers[dataStore.plots[0]]);
+
+  //locate the spectrum in the dataStore
+  if(spectrum in dataStore.createdSpectra){ // true if spectrum is a key of createdSpectra
+    //set up the spectrum data for fitting
+    spectrumData = JSON.parse(JSON.stringify(dataStore.createdSpectra[spectrum]));
+  }else if(spectrum in dataStore.rawData){
+    //set up the spectrum data for fitting
+    spectrumData = JSON.parse(JSON.stringify(dataStore.rawData[spectrum]));
+  }else{
+    console.log("Failed to locate spectrum data for \'"+spectrum+"\' in fitCOMSpectra");
+    return;
+  }
+
+  // Loop through the peaks to fit for this projection
+  for(peakIndex=0; peakIndex<peaks.length; peakIndex++){
+    dataStore.currentPeak = peakIndex;
+
+    //Perform the actual Center-Of-Mass (COM) determination
+
+    // Find the maximum bin which is close to peak centre
+    var regionWidth = 100;
+    var thisLowerLimit = peaks[peakIndex]-regionWidth;
+    var thisUpperLimit = peaks[peakIndex]+regionWidth;
+    var maxValue = 0; var maxIndex=-1; var index=0;
+    for(k=thisLowerLimit; k<thisUpperLimit; k++){
+      if(k>spectrumData.length-1){ continue; }
+      if(isNaN(spectrumData[k])){ continue; }
+      if(spectrumData[k]>maxValue){ maxValue = spectrumData[k]; maxIndex = index = k; }
+    }
+
+    // Find the rough FWHM - Do this from the outside inwards otherwise we get quickly stuck in false minima
+    index = thisLowerLimit;
+    while(spectrumData[index]<maxValue/2){ index++; }
+    var ROIlowerLimit = maxIndex - (maxIndex-index)*3;
+    index = thisUpperLimit;
+    while(spectrumData[index]<maxValue/2){ index--; }
+    var ROIupperLimit = maxIndex + (index-maxIndex)*3;
+
+    // Reduce the sectionData to just the peak Region of Interest
+    var thisSectionData = spectrumData.slice(ROIlowerLimit,ROIupperLimit);
+
+    // Find the centre of mass of this peak
+    var sum = sumProducts = sumSqDeviations = 0;
+    for(k=0; k<thisSectionData.length; k++){
+      if(isNaN(thisSectionData[k])){ continue; }
+      sum += thisSectionData[k];
+      sumProducts += thisSectionData[k] * (k+ROIlowerLimit);
+    }
+    var mean = sumProducts / sum;
+
+    // Find the standard deviation (sigma or width)
+    var sumSqDeviations = 0;
+    for(k=ROIlowerLimit; k<ROIupperLimit; k++){
+      if(isNaN(spectrumData[k])){ continue; }
+      sumSqDeviations += ((k-mean)*(k-mean))*spectrumData[k];
+    }
+    var variance = sumSqDeviations / sum;
+    var width = Math.sqrt(variance);
+    var fwhm = width*2.35;
+
+    // Find the rough amplitude
+    var amplitude=0;
+    for(k=parseInt(mean)-5; k<parseInt(mean)+6; k++){
+      if(isNaN(spectrumData[k])){ continue; }
+      amplitude += spectrumData[k];
+    }
+    amplitude /= 10;
+
+    // Save the results
+    //keep track of fit results and peak area
+    if(!dataStore.fitResults[dataStore.currentPlot]) dataStore.fitResults[dataStore.currentPlot] = [];
+    dataStore.fitResults[dataStore.currentPlot][dataStore.currentPeak] = [amplitude, mean, width, 1, 0, sum, fwhm];
+
+    // Update the ROI
+    // DO WE NEED ROI ANY MORE? Yes, for addFitLines
+    if(!dataStore.ROI[dataStore.currentPlot]) dataStore.ROI[dataStore.currentPlot] = [];
+    if(!dataStore.ROI[dataStore.currentPlot][dataStore.currentPeak]) dataStore.ROI[dataStore.currentPlot][dataStore.currentPeak] = [];
+    dataStore.ROI[dataStore.currentPlot][dataStore.currentPeak][0] = ROIlowerLimit;
+    dataStore.ROI[dataStore.currentPlot][dataStore.currentPeak][1] = ROIupperLimit;
+  }
+
+  //dump data so it doesn't stack up
+  dataStore.viewers[viewerName].removeData(spectrum);
 }
 
 
