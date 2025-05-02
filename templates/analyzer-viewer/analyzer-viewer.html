@@ -156,18 +156,31 @@
         }.bind(newButton);
         document.getElementById('launchAppsDiv').appendChild(newButton);
 
-        // Create button for launching fastTimingCalibrations app
-        newButton = document.createElement('button');
-        newButton.setAttribute('id', 'launchFTCalButton');
-        newButton.setAttribute('class', 'btn btn-default btn-lg');
-        newButton.innerHTML = "Launch Fast-Timing Calibrations";
-        document.getElementById('launchAppsDiv').style.textAlign = 'right';
-        newButton.style.padding = '4px';
-        newButton.onclick = function(){
-          var url = "https://griffincollaboration.github.io/SpectrumViewer/fastTimingCalibrations.html?analyzerBackend="+dataStore.spectrumServerBackend+"&analyzerPort="+dataStore.spectrumServerPort+"&histoDir="+dataStore.histoFileDirectoryPath;
-          window.open(url);
-        }.bind(newButton);
-        document.getElementById('launchAppsDiv').appendChild(newButton);
+                // Create button for launching fastTimingCalibrations app
+                newButton = document.createElement('button');
+                newButton.setAttribute('id', 'launchFTCalButton');
+                newButton.setAttribute('class', 'btn btn-default btn-lg');
+                newButton.innerHTML = "Launch Fast-Timing Calibrations";
+                document.getElementById('launchAppsDiv').style.textAlign = 'right';
+                newButton.style.padding = '4px';
+                newButton.onclick = function(){
+                  var url = "https://griffincollaboration.github.io/SpectrumViewer/fastTimingCalibrations.html?analyzerBackend="+dataStore.spectrumServerBackend+"&analyzerPort="+dataStore.spectrumServerPort+"&histoDir="+dataStore.histoFileDirectoryPath;
+                  window.open(url);
+                }.bind(newButton);
+                document.getElementById('launchAppsDiv').appendChild(newButton);
+
+                        // Create button for launching fastTimingWalkCurves app
+                        newButton = document.createElement('button');
+                        newButton.setAttribute('id', 'launchFTCalButton');
+                        newButton.setAttribute('class', 'btn btn-default btn-lg');
+                        newButton.innerHTML = "Launch Fast-Timing Walk Curves";
+                        document.getElementById('launchAppsDiv').style.textAlign = 'right';
+                        newButton.style.padding = '4px';
+                        newButton.onclick = function(){
+                          var url = "https://griffincollaboration.github.io/SpectrumViewer/fastTimingWalkCurves.html?analyzerBackend="+dataStore.spectrumServerBackend+"&analyzerPort="+dataStore.spectrumServerPort+"&histoDir="+dataStore.histoFileDirectoryPath;
+                          window.open(url);
+                        }.bind(newButton);
+                        document.getElementById('launchAppsDiv').appendChild(newButton);
 
     // Create button for launching Efficiency Fitter app
     newButton = document.createElement('button');
