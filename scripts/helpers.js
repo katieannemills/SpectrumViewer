@@ -82,7 +82,8 @@ function promiseJSONURL(url){
     if(dataStore.xmltimeout != undefined){
       req.timeout = dataStore.xmltimeout;
     }else{
-      req.timeout = 5000; // time in milliseconds
+      //req.timeout = 5000; // time in milliseconds
+      req.timeout = 0; // timeout is diabled
     }
     req.open('GET', url);
 
@@ -168,7 +169,8 @@ function promisePartial(name){
     if(dataStore.xmltimeout != undefined){
       req.timeout = dataStore.xmltimeout;
     }else{
-      req.timeout = 5000; // time in milliseconds
+      //req.timeout = 5000; // time in milliseconds
+      req.timeout = 0; // timeout is diabled
     }
     req.open('GET', url);
 
@@ -206,7 +208,8 @@ function promiseXHR(url, errorMessage, callback, reject){
     if(dataStore.xmltimeout != undefined){
       req.timeout = dataStore.xmltimeout;
     }else{
-      req.timeout = 5000; // time in milliseconds
+      //req.timeout = 5000; // time in milliseconds
+      req.timeout = 0; // timeout is diabled
     }
     req.open('GET', url);
 
@@ -298,7 +301,8 @@ function XHR(url, errorMessage, callback, reject){
   if(dataStore.xmltimeout != undefined){
     req.timeout = dataStore.xmltimeout;
   }else{
-    req.timeout = 5000; // time in milliseconds
+    //req.timeout = 5000; // time in milliseconds
+    req.timeout = 0; // timeout is diabled
   }
   req.open('GET', url);
 
