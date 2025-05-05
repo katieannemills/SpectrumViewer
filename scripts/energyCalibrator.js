@@ -183,14 +183,14 @@ function setupDataStore(){
     },
     '56Co' : {"name":  "Co-56", "title":  "56Co", 'histoFileName' : '', "maxXValue":4000,       // General source details
     "Config": {},         // Place to store the Calibrations from the Config file of this run
-    "literaturePeaks": [ 122.06, 846.76, 1037.84, 1175.1, 1238.29, 1360.21, 1771.35, 2034.76, 2598.46, 3009.56, 3201.95,
+    "literaturePeaks": [ 846.76, 1037.84, 1175.1, 1238.29, 1360.21, 1771.35, 2034.76, 2598.46, 3009.56, 3201.95,
       3253.42,
       // 3272.99,
       3451.15,
       // 3548.27
     ],     // Peak energies from this source. Literature values taken from ENSDF.
-    "literatureIntensity":    [ 0.99940, 0.14052, 0.02252, 0.66460, 0.04283, 0.15411, 0.03016, 0.07769, 0.16970, 0.03209, 0.07923, 0.01876, 0.00949, 0.00196 ], // Peak intensities from this source. Literature values taken from ENSDF (gamma rays per 100 decays of the parent).
-    "literatureIntensityUnc": [ 0.00002, 0.00040, 0.00006, 0.00120, 0.00012, 0.00060, 0.00012, 0.00028, 0.00040, 0.00012, 0.00021, 0.00002, 0.00005, 0.00002 ], // Peak intensities from this source. Literature values taken from ENSDF (gamma rays per 100 decays of the parent).
+    "literatureIntensity":    [ 0.14052, 0.02252, 0.66460, 0.04283, 0.15411, 0.03016, 0.07769, 0.16970, 0.03209, 0.07923, 0.01876, 0.00949, 0.00196 ], // Peak intensities from this source. Literature values taken from ENSDF (gamma rays per 100 decays of the parent).
+    "literatureIntensityUnc": [ 0.00040, 0.00006, 0.00120, 0.00012, 0.00060, 0.00012, 0.00028, 0.00040, 0.00012, 0.00021, 0.00002, 0.00005, 0.00002 ], // Peak intensities from this source. Literature values taken from ENSDF (gamma rays per 100 decays of the parent).
     "peakWidth": 4,                     // integer number of channels used for gating. [centroid-peakWidth ... centroid+peakWidth]
     "uncalibratedCentroids": [],
     "calibratedCentroids": [],
@@ -198,7 +198,7 @@ function setupDataStore(){
     "correctedArea": [],
     "FWHM": [],
     "FCorrectionFactor": [],           // F factor determined from the number of active/inactive crystals which contribute to the 180 degree coincidence matrix
-    "summingInCorrectionPeaks": [ [[]],  [[]],  [[]],  [[]],  [[]], // An array of arrays of literautre peak energies which need to be gated on and fit to obtain the summing-In correction for the corresponding (by index number) 'literaturePeak'
+    "summingInCorrectionPeaks": [ [[]],  [[]],  [[]],  [[]], // An array of arrays of literautre peak energies which need to be gated on and fit to obtain the summing-In correction for the corresponding (by index number) 'literaturePeak'
     [[733,1037.84],[411,1360]], // for 1771.35 keV
     [[977,1037.84],[655,1360]], // for 2015.18 keV
     [[996,1037.84],[674,1360],[263,1771]], // for 2034.76 keV
