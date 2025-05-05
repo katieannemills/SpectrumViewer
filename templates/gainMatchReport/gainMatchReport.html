@@ -528,14 +528,22 @@
                thisPlotName = thisPlotName.slice(0,10);
             }
 
-            if(Array.isArray(dataStore.fitResults[spectrum][0]))
+            if(Array.isArray(dataStore.fitResults[spectrum][0])){
+              if(typeof(dataStore.fitResults[spectrum][0][1])!="undefined")
                 document.getElementById(this.wrapID + thisPlotName + 'chan1').innerHTML = dataStore.fitResults[spectrum][0][1].toFixed(3);
-            if(Array.isArray(dataStore.fitResults[spectrum][1]))
+              }
+            if(Array.isArray(dataStore.fitResults[spectrum][1])){
+              if(typeof(dataStore.fitResults[spectrum][1][1])!="undefined")
                 document.getElementById(this.wrapID + thisPlotName + 'chan2').innerHTML = dataStore.fitResults[spectrum][1][1].toFixed(3);
-            if(Array.isArray(dataStore.fitResults[spectrum][2]))
+              }
+            if(Array.isArray(dataStore.fitResults[spectrum][2])){
+              if(typeof(dataStore.fitResults[spectrum][2][1])!="undefined")
                 document.getElementById(this.wrapID + thisPlotName + 'chan3').innerHTML = dataStore.fitResults[spectrum][2][1].toFixed(3);
-            if(Array.isArray(dataStore.fitResults[spectrum][3]))
+              }
+            if(Array.isArray(dataStore.fitResults[spectrum][3])){
+              if(typeof(dataStore.fitResults[spectrum][3][1])!="undefined")
                 document.getElementById(this.wrapID + thisPlotName + 'chan4').innerHTML = dataStore.fitResults[spectrum][3][1].toFixed(3);
+              }
 
                 if(Array.isArray(dataStore.fitResults[spectrum][0]) && Array.isArray(dataStore.fitResults[spectrum][1]) && Array.isArray(dataStore.fitResults[spectrum][2])){
 
