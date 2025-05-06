@@ -111,7 +111,8 @@ function setupDataStore(){
   dataStore.sourceType = '';                                          // Source type that has been selected
   dataStore.sourceInfo = {                                            // Source information and settings
     'HPGe': [
-      {"name":  "Co-60", "title":  "60Co", "lowEnergy":  74.97, "midEnergy": 1173.23, "highEnergy": 1332.49, "vhiEnergy": 2614.52, "energies": [74.97,1173.23,1332.49,2614.52], "maxXValue":2650 },
+      {"name":  "Co-60L", "title":  "60Co Low rate", "lowEnergy":  74.97, "midEnergy": 1173.23, "highEnergy": 1332.49, "vhiEnergy": 2614.52, "energies": [74.97,1173.23,1332.49,2614.52], "maxXValue":2650 },
+      {"name":  "Co-60H", "title":  "60Co Hi rate", "lowEnergy":  74.97, "midEnergy": 1173.23, "highEnergy": 1332.49, "vhiEnergy": 2505.72, "energies": [74.97,1173.23,1332.49,2505.72], "maxXValue":2800 },
       {"name":  "Co-56L", "title":  "56Co Low En", "lowEnergy": 122.06, "midEnergy":  846.77, "highEnergy": 1238.29, "vhiEnergy": 2598.50, "energies": [122.06,846.77,1238.29,2598.50], "maxXValue":2650 },
       {"name":  "Co-56H", "title":  "56Co Hi En", "lowEnergy": 122.06, "midEnergy":  846.77, "highEnergy": 2598.50, "vhiEnergy": 3253.40, "energies": [122.06,846.77,2598.50,3253.40], "maxXValue":3800 },
       {"name": "Ba-133", "title": "133Ba", "lowEnergy":  81.00, "midEnergy":  356.01, "highEnergy": 1460.85, "vhiEnergy": 2614.52, "energies": [81.00,356.01,1460.85,2614.52], "maxXValue":2650 },
