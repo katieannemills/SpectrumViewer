@@ -32,6 +32,7 @@ function fastTimingWalkCurvesReport(wrapID,wrapID2,wrapID3){
   this.textFileSeparator = [" ",",","\t",":","|"];
   this.textFileSeparatorNames = ["space","comma","tab","colon","pipe"];
   this.textFileSeparatorIndex = 0;
+  this.selectTitles = ["TAC01_LBL01-00","TAC00_LBL00-01","TAC00_LBL00-02","TAC00_LBL00-03","TAC00_LBL00-04","TAC00_LBL00-05","TAC00_LBL00-06","TAC00_LBL00-07"];
 
   this.setup = function(){
 
@@ -85,8 +86,8 @@ function fastTimingWalkCurvesReport(wrapID,wrapID2,wrapID3){
 
     // Add the list of detectors as the options
     thisSelect = document.getElementById('tableMenuSelect');
-    for(var j=0; j<dataStore.THESEdetectors.length; j++){
-      thisSelect.add( new Option(dataStore.THESEdetectors[j], j) );
+    for(var j=0; j<this.selectTitles.length; j++){
+      thisSelect.add( new Option(this.selectTitles[j], j) );
     }
 
     // Create the previous Detector button
@@ -145,7 +146,8 @@ this.updateTable = function(){
     document.getElementById(row.id + 'Cell' + 2).innerHTML = dataStore.ComptonWalkCurves[key].yUncSeries[j];
   }
 
-
+ // Trigger the first plot
+this.refreshDetectorPlotData(0);
 };
 
 this.updateFitTable = function(){

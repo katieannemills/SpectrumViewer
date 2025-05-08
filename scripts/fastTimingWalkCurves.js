@@ -123,9 +123,8 @@ function setupDataStore(){
   dataStore.peakFitterScriptTemplate = {
     '60Co' : {'spectrumList1d' : [], 'spectrumList1dPeaks' : { 'All':[] }, 'histogramFileNames' : [],
     'spectrumList2d' : [
-      'TAC_00_CompWalk','TAC_01_CompWalk','TAC_02_CompWalk','TAC_03_CompWalk','TAC_04_CompWalk','TAC_05_CompWalk','TAC_06_CompWalk','TAC_07_CompWalk'
+      'TAC01_LBL01-00_CompWalk','TAC00_LBL00-01_CompWalk','TAC00_LBL00-02_CompWalk','TAC00_LBL00-03_CompWalk','TAC00_LBL00-04_CompWalk','TAC00_LBL00-05_CompWalk','TAC00_LBL00-06_CompWalk','TAC00_LBL00-07_CompWalk'
     ], 'spectrumListGates' : [
-      ["x",  2, 25],
       ["x", 25, 50],
       ["x", 50, 75],
       ["x", 75,100],
@@ -675,7 +674,7 @@ dataStore.YAxisMaxValue = [[0,0],[0,0]];
         // y series error bars are the standard deviation of the Center-Of-Mass centroid, which is the width stored in fitResults
 
         var walkCurveData = {};
-        var binIndexes = [2,25,50,75,100,125,150,175,200,225,250,275,300,325,350,375,400,500,600,700,800,900,1143];
+        var binIndexes = [25,50,75,100,125,150,175,200,225,250,275,300,325,350,375,400,500,600,700,800,900,1143];
 
         // The dataStore.spectrumListProjections array is a list of all projection histograms
         // Loop through this, extract the TAC number and gate limits from the histogram name
@@ -683,7 +682,12 @@ dataStore.YAxisMaxValue = [[0,0],[0,0]];
         // In this first pass we will save the COM centroid - then we will turn it into the difference from the full-energy peak later
         for(var i=0; i<dataStore.spectrumListProjections.length; i++){
           // TAC_00
-          var thisTAC = parseInt(dataStore.spectrumListProjections[i].split("_")[1]);
+          var thisTAC = -1;
+          if(dataStore.spectrumListProjections[i].includes("TAC01")){
+            thisTAC = 0;
+          }else if(dataStore.spectrumListProjections[i].includes("LBL00")){
+            thisTAC = parseInt(dataStore.spectrumListProjections[i].split("-")[1].split("_")[0]);
+          }
           if(!walkCurveData["TAC"+thisTAC]){
             // Create the object for this TAC
             walkCurveData["TAC"+thisTAC] = {
@@ -696,8 +700,8 @@ dataStore.YAxisMaxValue = [[0,0],[0,0]];
             };
           }
           // Determine the index and bin
-          var thisIndex = binIndexes.indexOf(parseInt(dataStore.spectrumListProjections[i].split("-")[1]));
-          var thisBin = (parseInt(dataStore.spectrumListProjections[i].split("-")[2]) - parseInt(dataStore.spectrumListProjections[i].split("-")[1]))/2 + parseInt(dataStore.spectrumListProjections[i].split("-")[1]);
+          var thisIndex = binIndexes.indexOf(parseInt(dataStore.spectrumListProjections[i].split("-")[2]));
+          var thisBin = (parseInt(dataStore.spectrumListProjections[i].split("-")[3]) - parseInt(dataStore.spectrumListProjections[i].split("-")[2]))/2 + parseInt(dataStore.spectrumListProjections[i].split("-")[2]);
 
           // Get the results
           var thisYvalue = dataStore.fitResults[dataStore.spectrumListProjections[i]][0][1];
