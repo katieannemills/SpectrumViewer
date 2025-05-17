@@ -100,7 +100,6 @@ function plotControl2d(wrapID){
     //<event>: event; requestPlot custom event
     //this: plotControl2d object
     var i, evt;
-
     // Any requests for 1d objects must be rejected here, they are handled elsewhere
     if(!dataStore.twoDimensionalSpectra.includes(event.detail.plotName)){
       // The plot requested is a 1d spectrum but this viewer can only handle 2d
@@ -126,7 +125,6 @@ function plotControl2d(wrapID){
       dataStore.activeMatrix = event.detail.plotName;
       this.activeSpectra = [event.detail.plotName];
       dataStore.hm.plotTitle = event.detail.plotName;
-
       //demand refresh to fetch the spectrum data from the server
       this.refreshData()
     }else{
@@ -432,11 +430,12 @@ function fetchCallback(){
 
   // unpack the raw 2d spectrum to the required format
   //dataStore.hm.raw = packZ(dataStore.rawData[dataStore.activeMatrix].data2);
-  dataStore.hm.raw = packZcompressed(dataStore.rawData[dataStore.activeMatrix].data2,dataStore.activeMatrixXaxisLength,dataStore.activeMatrixYaxisLength,dataStore.activeMatrixZaxisMax,dataStore.activeMatrixSymmetrized,true);
-
+  bincounts = packZcompressed(dataStore.rawData[dataStore.activeMatrix].data2,dataStore.activeMatrixXaxisLength,dataStore.activeMatrixYaxisLength,dataStore.activeMatrixZaxisMax,dataStore.activeMatrixSymmetrized,true);
+  dataStore.hm.raw = bincounts
   // make the 2d heatmap plot of this histogram
   dataStore.hm._oldraw = null; //force complete redraw
   dataStore.hm.drawData();
+  dataStore.phm.draw(bincounts);
 
   // Create total projections for the two axes of the active matrix
   dispatcher({ 'gateAxis': 'x', 'gateMin': undefined, 'gateMax': undefined, 'plotNow': false }, 'requestGate');
