@@ -125,6 +125,7 @@ function plotControl2d(wrapID){
       dataStore.activeMatrix = event.detail.plotName;
       this.activeSpectra = [event.detail.plotName];
       dataStore.hm.plotTitle = event.detail.plotName;
+      dataStore.phm.title = event.detail.plotName;
       //demand refresh to fetch the spectrum data from the server
       this.refreshData()
     }else{
@@ -512,17 +513,17 @@ function moveCutVertex(){
 
 function saveCutToODB(){
   // take the current cut vertices and save them to the ODB
-  var xVals=[], yVals=[],
-  i;
+//   var xVals=[], yVals=[],
+//   i;
 
-  for(i=0; i<dataStore.cutVertices.length; i++){
-    xVals.push(dataStore.cutVertices[i][0]);
-    yVals.push(dataStore.cutVertices[i][1]);
-  }
+//   for(i=0; i<dataStore.cutVertices.length; i++){
+//     xVals.push(dataStore.cutVertices[i][0]);
+//     yVals.push(dataStore.cutVertices[i][1]);
+//   }
 
   CRUDarrays(
     ['/DAQ/analyzerGates/x', '/DAQ/analyzerGates/y'],
-    [xVals, yVals],
+    [dataStore.phm.polyX, dataStore.phm.polyY],
     [7,7]
   )
 }

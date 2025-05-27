@@ -90,11 +90,14 @@
   </div>
   <div id='plotRegion' class='sectionWrapper item'>
     <div id='plotWrap2D' class='col-md-6 col-md-offset-1 plotRegion'>
-      <div id='heatmapTarget' class='well no-pad'>
+      <div id="hist2d" style="width:600px;height:600px;">
         <div id='intro-plot-picker' class="alert alert-warning" role="alert">
-          <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
-          Choose a plot from the menu at the top to get started.
-        </div>
+            <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
+            Choose a plot from the menu at the top to get started.
+          </div>
+      </div>
+      <div id='heatmapTarget' class='well no-pad'>
+
       </div>
     </div>
     <div id='plotWrap1D' class='col-md-9 plotRegion' style='display: none'>
@@ -139,8 +142,6 @@
       </div>
     </div>
   </div>
-
-  <div id="hist2d" style="width:600px;height:500px;"></div>
 
   <!-- Extra control features and fitting results table -->
   <div id='auxCtrlWrap' class='sectionWrapper' style='display: none'>
@@ -253,11 +254,12 @@
         newSelect.id = 'colorPaletteSelect';
         newSelect.name = 'colorPaletteSelect';
         newSelect.onchange = function(){
-          dataStore.hm.colorscale = this.value;
-          if(dataStore.hm._raw != null){
-          // trigger a redraw with the new colorScale
-          dataStore.hm.zoom(dataStore.hm.xmin,dataStore.hm.ymin,dataStore.hm.xmax,dataStore.hm.ymax);
-          }
+          dataStore.phm.colorscale = this.value;
+          dataStore.phm.draw(dataStore.phm.lastZ)
+        //   if(dataStore.hm._raw != null){
+        //   // trigger a redraw with the new colorScale
+        //   dataStore.hm.zoom(dataStore.hm.xmin,dataStore.hm.ymin,dataStore.hm.xmax,dataStore.hm.ymax);
+        //   }
         }.bind(newSelect);
         document.getElementById('colorPaletteSelectDiv').appendChild(newSelect);
 
