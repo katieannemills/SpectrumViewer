@@ -100,8 +100,10 @@ function plotly_hm(div){
                         }
                     );
                     li.getElementsByClassName('delete-vertex')[0].onclick = this.removeVertex.bind(li, this);
-                    li.getElementsByClassName('move-vertex-up')[0].onclick = this.moveVertex.bind(li, 'up', this);
-                    li.getElementsByClassName('move-vertex-down')[0].onclick = this.moveVertex.bind(li, 'down', this);
+                    li.getElementsByClassName('move-vertex-up')[0].onclick = this.reorderVertex.bind(li, 'up', this);
+                    li.getElementsByClassName('move-vertex-down')[0].onclick = this.reorderVertex.bind(li, 'down', this);
+                    li.getElementsByClassName('vertex-x')[0].onchange = this.moveVertex.bind(li, this);
+                    li.getElementsByClassName('vertex-y')[0].onchange = this.moveVertex.bind(li, this);
                     document.getElementById('cutPolyVertices').appendChild(li);
 
                     this.draw(this.lastZ);
@@ -119,7 +121,7 @@ function plotly_hm(div){
         plotly_heatmap_object.extractCutVertices();
     }
       
-    this.moveVertex = function(direction, plotly_heatmap_object){
+    this.reorderVertex = function(direction, plotly_heatmap_object){
         // move vertex one step in <direction>== 'up' or 'down'
         // this == li node containing this vertex
       
@@ -129,6 +131,12 @@ function plotly_hm(div){
           this.parentElement.insertBefore(this.nextSibling, this)
         }
       
+        plotly_heatmap_object.extractCutVertices();
+    }
+
+    this.moveVertex = function(plotly_heatmap_object){
+        // onchange callback for changing the coordinates of a cut vertex
+
         plotly_heatmap_object.extractCutVertices();
     }
 
