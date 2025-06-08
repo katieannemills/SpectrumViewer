@@ -32,13 +32,19 @@ function plotly_hm(div){
     });
 
     this.draw = (z) => {
-        const zZeroMask = z.map(row => row.map(val => val <= 1 ? 1 : null));
+        const z_sparse = z.map(row => row.map(val => val > 1 ? val : null));
+
+        // thinking about downsampling - return to this later
+        //downsample_factor = chooseDownsample(z);
+        //downsampled_z = downsample2D(z, downsample_factor);
+        //sparse_downsampled_z = downsampled_z.map(row => row.map(val => val > 1 ? val : null));
 
         this.lastZ = z
-
         const data = {
-            z: z,
+            z: z_sparse,
             type: 'heatmap',
+            zmin: 0,
+            zmax: 300,
             colorscale: {
                 'turbo': this.turboCS,
                 'viridis': this.viridisCS
@@ -46,15 +52,6 @@ function plotly_hm(div){
             hoverongaps: false,
             hoverinfo: 'x+y+z',
         };
-
-        const traceZero = {
-            z: zZeroMask,
-            type: 'heatmap',
-            colorscale: [[0, 'white'], [1, 'white']],
-            showscale: false,
-            hoverinfo: 'skip',
-            opacity: 1.0  // fully opaque to cover the main plot
-          };
 
         const layout = {
             title: this.title,
@@ -80,7 +77,7 @@ function plotly_hm(div){
             showlegend: false
         };
 
-        Plotly.newPlot(this.div, [data, traceZero, polygon], layout).then(() => {
+        Plotly.newPlot(this.div, [data, polygon], layout).then(() => {
                 document.getElementById(this.div).on('plotly_click', (event) => {
                     if (!this.shiftDown) return;
 
@@ -149,4 +146,37 @@ function plotly_hm(div){
 
         this.draw(this.lastZ);
     };
+}
+
+function downsample2D(matrix, factor = 2) {
+    // needs to deal with imperfect division
+    const out = [];
+    for (let i = 0; i < matrix.length; i += factor) {
+      const row = [];
+      for (let j = 0; j < matrix[0].length; j += factor) {
+        let sum = 0;
+        for (let di = 0; di < factor; di++) {
+          for (let dj = 0; dj < factor; dj++) {
+            const val = matrix[i + di]?.[j + dj];
+            if (val != null) {
+              sum += val;
+            }
+          }
+        }
+        row.push(sum);
+      }
+      out.push(row);
+    }
+    return out;
+}
+
+function chooseDownsample(matrix){
+    // choose a downsample factor based on the size of the matrix
+    downsample = 2
+    const size = matrix.length * matrix[0].length;
+    while (size > 512*512 && downsample < 8) {
+        downsample *= 2;
+    }
+    console.log(downsample)
+    return downsample;
 }

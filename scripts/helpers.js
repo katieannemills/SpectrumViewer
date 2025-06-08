@@ -1458,7 +1458,6 @@ function projectAllMatrices(projectionsList){
       // Set the details for this matrix needed by the projectXaxis function
       var thisKey = matrixKeys[i].matrixName;
       dataStore.activeMatrix = thisKey;
-      dataStore.hm._raw = dataStore.matrix[thisKey].data;
 
       // Set limits for the projections in this matrix
       var gateMin = matrixKeys[i].gateDetails[1];
