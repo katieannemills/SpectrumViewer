@@ -1458,7 +1458,6 @@ function projectAllMatrices(projectionsList){
       // Set the details for this matrix needed by the projectXaxis function
       var thisKey = matrixKeys[i].matrixName;
       dataStore.activeMatrix = thisKey;
-      dataStore.hm._raw = dataStore.matrix[thisKey].data;
 
       // Set limits for the projections in this matrix
       var gateMin = matrixKeys[i].gateDetails[1];
@@ -2027,7 +2026,7 @@ function projectXaxis(gateMin,gateMax,type,parentPlotname){
   // If no limits for the gate/projection are provided then make a total projection
   if(gateMin == undefined || gateMin<1) gateMin = 0;
   if(gateMax == undefined){
-    gateMax = dataStore.hm._raw.length-1;
+    gateMax = dataStore.phm.rawz.length-1;
     // Set name for total projection
     thisProjectionName = dataStore.activeMatrix+'x';
   }else{
@@ -2038,13 +2037,13 @@ function projectXaxis(gateMin,gateMax,type,parentPlotname){
   var gateLength = gateMax-gateMin;
   var thisProjection = [];
   let filledArray = new Array(1023).fillN(0); // May need to be .fillN()
-  for(let i=0; i<dataStore.hm._raw[0].length; i++){
+  for(let i=0; i<dataStore.phm.rawz[0].length; i++){
     thisProjection[i] = 0;
   }
 
   // build the projection from the sum of the arrays between the gate min and max values.
   for(let i=gateMin; i<=gateMax; i++){
-    thisRow = dataStore.hm._raw[i];
+    thisRow = dataStore.phm.rawz[i];
     thisProjection = thisProjection.map(function (num, index) {
       return num + thisRow[index];
     });
@@ -2077,7 +2076,7 @@ function projectYaxis(gateMin,gateMax,type,parentPlotname){
   // If no limits for the gate/projection are provided then make a total projection
   if(gateMin == undefined || gateMin<1) gateMin = 0;
   if(gateMax == undefined){
-    gateMax = dataStore.hm._raw[0].length-1;
+    gateMax = dataStore.phm.rawz[0].length-1;
     // Set name for total projection
     thisProjectionName = dataStore.activeMatrix+'y';
   }else{
@@ -2087,13 +2086,13 @@ function projectYaxis(gateMin,gateMax,type,parentPlotname){
 
   var gateLength = gateMax-gateMin;
   var thisProjection = [];
-  for(let i=0; i<dataStore.hm._raw.length; i++){
+  for(let i=0; i<dataStore.phm.rawz.length; i++){
     thisProjection[i] = 0;
   }
 
   // build the projection from the sum of the elements between the gate min and max values of all arrays.
-  for(let i=0; i<dataStore.hm._raw.length; i++){
-    thisProjection[i] = dataStore.hm._raw[i].slice(gateMin,gateMax).reduce((a, b) => a + b, 0);
+  for(let i=0; i<dataStore.phm.rawz.length; i++){
+    thisProjection[i] = dataStore.phm.rawz[i].slice(gateMin,gateMax).reduce((a, b) => a + b, 0);
   }
 
   // Ensure there are no NaN entries
@@ -2156,30 +2155,6 @@ function packZcompressed(raw2,XaxisLength,YaxisLength,Zmax,symmeterize,generateC
   repack2 = new Array(nRows);
   for (let i = 0; i < repack2.length; i++) {
     repack2[i] = new Array(rowLength).fill(0); // Creating an array of size rowLength and filled of 0
-  }
-
-  // Create a full color map for this matrix. Building this now saves the time of accessing all elements again later.
-  // First check if a color map exists for this matrix. If so, zero it. If not, create it.
-  if(generateColorMap){
-    try{ objectIndex = dataStore.hm.colorMap.map(e => e.matrix).indexOf(dataStore.activeMatrix);
-      //  console.log('A colorMap exists for this matrix.');
-    }
-    catch(err){ console.log('No colorMap for this matrix.'); objectIndex=-1; }
-
-    if(objectIndex<0){
-      // A colorMap for this matrix does not exist, so we need to create space for it
-      let name = dataStore.activeMatrix;
-      newMatrix = {
-        "matrix" : dataStore.activeMatrix,
-        "data" : []
-      }
-      if(dataStore.hm.colorMap == undefined){ dataStore.hm.colorMap = []; }
-      dataStore.hm.colorMap.push(newMatrix);
-      objectIndex = dataStore.hm.colorMap.map(e => e.matrix).indexOf(dataStore.activeMatrix);
-    }else{
-      //  console.log('zero the color map and build it for this zoomed region');
-      dataStore.hm.colorMap[objectIndex].data = [];
-    }
   }
 
   subMatrixIndexValue=-1;
@@ -2248,10 +2223,6 @@ function packZcompressed(raw2,XaxisLength,YaxisLength,Zmax,symmeterize,generateC
             repack2[thisYindex][thisXindex] = thisValue;
             if(symmeterize){ repack2[thisXindex][thisYindex] = thisValue; }
             if(thisValue>matrixMaxValue){ matrixMaxValue = thisValue; } // Update the max Z value
-            if(generateColorMap){
-              dataStore.hm.addPointToColorMap(objectIndex,thisYindex,thisXindex,thisValue); // Add this point to the color Map
-              if(symmeterize){ dataStore.hm.addPointToColorMap(objectIndex,thisXindex,thisYindex,thisValue); }
-            }
             thisIndex += thisArrayValueSize;
           }
         }
@@ -2305,11 +2276,6 @@ function packZcompressed(raw2,XaxisLength,YaxisLength,Zmax,symmeterize,generateC
             repack2[thisYindex][thisXindex] = thisValue;
             if(symmeterize){ repack2[thisXindex][thisYindex] = thisValue; }
             if(thisValue>matrixMaxValue){ matrixMaxValue = thisValue; } // Update the max Z value
-            if(generateColorMap){
-              dataStore.hm.addPointToColorMap(objectIndex,thisYindex,thisXindex,thisValue); // Add this point to the color Map
-              if(symmeterize){ dataStore.hm.addPointToColorMap(objectIndex,thisXindex,thisYindex,thisValue);
-              }
-            }
           }
         }
         break;
@@ -2392,15 +2358,6 @@ for(i=0; i<rowLength-1; i++){
 repack2[0][i] = 0;
 }
 */
-
-if(generateColorMap){
-  // set the zmax value for this matrix
-  dataStore.hm.zminfull = 0;
-  dataStore.hm.zmaxfull = matrixMaxValue;
-
-  // save this colorMap to the colorMapFull for subsequent fast redraws
-  dataStore.hm.colorMap[objectIndex].fulldata = dataStore.hm.colorMap[objectIndex].data;
-}
 
 // return the correctly formatted data
 return repack2;

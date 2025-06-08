@@ -2,7 +2,6 @@
 <head>
   <!--libraries-->
   <script src='scripts/HTMLImports.min.js' type="text/javascript"></script>
-  <script type='text/javascript' src='scripts/heatmap.js'></script>
   <script type='text/javascript' src='scripts/plotly-heatmap.js'></script>
   <script src="scripts/jquery1-11-3.min.js" type="text/javascript"></script>
   <script src="scripts/bootstrap3-3-5.min.js" type="text/javascript"></script>
@@ -96,9 +95,6 @@
             Choose a plot from the menu at the top to get started.
           </div>
       </div>
-      <div id='heatmapTarget' class='well no-pad'>
-
-      </div>
     </div>
     <div id='plotWrap1D' class='col-md-9 plotRegion' style='display: none'>
       <div id='plottingGrid'></div>
@@ -185,23 +181,7 @@
     // document.getElementById(dataStore.backendHost).onclick();
 
     //empty plot
-    dim = Math.min(document.getElementById('heatmapTarget').offsetWidth, window.innerHeight)
-    dataStore.hm = new heatmap(dim,dim);
     dataStore.phm = new plotly_hm('hist2d');
-    document.getElementById('heatmapTarget').appendChild(dataStore.hm.canvas);
-    dataStore.hm.preRender = generateOverlay;
-    dataStore.hm.slowDataWarning = function(state){
-      if(state === 'on')
-      document.getElementById('info-slow-data').classList.remove('hidden');
-      else
-      document.getElementById('info-slow-data').classList.add('hidden');
-    };
-    dataStore.hm.DataDownloading = function(state){
-      if(state === 'on')
-      document.getElementById('info-downloading').classList.remove('hidden');
-      else
-      document.getElementById('info-downloading').classList.add('hidden');
-    };
 
     // 1D viewer setup
     dataStore._plotGrid = new plotGrid('plottingGrid');
@@ -256,16 +236,12 @@
         newSelect.onchange = function(){
           dataStore.phm.colorscale = this.value;
           dataStore.phm.draw(dataStore.phm.lastZ)
-        //   if(dataStore.hm._raw != null){
-        //   // trigger a redraw with the new colorScale
-        //   dataStore.hm.zoom(dataStore.hm.xmin,dataStore.hm.ymin,dataStore.hm.xmax,dataStore.hm.ymax);
-        //   }
         }.bind(newSelect);
         document.getElementById('colorPaletteSelectDiv').appendChild(newSelect);
 
         // Add the list of colorScales available as the options
         thisSelect = document.getElementById('colorPaletteSelect');
-        var keys = Object.keys(dataStore.hm.colorscales)
+        var keys = ['turbo', 'viridis']
         for(i=0; i<keys.length; i++){
     	    thisSelect.add( new Option(keys[i], keys[i]) );
         }

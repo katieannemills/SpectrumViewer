@@ -124,7 +124,6 @@ function plotControl2d(wrapID){
       dataStore.activeSpectra = event.detail.plotName;
       dataStore.activeMatrix = event.detail.plotName;
       this.activeSpectra = [event.detail.plotName];
-      dataStore.hm.plotTitle = event.detail.plotName;
       dataStore.phm.title = event.detail.plotName;
       //demand refresh to fetch the spectrum data from the server
       this.refreshData()
@@ -137,9 +136,6 @@ function plotControl2d(wrapID){
   this.refreshData = function(){
     //refresh the current histogram data, then call fetchCallback()
     //this: plotControl2d object
-
-    // Display info to user that the data is downloading (switched off in fetchCallback)
-    dataStore.hm.DataDownloading('on');
 
     // activeSpectra can now include 1D Projections of 2D matrices which are created locally in the server.
     // So these need to be stripped from the requests that go to the server for updates.
@@ -337,47 +333,6 @@ function toggleGatingMode(){
   document.getElementById('modeBtnGate').classList.add('btn-success');
 }
 
-
-function heatmapClick(evt){
-  // do something when the plot is clicked
-
-  var data = evt.detail,
-  li = document.createElement('li'),
-  i;
-
-  // abort if this point already added to list
-  // mitigates funky multiple-fires of heatmap_click when updating
-  for(i=0; i<dataStore.cutVertices.length; i++){
-    if(dataStore.cutVertices[i][0] == data.cell.x && dataStore.cutVertices[i][1] == data.cell.y)
-    return 0;
-  }
-
-  // don't need plot click help anymore
-  document.getElementById('intro-shift-click').classList.add('hidden');
-
-  // expand UI
-  li.innerHTML = Mustache.to_html(
-    dataStore.templates.cutVertex,
-    {
-      'initialX': data.cell.x,
-      'initialY': data.cell.y
-    }
-  );
-  // point the delete vertex button at the right place
-  li.getElementsByClassName('delete-vertex')[0].onclick = removeCutVertex;
-  // point the move vertex buttons at the right place
-  li.getElementsByClassName('move-vertex-up')[0].onclick = moveVertex.bind(li, 'up');
-  li.getElementsByClassName('move-vertex-down')[0].onclick = moveVertex.bind(li, 'down');
-
-  document.getElementById('cutPolyVertices').appendChild(li);
-
-  //update dataStore
-  extractCutVertices();
-
-  //update plot overlay
-  dataStore.hm.render();
-}
-
 function extractCutVertices(){
   // read the cut vertices from the UI and pack them in dataStore.cutVertices as [[x0,y0], [x1,y1],...]
 
@@ -410,32 +365,9 @@ function fetchCallback(){
   }
   if(numOf2dActive == 0 && dataStore.activeMatrix.length<1){ return; }
 
-  // clear a previous color map if necessary
-  try{ objectIndex = this.colorMap.map(e => e.matrix).indexOf(dataStore.activeMatrix);
-    dataStore.hm.colorMap[objectIndex].data = [];
-    //console.log('In FetchCallback, Clear the colorMap');
-  }
-  catch(err){
-    //console.log('In FetchCallback, No colorMap to clear')
-  }
-
-  // set the axis lengths for this histograms
-  dataStore.hm.xmin = 0;
-  dataStore.hm.ymin = 0;
-  dataStore.hm.xmax = dataStore.activeMatrixXaxisLength;
-  dataStore.hm.ymax = dataStore.activeMatrixYaxisLength;
-  dataStore.hm.zmin = 0;
-  dataStore.hm.zmax = dataStore.activeMatrixZaxisMax;
-  dataStore.hm.zminfull = 0;
-  dataStore.hm.zmaxfull = dataStore.activeMatrixZaxisMax;
-
   // unpack the raw 2d spectrum to the required format
-  //dataStore.hm.raw = packZ(dataStore.rawData[dataStore.activeMatrix].data2);
   bincounts = packZcompressed(dataStore.rawData[dataStore.activeMatrix].data2,dataStore.activeMatrixXaxisLength,dataStore.activeMatrixYaxisLength,dataStore.activeMatrixZaxisMax,dataStore.activeMatrixSymmetrized,true);
-  dataStore.hm.raw = bincounts
   // make the 2d heatmap plot of this histogram
-  dataStore.hm._oldraw = null; //force complete redraw
-  dataStore.hm.drawData();
   dataStore.phm.draw(bincounts);
 
   // Create total projections for the two axes of the active matrix
@@ -457,58 +389,6 @@ function fetchCallback(){
     document.getElementById('showXproj').disabled = false;
     document.getElementById('showYproj').disabled = false;
   }
-
-  // plug in the onclicks to the 2d heatmap
-  dataStore.hm.canvas.addEventListener('heatmap_shiftclick', heatmapClick, false);
-
-}
-
-function generateOverlay(){
-  // generate the gate polygon overlay
-
-  var i, coords, update = {};
-
-  dataStore.hm.ctx[1].clearRect(0,0,dataStore.hm.width, dataStore.hm.height);
-  if(dataStore.cutVertices.length > 1){
-    // line style
-    dataStore.hm.ctx[1].strokeStyle = '#FFFFFF';
-    dataStore.hm.ctx[1].lineWidth = 2;
-    // don't draw outside of data area
-    dataStore.hm.ctx[1].clip(dataStore.hm.dataArea);
-
-    coords = dataStore.hm.cell2coords(dataStore.cutVertices[0][0], dataStore.cutVertices[0][1]);
-    dataStore.hm.ctx[1].beginPath();
-    dataStore.hm.ctx[1].moveTo(coords.x, coords.y);
-    for(i=1;i<dataStore.cutVertices.length; i++){
-      coords = dataStore.hm.cell2coords(dataStore.cutVertices[i][0], dataStore.cutVertices[i][1]);
-      dataStore.hm.ctx[1].lineTo(coords.x, coords.y);
-    }
-    dataStore.hm.ctx[1].closePath();
-    dataStore.hm.ctx[1].stroke();
-    dataStore.hm.ctx[1].restore();
-  }
-}
-
-
-function removeCutVertex(){
-  // onclick callback for removing a cut vertex
-  // this == delete button
-
-  var parent = this.parentElement,
-  grandparent = parent.parentElement;
-
-  grandparent.removeChild(parent);
-
-  extractCutVertices();
-  dataStore.hm.render();
-}
-
-function moveCutVertex(){
-  // onchange callbakc for changing the coordinates of a cut vertex
-  // this == input:number element
-
-  extractCutVertices();
-  dataStore.hm.render();
 }
 
 function saveCutToODB(){
@@ -526,20 +406,6 @@ function saveCutToODB(){
     [dataStore.phm.polyX, dataStore.phm.polyY],
     [7,7]
   )
-}
-
-function moveVertex(direction){
-  // move vertex one step in <direction>== 'up' or 'down'
-  // this == li node containing this vertex
-
-  if(direction=='up'){
-    this.parentElement.insertBefore(this, this.previousSibling)
-  }else if(direction=='down'){
-    this.parentElement.insertBefore(this.nextSibling, this)
-  }
-
-  extractCutVertices();
-  dataStore.hm.render();
 }
 
 function addSingleSpectrumViewer(wrapper,label,state){
