@@ -32,6 +32,7 @@ function plotly_hm(div){
     });
 
     this.draw = (z) => {
+        this.rawz = z;
         const z_sparse = z.map(row => row.map(val => val > 1 ? val : null));
 
         // thinking about downsampling - return to this later
@@ -43,8 +44,6 @@ function plotly_hm(div){
         const data = {
             z: z_sparse,
             type: 'heatmap',
-            zmin: 0,
-            zmax: 300,
             colorscale: {
                 'turbo': this.turboCS,
                 'viridis': this.viridisCS
@@ -77,7 +76,9 @@ function plotly_hm(div){
             showlegend: false
         };
 
-        Plotly.newPlot(this.div, [data, polygon], layout).then(() => {
+        Plotly.react(this.div, [data, polygon], layout).then(() => {
+                // rebind events handlers on new plot
+
                 document.getElementById(this.div).on('plotly_click', (event) => {
                     if (!this.shiftDown) return;
 
@@ -105,6 +106,39 @@ function plotly_hm(div){
 
                     this.draw(this.lastZ);
                 });
+
+                // customize the zoom response - needs attention
+                // document.getElementById(this.div).on('plotly_relayout', (event) => {
+                //     if (!this.rawz) return;
+
+                //     let visibleZ;
+                  
+                //     if (event['xaxis.range[0]'] != null && event['xaxis.range[1]'] != null) {
+                //       // Zoomed-in case
+                //       const x0 = Math.floor(event['xaxis.range[0]']);
+                //       const x1 = Math.ceil(event['xaxis.range[1]']);
+                //       const y0 = Math.floor(event['yaxis.range[0]']);
+                //       const y1 = Math.ceil(event['yaxis.range[1]']);
+                  
+                //       visibleZ = this.rawz.slice(y0, y1).map(row => row.slice(x0, x1));
+                //     } else if (event['xaxis.autorange'] || event['yaxis.autorange']) {
+                //       // Zoom reset (double click)
+                //       visibleZ = this.rawz;
+                //     } else {
+                //       return;  // no relevant relayout info
+                //     }
+                  
+                //     const visibleVals = visibleZ.flat().filter(v => v != null && !isNaN(v));
+                //     const newZmin = Math.min(...visibleVals);
+                //     const newZmax = Math.max(...visibleVals);
+                  
+                //     Plotly.restyle(this.div, {
+                //       zmin: [newZmin],
+                //       zmax: [newZmax]
+                //     });
+
+                // });
+
                 this.eventsBound = true;
         });
     }
@@ -148,6 +182,7 @@ function plotly_hm(div){
     };
 }
 
+// hacked in helpers while I think about downsampling
 function downsample2D(matrix, factor = 2) {
     // needs to deal with imperfect division
     const out = [];
