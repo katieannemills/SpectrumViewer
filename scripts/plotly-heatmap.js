@@ -47,7 +47,8 @@ function plotly_hm(div){
                 size: 1 
             },
             mode: 'markers',
-            type: 'scattergl'
+            type: 'scattergl',
+            hoverinfo: 'skip'
           };
           
           for (let y = 0; y < z.length; y++) {
