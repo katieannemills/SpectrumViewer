@@ -33,24 +33,52 @@ function plotly_hm(div){
 
     this.draw = (z) => {
         this.rawz = z;
-        const z_sparse = z.map(row => row.map(val => val > 1 ? val : null));
+        //const z_sparse = z.map(row => row.map(val => val > 1 ? val : null));
+
+        const data = {
+            x: [], 
+            y: [], 
+            marker: { 
+                color: [], 
+                colorscale: {
+                    'turbo': this.turboCS,
+                    'viridis': this.viridisCS
+                }[this.colorscale],
+                size: 1 
+            },
+            mode: 'markers',
+            type: 'scattergl'
+          };
+          
+          for (let y = 0; y < z.length; y++) {
+            for (let x = 0; x < z[0].length; x++) {
+              const val = z[y][x];
+              if (val != null && val > 1) {
+                data.x.push(x);
+                data.y.push(y);
+                data.marker.color.push(val);
+              }
+            }
+          }
+
+          console.log(data.x.length)
 
         // thinking about downsampling - return to this later
         //downsample_factor = chooseDownsample(z);
         //downsampled_z = downsample2D(z, downsample_factor);
         //sparse_downsampled_z = downsampled_z.map(row => row.map(val => val > 1 ? val : null));
 
-        this.lastZ = z
-        const data = {
-            z: z_sparse,
-            type: 'heatmap',
-            colorscale: {
-                'turbo': this.turboCS,
-                'viridis': this.viridisCS
-            }[this.colorscale],
-            hoverongaps: false,
-            hoverinfo: 'x+y+z',
-        };
+        // this.lastZ = z
+        // const data = {
+        //     z: z_sparse,
+        //     type: 'heatmap',
+        //     colorscale: {
+        //         'turbo': this.turboCS,
+        //         'viridis': this.viridisCS
+        //     }[this.colorscale],
+        //     hoverongaps: false,
+        //     hoverinfo: 'x+y+z',
+        // };
 
         const layout = {
             title: this.title,
@@ -76,7 +104,7 @@ function plotly_hm(div){
             showlegend: false
         };
 
-        Plotly.react(this.div, [data, polygon], layout).then(() => {
+        Plotly.newPlot(this.div, [data, polygon], layout).then(() => {
                 // rebind events handlers on new plot
 
                 document.getElementById(this.div).on('plotly_click', (event) => {
